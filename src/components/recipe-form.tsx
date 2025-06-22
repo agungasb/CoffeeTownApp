@@ -1,0 +1,141 @@
+"use client";
+
+import { useForm, useFieldArray } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import type { Recipe } from '@/lib/recipes';
+import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { PlusCircle, Trash2 } from 'lucide-react';
+
+const recipeFormSchema = z.object({
+    id: z.string().optional(),
+    name: z.string().min(3, "Recipe name must be at least 3 characters."),
+    ingredients: z.array(z.object({
+        name: z.string().min(1, "Name is required."),
+        amount: z.coerce.number().positive("Amount must be positive."),
+        unit: z.string().min(1, "Unit is required."),
+    })).min(1, "A recipe must have at least one ingredient."),
+});
+
+type RecipeFormData = z.infer<typeof recipeFormSchema>;
+
+interface RecipeFormProps {
+    recipeToEdit?: Recipe | null;
+    onSubmit: (data: Recipe) => void;
+    onCancel: () => void;
+}
+
+export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps) {
+    const form = useForm<RecipeFormData>({
+        resolver: zodResolver(recipeFormSchema),
+        defaultValues: recipeToEdit ?? {
+            name: '',
+            ingredients: [{ name: '', amount: 1, unit: '' }],
+        },
+    });
+
+    const { fields, append, remove } = useFieldArray({
+        control: form.control,
+        name: "ingredients",
+    });
+
+    const handleSubmit = (data: RecipeFormData) => {
+        onSubmit(data as Recipe);
+    };
+
+    return (
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+                <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Recipe Name</FormLabel>
+                            <FormControl>
+                                <Input placeholder="e.g. Chocolate Chip Cookies" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <div>
+                    <h3 className="text-lg font-medium mb-2">Ingredients</h3>
+                    <ScrollArea className="h-64 border rounded-md p-4">
+                        <div className="space-y-4">
+                            {fields.map((field, index) => (
+                                <div key={field.id} className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-end p-2 border rounded-md">
+                                    <FormField
+                                        control={form.control}
+                                        name={`ingredients.${index}.name`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                {index === 0 && <FormLabel>Name</FormLabel>}
+                                                <FormControl>
+                                                    <Input placeholder="Flour" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name={`ingredients.${index}.amount`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                 {index === 0 && <FormLabel>Amount</FormLabel>}
+                                                <FormControl>
+                                                    <Input type="number" step="0.01" {...field} className="w-24"/>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name={`ingredients.${index}.unit`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                 {index === 0 && <FormLabel>Unit</FormLabel>}
+                                                <FormControl>
+                                                    <Input placeholder="grams" {...field} className="w-24" />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="destructive"
+                                        size="icon"
+                                        onClick={() => remove(index)}
+                                        disabled={fields.length <= 1}
+                                    >
+                                        <Trash2 />
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
+                    </ScrollArea>
+                     <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => append({ name: '', amount: 1, unit: '' })}
+                        className="mt-2"
+                    >
+                        <PlusCircle className="mr-2" /> Add Ingredient
+                    </Button>
+                </div>
+
+                <div className="flex justify-end gap-2">
+                    <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
+                    <Button type="submit">Save Recipe</Button>
+                </div>
+            </form>
+        </Form>
+    );
+}

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Label } from "@/components/ui/label";
-import { recipes } from "@/lib/recipes";
+import { type Recipe } from "@/lib/recipes";
 import { ScrollArea } from './ui/scroll-area';
 
 interface ScaledIngredient {
@@ -16,29 +16,32 @@ interface ScaledIngredient {
     unit: string;
 }
 
-const capitalize = (s: string) => s.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+interface RecipeScalerProps {
+    recipes: Recipe[];
+}
 
-export default function RecipeScaler() {
-    const [selectedRecipe, setSelectedRecipe] = useState<string>('');
+export default function RecipeScaler({ recipes }: RecipeScalerProps) {
+    const [selectedRecipeId, setSelectedRecipeId] = useState<string>('');
     const [multiplier, setMultiplier] = useState<number>(1);
     const [scaledIngredients, setScaledIngredients] = useState<ScaledIngredient[]>([]);
     const [recipeTitle, setRecipeTitle] = useState('');
 
     const handleScaleRecipe = () => {
-        if (!selectedRecipe || multiplier <= 0) {
-            // Potentially show a toast notification for error
+        if (!selectedRecipeId || multiplier <= 0) {
             return;
         }
 
-        const recipe = recipes[selectedRecipe];
-        const scaled = Object.entries(recipe).map(([ingredient, details]) => ({
-            name: capitalize(ingredient),
-            amount: (details.amount * multiplier).toFixed(2),
-            unit: details.unit,
+        const recipe = recipes.find(r => r.id === selectedRecipeId);
+        if (!recipe) return;
+        
+        const scaled = recipe.ingredients.map((ing) => ({
+            name: ing.name,
+            amount: (ing.amount * multiplier).toFixed(2),
+            unit: ing.unit,
         }));
         
         setScaledIngredients(scaled);
-        setRecipeTitle(capitalize(selectedRecipe));
+        setRecipeTitle(recipe.name);
     };
 
     return (
@@ -52,14 +55,14 @@ export default function RecipeScaler() {
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="recipes" className="text-base">Choose a recipe</Label>
-                            <Select onValueChange={setSelectedRecipe} value={selectedRecipe}>
+                            <Select onValueChange={setSelectedRecipeId} value={selectedRecipeId}>
                                 <SelectTrigger id="recipes">
                                     <SelectValue placeholder="Select a recipe" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {Object.keys(recipes).map(recipeKey => (
-                                        <SelectItem key={recipeKey} value={recipeKey}>
-                                            {capitalize(recipeKey)}
+                                    {recipes.map(recipe => (
+                                        <SelectItem key={recipe.id} value={recipe.id}>
+                                            {recipe.name}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>

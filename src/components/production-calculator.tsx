@@ -36,7 +36,7 @@ export default function ProductionCalculator() {
   useEffect(() => {
     const newResults = calculateProductionMetrics(watchedValues);
     setResults(newResults);
-  }, [watchedValues]);
+  }, [JSON.stringify(watchedValues)]);
 
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

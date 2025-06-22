@@ -65,8 +65,8 @@ export default function RecipeManager({ recipes, setRecipes }: RecipeManagerProp
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Recipe Name</TableHead>
-                                <TableHead>Ingredients Count</TableHead>
+                                <TableHead className="w-[40%]">Recipe Name</TableHead>
+                                <TableHead>Ingredients</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -74,7 +74,10 @@ export default function RecipeManager({ recipes, setRecipes }: RecipeManagerProp
                             {recipes.map((recipe) => (
                                 <TableRow key={recipe.id}>
                                     <TableCell className="font-medium">{recipe.name}</TableCell>
-                                    <TableCell>{recipe.ingredients.length}</TableCell>
+                                    <TableCell className="text-muted-foreground text-xs truncate max-w-sm">
+                                        {recipe.ingredients.slice(0, 4).map(ing => ing.name).join(', ')}
+                                        {recipe.ingredients.length > 4 ? ', ...' : ''}
+                                    </TableCell>
                                     <TableCell className="text-right space-x-2">
                                         <Button variant="ghost" size="icon" onClick={() => handleEditClick(recipe)}>
                                             <Edit className="h-4 w-4" />

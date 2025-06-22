@@ -59,6 +59,11 @@ export const recipes: Record<string, Record<string, { amount: number; unit: stri
         "gula_halus": {"amount": 2000, "unit": "grams"},
         "skm": {"amount": 1000, "unit": "grams"}
     },
+    "butter_donat": {
+        "margarin": {"amount": 6000, "unit": "grams"},
+        "gula_halus": {"amount": 3000, "unit": "grams"},
+        "skm": {"amount": 1000, "unit": "grams"}
+    },
     "cream_cheese": {
         "margarin": {"amount": 4000, "unit": "grams"},
         "gula_halus": {"amount": 2000, "unit": "grams"},

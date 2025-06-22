@@ -51,9 +51,9 @@ export default function RecipeManager({ recipes, setRecipes }: RecipeManagerProp
 
     return (
         <Card className="glassmorphic border-2 border-border/30 w-full max-w-6xl mx-auto">
-            <CardHeader className="flex-row items-center justify-between">
+            <CardHeader className="flex-col items-start sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <CardTitle className="font-headline text-3xl">Recipe Management</CardTitle>
+                    <CardTitle className="font-headline text-2xl md:text-3xl">Recipe Management</CardTitle>
                     <CardDescription>Add, edit, or delete your custom recipes.</CardDescription>
                 </div>
                  <Button onClick={handleAddClick}>
@@ -107,7 +107,7 @@ export default function RecipeManager({ recipes, setRecipes }: RecipeManagerProp
                     </Table>
                 </ScrollArea>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">
+                    <DialogContent className="md:max-w-[600px] max-h-[90vh] flex flex-col">
                         <DialogHeader>
                             <DialogTitle>{recipeToEdit ? 'Edit Recipe' : 'Add New Recipe'}</DialogTitle>
                         </DialogHeader>

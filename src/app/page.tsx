@@ -11,22 +11,22 @@ export default function Home() {
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
 
   return (
-    <div className="flex flex-col items-center min-h-screen p-4 md:p-8">
+    <div className="flex flex-col items-center min-h-screen p-4 sm:p-6 md:p-8">
       <header className="text-center mb-8">
-        <h1 className="font-headline text-5xl md:text-6xl font-bold text-primary-foreground" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+        <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl font-bold text-primary-foreground" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
           BakeWise
         </h1>
-        <p className="text-primary-foreground/90 italic mt-2" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
+        <p className="text-sm sm:text-base text-primary-foreground/90 italic mt-2" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
           Not What You Want, But Surely What You Need
         </p>
       </header>
 
       <main className="w-full max-w-7xl">
         <Tabs defaultValue="calculator" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 max-w-lg mx-auto h-12">
-            <TabsTrigger value="calculator" className="text-lg h-10">Production Calculator</TabsTrigger>
-            <TabsTrigger value="recipe" className="text-lg h-10">Recipe Scaler</TabsTrigger>
-            <TabsTrigger value="manager" className="text-lg h-10">Recipe Management</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 max-w-md sm:max-w-lg mx-auto">
+            <TabsTrigger value="calculator" className="text-sm sm:text-base px-1 sm:px-3">Production Calculator</TabsTrigger>
+            <TabsTrigger value="recipe" className="text-sm sm:text-base px-1 sm:px-3">Recipe Scaler</TabsTrigger>
+            <TabsTrigger value="manager" className="text-sm sm:text-base px-1 sm:px-3">Recipe Management</TabsTrigger>
           </TabsList>
           <TabsContent value="calculator">
             <ProductionCalculator />

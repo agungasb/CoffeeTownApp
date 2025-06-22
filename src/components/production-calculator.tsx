@@ -71,7 +71,7 @@ export default function ProductionCalculator() {
   return (
     <Card className="glassmorphic border-2 border-border/30">
       <CardHeader>
-        <CardTitle className="font-headline text-3xl">Production Quantities</CardTitle>
+        <CardTitle className="font-headline text-2xl md:text-3xl">Production Quantities</CardTitle>
         <CardDescription>Enter product quantities or upload an image to auto-fill.</CardDescription>
       </CardHeader>
       <CardContent>
@@ -92,7 +92,7 @@ export default function ProductionCalculator() {
             </div>
             <Form {...form}>
               <form>
-                <ScrollArea className="h-[50vh] pr-4">
+                <ScrollArea className="h-[45vh] md:h-[50vh] pr-4">
                   <div className="space-y-4">
                     {productItems.map((item) => (
                       <FormField
@@ -102,7 +102,7 @@ export default function ProductionCalculator() {
                         render={({ field }) => (
                           <FormItem>
                             <div className="flex items-center justify-between">
-                              <FormLabel className="text-base">{item.split('_').map(capitalize).join(' ')}</FormLabel>
+                              <FormLabel>{item.split('_').map(capitalize).join(' ')}</FormLabel>
                               <FormControl>
                                 <Input type="number" placeholder="0" {...field} className="w-24" />
                               </FormControl>
@@ -118,8 +118,8 @@ export default function ProductionCalculator() {
           </div>
 
           <div>
-            <h3 className="font-headline text-2xl mb-4 text-center flex items-center justify-center gap-2"><Calculator/> Calculation Results</h3>
-            <ScrollArea className="h-[60vh] pr-4">
+            <h3 className="font-headline text-xl md:text-2xl mb-4 text-center flex items-center justify-center gap-2"><Calculator/> Calculation Results</h3>
+            <ScrollArea className="h-[55vh] md:h-[60vh] pr-4">
               <Table>
                 <TableHeader>
                   <TableRow>

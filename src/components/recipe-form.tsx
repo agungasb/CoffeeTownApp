@@ -68,13 +68,13 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
                     <ScrollArea className="h-64 border rounded-md p-4">
                         <div className="space-y-4">
                             {fields.map((field, index) => (
-                                <div key={field.id} className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-end p-2 border rounded-md">
+                                <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto_auto] gap-4 md:gap-2 p-2 border rounded-md md:items-end">
                                     <FormField
                                         control={form.control}
                                         name={`ingredients.${index}.name`}
                                         render={({ field }) => (
                                             <FormItem>
-                                                {index === 0 && <FormLabel>Name</FormLabel>}
+                                                <FormLabel>Name</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="Flour" {...field} />
                                                 </FormControl>
@@ -87,9 +87,9 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
                                         name={`ingredients.${index}.amount`}
                                         render={({ field }) => (
                                             <FormItem>
-                                                 {index === 0 && <FormLabel>Amount</FormLabel>}
+                                                <FormLabel>Amount</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" step="0.01" {...field} className="w-24"/>
+                                                    <Input type="number" step="0.01" {...field} className="md:w-24"/>
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -100,9 +100,9 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
                                         name={`ingredients.${index}.unit`}
                                         render={({ field }) => (
                                             <FormItem>
-                                                 {index === 0 && <FormLabel>Unit</FormLabel>}
+                                                <FormLabel>Unit</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="grams" {...field} className="w-24" />
+                                                    <Input placeholder="grams" {...field} className="md:w-24" />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -114,6 +114,7 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
                                         size="icon"
                                         onClick={() => remove(index)}
                                         disabled={fields.length <= 1}
+                                        className="justify-self-end md:justify-self-auto"
                                     >
                                         <Trash2 />
                                     </Button>

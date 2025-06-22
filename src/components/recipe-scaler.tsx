@@ -47,14 +47,14 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
     return (
         <Card className="glassmorphic border-2 border-border/30 w-full max-w-4xl mx-auto">
             <CardHeader>
-                <CardTitle className="font-headline text-3xl">Recipe Scaler</CardTitle>
+                <CardTitle className="font-headline text-2xl md:text-3xl">Recipe Scaler</CardTitle>
                 <CardDescription>Choose a recipe and enter a multiplier to scale the ingredients.</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="grid md:grid-cols-3 gap-6 items-start">
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="recipes" className="text-base">Choose a recipe</Label>
+                            <Label htmlFor="recipes">Choose a recipe</Label>
                             <Select onValueChange={setSelectedRecipeId} value={selectedRecipeId}>
                                 <SelectTrigger id="recipes">
                                     <SelectValue placeholder="Select a recipe" />
@@ -69,7 +69,7 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
                             </Select>
                         </div>
                         <div className="space-y-2">
-                             <Label htmlFor="multiplier" className="text-base">Enter multiplier</Label>
+                             <Label htmlFor="multiplier">Enter multiplier</Label>
                              <Input 
                                 id="multiplier"
                                 type="number" 
@@ -85,8 +85,8 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
                     <div className="md:col-span-2">
                         {scaledIngredients.length > 0 ? (
                            <div className='pl-4'>
-                                <h3 className="font-headline text-2xl mb-4">Scaled: {recipeTitle}</h3>
-                                <ScrollArea className="h-[50vh] pr-4">
+                                <h3 className="font-headline text-xl md:text-2xl mb-4">Scaled: {recipeTitle}</h3>
+                                <ScrollArea className="h-[40vh] md:h-[50vh] pr-4">
                                 <Table>
                                     <TableHeader>
                                         <TableRow>

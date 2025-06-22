@@ -77,25 +77,45 @@ export const recipes: Record<string, Record<string, { amount: number; unit: stri
         "putih_telur": {"amount": 3000, "unit": "grams"}
     },
     "coklat_ganache": {
-        "compound dark": {"amount": 5000, "unit": "grams"},
+        "compound_dark": {"amount": 5000, "unit": "grams"},
         "uht": {"amount": 1000, "unit": "grams"}
     },
     "adonan_abon_taiwan": {
-        "telur kuning": {"amount": 2, "unit": "butir"},
+        "telur_kuning": {"amount": 2, "unit": "butir"},
         "garam": {"amount": 1, "unit": "grams"},
         "minyak": {"amount": 30, "unit": "grams"},
-        "susu uht": {"amount": 30, "unit": "grams"},
-        "tepung segitiga": {"amount": 40, "unit": "grams"},
-        "gula pasir": {"amount": 40, "unit": "grams"},
-        "putih telur": {"amount": 75, "unit": "grams"}
+        "susu_uht": {"amount": 30, "unit": "grams"},
+        "tepung_segitiga": {"amount": 40, "unit": "grams"},
+        "gula_pasir": {"amount": 40, "unit": "grams"},
+        "putih_telur": {"amount": 75, "unit": "grams"}
     },
     "fla_abon_taiwan": {
-        "telur kuning": {"amount": 1, "unit": "butir"},
+        "telur_kuning": {"amount": 1, "unit": "butir"},
         "garam": {"amount": 1, "unit": "grams"},
         "maizena": {"amount": 10, "unit": "grams"},
-        "susu uht": {"amount": 100, "unit": "grams"},
-        "tepung segitiga": {"amount": 10, "unit": "grams"},
-        "gula pasir": {"amount": 15, "unit": "grams"},
+        "susu_uht": {"amount": 100, "unit": "grams"},
+        "tepung_segitiga": {"amount": 10, "unit": "grams"},
+        "gula_pasir": {"amount": 15, "unit": "grams"},
         "everwhip": {"amount": 167, "unit": "grams"}
     },
+    "adonan_roti_tawar": {
+        "tepung": { "amount": 1000, "unit": "grams" },
+        "gula_pasir": { "amount": 50, "unit": "grams" },
+        "susu_bubuk": { "amount": 40, "unit": "grams" },
+        "ragi": { "amount": 15, "unit": "grams" },
+        "pelembut": { "amount": 5, "unit": "grams" },
+        "garam": { "amount": 15, "unit": "grams" },
+        "margarin": { "amount": 60, "unit": "grams" },
+        "air_dingin": { "amount": 600, "unit": "grams" }
+    },
+    "adonan_muffin": {
+        "tepung": { "amount": 500, "unit": "grams" },
+        "gula_pasir": { "amount": 250, "unit": "grams" },
+        "baking_powder": { "amount": 20, "unit": "grams" },
+        "garam": { "amount": 5, "unit": "grams" },
+        "telur": { "amount": 2, "unit": "butir" },
+        "susu_cair": { "amount": 250, "unit": "ml" },
+        "minyak_sayur": { "amount": 125, "unit": "ml" },
+        "ekstrak_vanila": { "amount": 5, "unit": "ml" }
+    }
 };

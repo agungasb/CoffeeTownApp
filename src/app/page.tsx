@@ -14,7 +14,7 @@ export default function Home() {
     <div className="flex flex-col items-center min-h-screen p-4 sm:p-6 md:p-8">
       <header className="text-center mb-8">
         <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl font-bold text-primary-foreground" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
-          BakeWise
+          COFFEE TOWN BAKERY
         </h1>
         <p className="text-sm sm:text-base text-primary-foreground/90 italic mt-2" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
           Not What You Want, But Surely What You Need

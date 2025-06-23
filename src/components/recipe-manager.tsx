@@ -10,7 +10,6 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { PlusCircle, Edit, Trash2 } from 'lucide-react';
 import { RecipeForm } from './recipe-form';
 import { useToast } from '@/hooks/use-toast';
-import { ScrollArea } from './ui/scroll-area';
 
 interface RecipeManagerProps {
     recipes: Recipe[];
@@ -61,7 +60,7 @@ export default function RecipeManager({ recipes, setRecipes }: RecipeManagerProp
                 </Button>
             </CardHeader>
             <CardContent>
-                <ScrollArea className="h-[60vh] rounded-md border">
+                <div className="rounded-md border">
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -105,7 +104,7 @@ export default function RecipeManager({ recipes, setRecipes }: RecipeManagerProp
                             ))}
                         </TableBody>
                     </Table>
-                </ScrollArea>
+                </div>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogContent className="md:max-w-[600px] max-h-[90vh] flex flex-col">
                         <DialogHeader>

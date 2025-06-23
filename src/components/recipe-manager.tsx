@@ -7,28 +7,32 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, ShieldAlert } from 'lucide-react';
 import { RecipeForm } from './recipe-form';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface RecipeManagerProps {
     recipes: Recipe[];
     setRecipes: (recipes: Recipe[]) => void;
+    isLoggedIn: boolean;
 }
 
-export default function RecipeManager({ recipes, setRecipes }: RecipeManagerProps) {
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
+export default function RecipeManager({ recipes, setRecipes, isLoggedIn }: RecipeManagerProps) {
+    const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
     const [recipeToEdit, setRecipeToEdit] = useState<Recipe | null>(null);
+    const [recipeToConfirm, setRecipeToConfirm] = useState<Recipe | null>(null);
+    const [isConfirmingSave, setIsConfirmingSave] = useState(false);
     const { toast } = useToast();
 
     const handleAddClick = () => {
         setRecipeToEdit(null);
-        setIsDialogOpen(true);
+        setIsFormDialogOpen(true);
     };
 
     const handleEditClick = (recipe: Recipe) => {
         setRecipeToEdit(recipe);
-        setIsDialogOpen(true);
+        setIsFormDialogOpen(true);
     };
 
     const handleDelete = (recipeId: string) => {
@@ -37,16 +41,27 @@ export default function RecipeManager({ recipes, setRecipes }: RecipeManagerProp
     };
 
     const handleFormSubmit = (data: Recipe) => {
-        if (recipeToEdit) {
-            setRecipes(recipes.map(r => (r.id === data.id ? data : r)));
+        setIsFormDialogOpen(false);
+        setRecipeToConfirm(data);
+        setIsConfirmingSave(true);
+    };
+
+    const executeSave = () => {
+        if (!recipeToConfirm) return;
+
+        if (recipeToEdit && recipeToConfirm.id) {
+            setRecipes(recipes.map(r => (r.id === recipeToConfirm.id ? recipeToConfirm : r)));
             toast({ title: 'Success', description: 'Recipe updated successfully.' });
         } else {
-            setRecipes([...recipes, { ...data, id: data.name.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now() }]);
+            setRecipes([...recipes, { ...recipeToConfirm, id: recipeToConfirm.name.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now() }]);
             toast({ title: 'Success', description: 'Recipe added successfully.' });
         }
+        
         setRecipeToEdit(null);
-        setIsDialogOpen(false);
+        setRecipeToConfirm(null);
+        setIsConfirmingSave(false);
     };
+
 
     return (
         <Card className="glassmorphic border-2 border-border/30 w-full max-w-6xl mx-auto">
@@ -55,11 +70,20 @@ export default function RecipeManager({ recipes, setRecipes }: RecipeManagerProp
                     <CardTitle>Recipe Management</CardTitle>
                     <CardDescription>Add, edit, or delete your custom recipes.</CardDescription>
                 </div>
-                 <Button onClick={handleAddClick}>
+                 <Button onClick={handleAddClick} disabled={!isLoggedIn}>
                     <PlusCircle className="mr-2" /> Add New Recipe
                 </Button>
             </CardHeader>
             <CardContent>
+                {!isLoggedIn && (
+                     <Alert variant="destructive" className="mb-4 bg-destructive/20 border-destructive/50">
+                        <ShieldAlert className="h-4 w-4" />
+                        <AlertTitle>Login Required</AlertTitle>
+                        <AlertDescription>
+                            Please log in to add, edit, or delete recipes.
+                        </AlertDescription>
+                    </Alert>
+                )}
                 <div className="rounded-md border">
                     <Table>
                         <TableHeader>
@@ -75,12 +99,12 @@ export default function RecipeManager({ recipes, setRecipes }: RecipeManagerProp
                                     <TableCell className="font-medium">{recipe.name}</TableCell>
                                     <TableCell className="text-center">{recipe.ingredients.length}</TableCell>
                                     <TableCell className="text-right space-x-2">
-                                        <Button variant="ghost" size="icon" onClick={() => handleEditClick(recipe)}>
+                                        <Button variant="ghost" size="icon" onClick={() => handleEditClick(recipe)} disabled={!isLoggedIn}>
                                             <Edit className="h-4 w-4" />
                                         </Button>
                                         <AlertDialog>
-                                            <AlertDialogTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                                            <AlertDialogTrigger asChild disabled={!isLoggedIn}>
+                                                <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" disabled={!isLoggedIn}>
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>
                                             </AlertDialogTrigger>
@@ -105,7 +129,9 @@ export default function RecipeManager({ recipes, setRecipes }: RecipeManagerProp
                         </TableBody>
                     </Table>
                 </div>
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+
+                {/* Form Dialog */}
+                <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
                     <DialogContent className="md:max-w-[600px] max-h-[90vh] flex flex-col">
                         <DialogHeader>
                             <DialogTitle>{recipeToEdit ? 'Edit Recipe' : 'Add New Recipe'}</DialogTitle>
@@ -114,11 +140,29 @@ export default function RecipeManager({ recipes, setRecipes }: RecipeManagerProp
                            <RecipeForm
                                 recipeToEdit={recipeToEdit}
                                 onSubmit={handleFormSubmit}
-                                onCancel={() => setIsDialogOpen(false)}
+                                onCancel={() => setIsFormDialogOpen(false)}
                             />
                         </div>
                     </DialogContent>
                 </Dialog>
+
+                {/* Save/Edit Confirmation Dialog */}
+                <AlertDialog open={isConfirmingSave} onOpenChange={setIsConfirmingSave}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Confirm Save</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Are you sure you want to save the changes for "{recipeToConfirm?.name}"?
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel onClick={() => setIsConfirmingSave(false)}>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={executeSave}>
+                                Save Changes
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             </CardContent>
         </Card>
     );

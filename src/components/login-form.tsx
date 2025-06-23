@@ -32,7 +32,7 @@ export default function LoginForm({ onLoginSuccess, onCancel }: LoginFormProps) 
 
     const handleSubmit = (data: LoginFormData) => {
         // Prototype login check
-        if (data.username === 'admin' && data.password === 'password') {
+        if (data.username === 'agung' && data.password === 'freepalestine') {
             onLoginSuccess();
             toast({ title: 'Success', description: 'Logged in successfully.' });
         } else {
@@ -54,7 +54,7 @@ export default function LoginForm({ onLoginSuccess, onCancel }: LoginFormProps) 
                         <FormItem>
                             <FormLabel>Username</FormLabel>
                             <FormControl>
-                                <Input placeholder="admin" {...field} />
+                                <Input placeholder="agung" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -67,7 +67,7 @@ export default function LoginForm({ onLoginSuccess, onCancel }: LoginFormProps) 
                         <FormItem>
                             <FormLabel>Password</FormLabel>
                             <FormControl>
-                                <Input type="password" placeholder="password" {...field} />
+                                <Input type="password" placeholder="freepalestine" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>

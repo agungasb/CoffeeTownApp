@@ -54,7 +54,7 @@ export default function LoginForm({ onLoginSuccess, onCancel }: LoginFormProps) 
                         <FormItem>
                             <FormLabel>Username</FormLabel>
                             <FormControl>
-                                <Input placeholder="agung" {...field} />
+                                <Input placeholder="admin" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -67,7 +67,7 @@ export default function LoginForm({ onLoginSuccess, onCancel }: LoginFormProps) 
                         <FormItem>
                             <FormLabel>Password</FormLabel>
                             <FormControl>
-                                <Input type="password" placeholder="freepalestine" {...field} />
+                                <Input type="password" placeholder="password" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>

@@ -7,12 +7,7 @@ import RecipeScaler from "@/components/recipe-scaler";
 import RecipeManager from "@/components/recipe-manager";
 import { recipes as initialRecipes, type Recipe } from '@/lib/recipes';
 
-interface PageProps {
-  params?: { [key: string]: string | string[] | undefined };
-  searchParams?: { [key: string]: string | string[] | undefined };
-}
-
-export default function Home({ params, searchParams }: PageProps) {
+export default function Home() {
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
 
   return (

@@ -29,6 +29,7 @@ export async function ocrProductionMapping(input: OcrProductionMappingInput): Pr
 
 const prompt = ai.definePrompt({
   name: 'ocrProductionMappingPrompt',
+  model: 'googleai/gemini-pro-vision',
   input: {schema: OcrProductionMappingInputSchema},
   output: {schema: OcrProductionMappingOutputSchema},
   prompt: `You are an expert bakery production manager. You will extract the production quantities for various bakery items from a photo and map them to the corresponding product names.  The photo is provided as a data URI.

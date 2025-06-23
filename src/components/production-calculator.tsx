@@ -19,21 +19,29 @@ import { getQuantitiesFromImage } from "@/app/actions";
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
+// Allow empty strings for form state, which will render as empty inputs
+type ProductionFormValues = {
+  [K in keyof ProductionInputs]: number | '';
+};
+
 export default function ProductionCalculator() {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [results, setResults] = useState(initialCalculations);
 
-  const form = useForm<ProductionInputs>({
+  const form = useForm<ProductionFormValues>({
     resolver: zodResolver(productionSchema),
-    defaultValues: productItems.reduce((acc, item) => ({ ...acc, [item]: 0 }), {}),
+    defaultValues: productItems.reduce((acc, item) => ({ ...acc, [item]: '' }), {}),
   });
 
   const watchedValues = form.watch();
 
   useEffect(() => {
-    const newResults = calculateProductionMetrics(watchedValues);
+    // calculateProductionMetrics expects all values to be numbers.
+    // The `calculateProductionMetrics` function already handles this by using `Number()`,
+    // so we can safely cast the type.
+    const newResults = calculateProductionMetrics(watchedValues as ProductionInputs);
     setResults(newResults);
   }, [JSON.stringify(watchedValues)]);
 
@@ -54,7 +62,7 @@ export default function ProductionCalculator() {
             let filledCount = 0;
             for (const [key, value] of Object.entries(data)) {
               if (productItems.includes(key)) {
-                form.setValue(key as keyof ProductionInputs, value, { shouldValidate: true });
+                form.setValue(key as keyof ProductionFormValues, value, { shouldValidate: true });
                 filledCount++;
               }
             }
@@ -68,7 +76,7 @@ export default function ProductionCalculator() {
   };
 
   return (
-    <Card className="glassmorphic border-2 border-border/30">
+    <Card className="glassmorphic border-2 border-border/30 w-full max-w-6xl mx-auto">
       <CardHeader>
         <CardTitle className="font-headline text-2xl md:text-3xl">Production Quantities</CardTitle>
         <CardDescription>Enter product quantities or upload an image to auto-fill.</CardDescription>
@@ -96,13 +104,13 @@ export default function ProductionCalculator() {
                     <FormField
                       key={item}
                       control={form.control}
-                      name={item as keyof ProductionInputs}
+                      name={item as keyof ProductionFormValues}
                       render={({ field }) => (
                         <FormItem>
                           <div className="flex items-center justify-between">
                             <FormLabel>{item.split('_').map(capitalize).join(' ')}</FormLabel>
                             <FormControl>
-                              <Input type="number" placeholder="0" {...field} className="w-24" />
+                              <Input type="number" {...field} className="w-24" />
                             </FormControl>
                           </div>
                         </FormItem>

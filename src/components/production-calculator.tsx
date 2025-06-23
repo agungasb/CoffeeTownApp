@@ -16,7 +16,6 @@ import { productItems } from "@/lib/products";
 import { productionSchema, calculateProductionMetrics, initialCalculations } from "@/lib/calculations";
 import type { ProductionInputs } from "@/lib/calculations";
 import { getQuantitiesFromImage } from "@/app/actions";
-import { ScrollArea } from "./ui/scroll-area";
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
@@ -59,7 +58,7 @@ export default function ProductionCalculator() {
                 filledCount++;
               }
             }
-            toast({ title: "OCR Success", description: `Auto-filled ${filledCount} items.` });
+            toast({ title: "Success", description: `Auto-filled ${filledCount} items.` });
           }
         });
       }
@@ -92,51 +91,47 @@ export default function ProductionCalculator() {
             </div>
             <Form {...form}>
               <form>
-                <ScrollArea className="h-[45vh] md:h-[50vh] pr-4">
-                  <div className="space-y-4">
-                    {productItems.map((item) => (
-                      <FormField
-                        key={item}
-                        control={form.control}
-                        name={item as keyof ProductionInputs}
-                        render={({ field }) => (
-                          <FormItem>
-                            <div className="flex items-center justify-between">
-                              <FormLabel>{item.split('_').map(capitalize).join(' ')}</FormLabel>
-                              <FormControl>
-                                <Input type="number" placeholder="0" {...field} className="w-24" />
-                              </FormControl>
-                            </div>
-                          </FormItem>
-                        )}
-                      />
-                    ))}
-                  </div>
-                </ScrollArea>
+                <div className="space-y-4">
+                  {productItems.map((item) => (
+                    <FormField
+                      key={item}
+                      control={form.control}
+                      name={item as keyof ProductionInputs}
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center justify-between">
+                            <FormLabel>{item.split('_').map(capitalize).join(' ')}</FormLabel>
+                            <FormControl>
+                              <Input type="number" placeholder="0" {...field} className="w-24" />
+                            </FormControl>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  ))}
+                </div>
               </form>
             </Form>
           </div>
 
           <div>
             <h3 className="font-headline text-xl md:text-2xl mb-4 text-center flex items-center justify-center gap-2"><Calculator/> Calculation Results</h3>
-            <ScrollArea className="h-[55vh] md:h-[60vh] pr-4">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Metric</TableHead>
-                    <TableHead className="text-right">Result</TableHead>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Metric</TableHead>
+                  <TableHead className="text-right">Result</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {results.map(([key, value]) => (
+                  <TableRow key={key}>
+                    <TableCell className="font-medium">{key}</TableCell>
+                    <TableCell className="text-right">{value}</TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {results.map(([key, value]) => (
-                    <TableRow key={key}>
-                      <TableCell className="font-medium">{key}</TableCell>
-                      <TableCell className="text-right">{value}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </ScrollArea>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         </div>
       </CardContent>

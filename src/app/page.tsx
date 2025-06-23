@@ -63,7 +63,7 @@ export default function Home() {
           <Tabs defaultValue="calculator" className="w-full">
             <div className="flex justify-center">
               <div className="overflow-x-auto pb-2 -mb-2 hide-scrollbar">
-                <TabsList>
+                <TabsList className="bg-primary text-primary-foreground">
                   <TabsTrigger value="calculator" className="text-sm sm:text-base px-2 sm:px-3">Production Calculator</TabsTrigger>
                   <TabsTrigger value="recipe" className="text-sm sm:text-base px-2 sm:px-3">Recipe Scaler</TabsTrigger>
                   <TabsTrigger value="manager" className="text-sm sm:text-base px-2 sm:px-3">Recipe Management</TabsTrigger>

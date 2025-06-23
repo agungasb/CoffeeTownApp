@@ -78,7 +78,7 @@ export default function ProductionCalculator() {
   return (
     <Card className="glassmorphic border-2 border-border/30 w-full max-w-6xl mx-auto">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl md:text-3xl">Production Quantities</CardTitle>
+        <CardTitle>Production Quantities</CardTitle>
         <CardDescription>Enter product quantities or upload an image to auto-fill.</CardDescription>
       </CardHeader>
       <CardContent>

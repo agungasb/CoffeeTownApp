@@ -52,7 +52,7 @@ export default function RecipeManager({ recipes, setRecipes }: RecipeManagerProp
         <Card className="glassmorphic border-2 border-border/30 w-full max-w-6xl mx-auto">
             <CardHeader className="flex-col items-start sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <CardTitle className="font-headline text-2xl md:text-3xl">Recipe Management</CardTitle>
+                    <CardTitle>Recipe Management</CardTitle>
                     <CardDescription>Add, edit, or delete your custom recipes.</CardDescription>
                 </div>
                  <Button onClick={handleAddClick}>

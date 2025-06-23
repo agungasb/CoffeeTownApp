@@ -31,17 +31,17 @@ export default function Home() {
       <div className="flex flex-col items-center min-h-screen p-4 sm:p-6 md:p-8">
         <header className="w-full max-w-7xl flex justify-between items-start mb-8">
           <div className="text-center flex-grow">
-            <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl font-bold text-primary-foreground" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+            <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl font-bold text-secondary-foreground" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
               COFFEE TOWN BAKERY
             </h1>
-            <p className="text-sm sm:text-base text-primary-foreground/90 italic mt-2" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
+            <p className="text-sm sm:text-base text-secondary-foreground/90 italic mt-2" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
               Not What You Want, But Surely What You Need
             </p>
           </div>
           {isLoggedIn ? (
              <Button
                 variant="ghost"
-                className="text-primary-foreground hover:text-primary-foreground/80 hover:bg-white/10"
+                className="text-secondary-foreground hover:text-secondary-foreground/80 hover:bg-white/10"
                 onClick={handleLogout}
               >
                 <LogOut />
@@ -50,7 +50,7 @@ export default function Home() {
           ) : (
              <Button
                 variant="ghost"
-                className="text-primary-foreground hover:text-primary-foreground/80 hover:bg-white/10"
+                className="text-secondary-foreground hover:text-secondary-foreground/80 hover:bg-white/10"
                 onClick={() => setIsLoginDialogOpen(true)}
               >
                 <LogIn />
@@ -114,9 +114,9 @@ export default function Home() {
           </Tabs>
         </main>
 
-        <footer className="w-full text-center mt-auto pt-8 text-primary-foreground/80">
+        <footer className="w-full text-center mt-auto pt-8 text-secondary-foreground/80">
           <p>
-            Created by <a href="https://twitter.com/Agung_styb" target="_blank" rel="noopener noreferrer" className="font-bold underline hover:text-primary-foreground">Agung Setia Budi</a>
+            Created by <a href="https://twitter.com/Agung_styb" target="_blank" rel="noopener noreferrer" className="font-bold underline hover:text-secondary-foreground">Agung Setia Budi</a>
           </p>
         </footer>
       </div>

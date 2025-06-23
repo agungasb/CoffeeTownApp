@@ -10,10 +10,10 @@
     --card-foreground: 25 76% 21%;
     --popover: 60 40% 98%;
     --popover-foreground: 25 76% 21%;
-    --primary: 34 44% 70%; /* tan - #D2B48C */
-    --primary-foreground: 25 76% 21%;
-    --secondary: 25 76% 31%; /* saddlebrown - #8B4513 */
-    --secondary-foreground: 60 56% 94%;
+    --primary: 25 76% 31%; /* saddlebrown - #8B4513 */
+    --primary-foreground: 60 56% 94%;
+    --secondary: 34 44% 70%; /* tan - #D2B48C */
+    --secondary-foreground: 25 76% 21%;
     --muted: 60 56% 90%; /* slightly darker beige */
     --muted-foreground: 25 76% 41%;
     --accent: 25 76% 31%; /* saddlebrown - #8B4513 */
@@ -39,10 +39,10 @@
     --card-foreground: 60 56% 94%;
     --popover: 25 20% 10%;
     --popover-foreground: 60 56% 94%;
-    --primary: 34 44% 70%; /* tan */
-    --primary-foreground: 25 76% 21%;
-    --secondary: 25 76% 31%; /* saddlebrown */
-    --secondary-foreground: 60 56% 94%;
+    --primary: 25 76% 31%; /* saddlebrown */
+    --primary-foreground: 60 56% 94%;
+    --secondary: 34 44% 70%; /* tan */
+    --secondary-foreground: 25 76% 21%;
     --muted: 25 20% 18%;
     --muted-foreground: 60 56% 84%;
     --accent: 34 44% 70%; /* tan */

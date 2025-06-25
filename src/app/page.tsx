@@ -67,10 +67,6 @@ export default function Home() {
                   <TabsTrigger value="calculator" className="text-sm sm:text-base px-2 sm:px-3">Production Calculator</TabsTrigger>
                   <TabsTrigger value="recipe" className="text-sm sm:text-base px-2 sm:px-3">Recipe Scaler</TabsTrigger>
                   <TabsTrigger value="manager" className="text-sm sm:text-base px-2 sm:px-3">Recipe Management</TabsTrigger>
-                  <TabsTrigger value="new1" className="text-sm sm:text-base px-2 sm:px-3">New Tab One</TabsTrigger>
-                  <TabsTrigger value="new2" className="text-sm sm:text-base px-2 sm:px-3">New Tab Two</TabsTrigger>
-                  <TabsTrigger value="new3" className="text-sm sm:text-base px-2 sm:px-3">New Tab Three</TabsTrigger>
-                  <TabsTrigger value="new4" className="text-sm sm:text-base px-2 sm:px-3">New Tab Four</TabsTrigger>
                 </TabsList>
               </div>
             </div>
@@ -82,34 +78,6 @@ export default function Home() {
             </TabsContent>
             <TabsContent value="manager">
               <RecipeManager recipes={recipes} setRecipes={setRecipes} isLoggedIn={isLoggedIn} />
-            </TabsContent>
-            <TabsContent value="new1">
-              <Card className="glassmorphic border-2 border-border/30 w-full max-w-6xl mx-auto">
-                <CardContent className="pt-6">
-                  <p>Content for New Tab One.</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="new2">
-              <Card className="glassmorphic border-2 border-border/30 w-full max-w-6xl mx-auto">
-                <CardContent className="pt-6">
-                  <p>Content for New Tab Two.</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="new3">
-              <Card className="glassmorphic border-2 border-border/30 w-full max-w-6xl mx-auto">
-                <CardContent className="pt-6">
-                  <p>Content for New Tab Three.</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            <TabsContent value="new4">
-              <Card className="glassmorphic border-2 border-border/30 w-full max-w-6xl mx-auto">
-                <CardContent className="pt-6">
-                  <p>Content for New Tab Four.</p>
-                </CardContent>
-              </Card>
             </TabsContent>
           </Tabs>
         </main>

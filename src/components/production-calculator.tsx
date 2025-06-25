@@ -87,7 +87,7 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
         <div className="flex flex-col gap-6">
           
           <div className="p-4 bg-muted/50 rounded-lg">
-            <label className="block mb-2 text-center text-[#f9e1c0] font-medium">Upload Screenshot for Auto-Fill</label>
+            <label className="block mb-2 text-center text-foreground font-medium">Upload Screenshot for Auto-Fill</label>
              <input
                 type="file"
                 accept="image/*"
@@ -117,7 +117,7 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
                       name={item as any}
                       render={({ field }) => (
                         <FormItem className="flex justify-between items-center py-2 border-b border-border">
-                            <FormLabel className="flex-grow text-left text-[#f9e1c0] font-medium text-sm">
+                            <FormLabel className="flex-grow text-left text-foreground font-medium text-sm">
                               {capitalize(item)}
                             </FormLabel>
                             <FormControl>
@@ -125,7 +125,7 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
                                 type="number" 
                                 {...field} 
                                 placeholder="0"
-                                className="flex-none w-24 text-center rounded-md py-1 px-2 h-auto focus:shadow-[0_0_8px_rgba(255,255,255,0.5)] focus:ring-0 focus:outline-none"
+                                className="flex-none w-24 text-center rounded-md py-1 px-2 h-auto"
                                 onChange={e => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
                                 value={field.value === 0 ? '' : field.value}
                               />

@@ -15,7 +15,6 @@ import { useToast } from "@/hooks/use-toast";
 import { calculateProductionMetrics, initialMetrics, productionSchema } from "@/lib/calculations";
 import type { ProductionInputs } from "@/lib/calculations";
 import { getQuantitiesFromImage } from "@/app/actions";
-import { ScrollArea } from "./ui/scroll-area";
 import type { ProductIngredients } from "@/lib/productIngredients";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { productItems } from "@/lib/products";
@@ -151,24 +150,22 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
                         <h3 className="flex items-center gap-2"><Calculator /> Calculation Results</h3>
                     </AccordionTrigger>
                     <AccordionContent className="p-4 pt-0">
-                        <ScrollArea className="h-auto max-h-[40vh]">
-                          <Table>
-                            <TableHeader>
-                              <TableRow className="border-white/30">
-                                <TableHead className="text-black font-semibold">Metric</TableHead>
-                                <TableHead className="text-right text-black font-semibold">Result</TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {results.productionCalculations.map(([key, value]) => (
-                                <TableRow key={key} className="border-white/30">
-                                    <TableCell className="font-medium text-black">{key}</TableCell>
-                                    <TableCell className="text-right text-black">{value}</TableCell>
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        </ScrollArea>
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="border-white/30">
+                            <TableHead className="text-black font-semibold">Metric</TableHead>
+                            <TableHead className="text-right text-black font-semibold">Result</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {results.productionCalculations.map(([key, value]) => (
+                            <TableRow key={key} className="border-white/30">
+                                <TableCell className="font-medium text-black">{key}</TableCell>
+                                <TableCell className="text-right text-black">{value}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
                     </AccordionContent>
                 </AccordionItem>
 
@@ -177,32 +174,30 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
                          <h3 className="flex items-center gap-2"><ShoppingBasket /> Ingredient Summary</h3>
                     </AccordionTrigger>
                     <AccordionContent className="p-4 pt-0">
-                        <ScrollArea className="h-auto max-h-[40vh]">
-                        <Table>
-                            <TableHeader>
-                            <TableRow className="border-white/30">
-                                <TableHead className="text-black font-semibold">Ingredient</TableHead>
-                                <TableHead className="text-right text-black font-semibold">Total Amount</TableHead>
-                            </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                            {results.ingredientSummary.length > 0 ? (
-                                results.ingredientSummary.map(([key, value, unit]) => (
-                                <TableRow key={key} className="border-white/30">
-                                    <TableCell className="font-medium text-black">{capitalize(key)}</TableCell>
-                                    <TableCell className="text-right text-black">{value} {unit}</TableCell>
-                                </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell colSpan={2} className="text-center h-24 text-black italic">
-                                        No ingredients for the entered quantities.
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                            </TableBody>
-                        </Table>
-                        </ScrollArea>
+                      <Table>
+                          <TableHeader>
+                          <TableRow className="border-white/30">
+                              <TableHead className="text-black font-semibold">Ingredient</TableHead>
+                              <TableHead className="text-right text-black font-semibold">Total Amount</TableHead>
+                          </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                          {results.ingredientSummary.length > 0 ? (
+                              results.ingredientSummary.map(([key, value, unit]) => (
+                              <TableRow key={key} className="border-white/30">
+                                  <TableCell className="font-medium text-black">{capitalize(key)}</TableCell>
+                                  <TableCell className="text-right text-black">{value} {unit}</TableCell>
+                              </TableRow>
+                              ))
+                          ) : (
+                              <TableRow>
+                                  <TableCell colSpan={2} className="text-center h-24 text-black italic">
+                                      No ingredients for the entered quantities.
+                                  </TableCell>
+                              </TableRow>
+                          )}
+                          </TableBody>
+                      </Table>
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>

@@ -13,15 +13,23 @@ import Inventory from '@/components/inventory';
 import LoginForm from '@/components/login-form';
 import { recipes as initialRecipes, type Recipe } from '@/lib/recipes';
 import { productIngredientsData, type ProductIngredients } from '@/lib/productIngredients';
-import { LogIn, LogOut } from 'lucide-react';
+import { 
+  LogIn, 
+  LogOut, 
+  Calculator, 
+  Scaling, 
+  BookHeart, 
+  Archive, 
+  Warehouse 
+} from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 const TABS = [
-  { id: 'calculator', label: 'Production Calculator' },
-  { id: 'recipe', label: 'Recipe Scaler' },
-  { id: 'manager', label: 'Recipe Management' },
-  { id: 'product_management', label: 'Product Management' },
-  { id: 'inventory', label: 'Inventory' },
+  { id: 'calculator', label: 'Production Calculator', icon: <Calculator /> },
+  { id: 'recipe', label: 'Recipe Scaler', icon: <Scaling /> },
+  { id: 'manager', label: 'Recipe Management', icon: <BookHeart /> },
+  { id: 'product_management', label: 'Product Management', icon: <Archive /> },
+  { id: 'inventory', label: 'Inventory', icon: <Warehouse /> },
 ];
 
 export default function Home() {
@@ -79,14 +87,15 @@ export default function Home() {
 
         <nav className="fixed top-[88px] md:top-[96px] left-0 w-full z-10 py-2 glassmorphic flex items-center justify-center">
             <div className="overflow-x-auto hide-scrollbar">
-                <div className="flex justify-start md:justify-center gap-5 px-4">
+                <div className="flex justify-start md:justify-center items-center gap-5 px-4">
                   {TABS.map((tab) => (
                      <button 
                         key={tab.id}
                         className={`nav-button ${activeTab === tab.id ? 'active' : ''}`} 
                         onClick={() => setActiveTab(tab.id)}
                       >
-                        {tab.label}
+                        {tab.icon}
+                        <span>{tab.label}</span>
                       </button>
                   ))}
                 </div>

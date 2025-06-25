@@ -77,6 +77,11 @@ export default function RecipeManager({ recipes, setRecipes, isLoggedIn }: Recip
                 </Button>
             </CardHeader>
             <CardContent>
+                <div className="p-3 mb-4 rounded-lg border bg-muted/30">
+                    <p className="text-sm text-muted-foreground">
+                        You are currently managing <span className="font-bold text-foreground">{recipes.length}</span> unique recipes. Add new creations or modify existing ones below.
+                    </p>
+                </div>
                 {!isLoggedIn && (
                      <Alert variant="destructive" className="mb-4 bg-destructive/20 border-destructive/50">
                         <ShieldAlert className="h-4 w-4" />

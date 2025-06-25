@@ -25,6 +25,7 @@ export default function ProductManager({ products, setProducts, isLoggedIn }: Pr
     const { toast } = useToast();
     const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
     const [productToEdit, setProductToEdit] = useState<{ name: string; ingredients: { name: string; amount: number; }[] } | null>(null);
+    const productCount = Object.keys(products).length;
 
     const handleAddClick = () => {
         setProductToEdit(null);
@@ -78,6 +79,11 @@ export default function ProductManager({ products, setProducts, isLoggedIn }: Pr
                 </Button>
             </CardHeader>
             <CardContent>
+                <div className="p-3 mb-4 rounded-lg border bg-muted/30">
+                    <p className="text-sm text-muted-foreground">
+                        There are <span className="font-bold text-foreground">{productCount}</span> products in your list. Each product's ingredients can be managed here.
+                    </p>
+                </div>
                 {!isLoggedIn && (
                     <Alert variant="destructive" className="mb-4 bg-destructive/20 border-destructive/50">
                         <ShieldAlert className="h-4 w-4" />

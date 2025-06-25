@@ -45,7 +45,7 @@ export default function Home() {
         
         <nav className="fixed top-[80px] left-0 w-full z-10 py-2 glassmorphic">
             <div className="overflow-x-auto hide-scrollbar">
-                <div className="flex justify-center gap-5 px-4">
+                <div className="flex justify-start md:justify-center gap-5 px-4">
                   <button className={`nav-button ${activeTab === 'calculator' ? 'active' : ''}`} onClick={() => setActiveTab('calculator')}>Production Calculator</button>
                   <button className={`nav-button ${activeTab === 'recipe' ? 'active' : ''}`} onClick={() => setActiveTab('recipe')}>Recipe Scaler</button>
                   <button className={`nav-button ${activeTab === 'manager' ? 'active' : ''}`} onClick={() => setActiveTab('manager')}>Recipe Management</button>

@@ -14,6 +14,7 @@ import LoginForm from '@/components/login-form';
 import { recipes as initialRecipes, type Recipe } from '@/lib/recipes';
 import { productIngredientsData, type ProductIngredients } from '@/lib/productIngredients';
 import { LogIn, LogOut } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 const TABS = [
   { id: 'calculator', label: 'Production Calculator' },
@@ -45,35 +46,38 @@ export default function Home() {
         
         <header className="fixed top-0 left-0 w-full p-4 z-20 glassmorphic flex justify-between items-center">
             <div>
-                 <h1 className="font-headline text-2xl md:text-3xl text-[#f9e1c0]" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+                 <h1 className="font-headline text-2xl md:text-3xl text-primary-foreground" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
                     Coffee Town Bakery
                 </h1>
-                <p className="hidden md:block text-sm text-white/90 italic" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
+                <p className="hidden md:block text-sm text-foreground/90 italic" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
                     Not What You Want, But Surely What You Need
                 </p>
             </div>
-            {isLoggedIn ? (
-                 <Button
-                    variant="ghost"
-                    className="text-white hover:text-white/80 hover:bg-white/10"
-                    onClick={handleLogout}
-                    title="Logout"
-                  >
-                    <LogOut className="h-5 w-5 md:h-6 md:w-6" />
-                  </Button>
-              ) : (
-                 <Button
-                    variant="ghost"
-                    className="text-white hover:text-white/80 hover:bg-white/10"
-                    onClick={() => setIsLoginDialogOpen(true)}
-                    title="Login"
-                  >
-                    <LogIn className="h-5 w-5 md:h-6 md:w-6" />
-                  </Button>
-              )}
+             <div className="flex items-center gap-2">
+                <ThemeToggle />
+                {isLoggedIn ? (
+                    <Button
+                        variant="ghost"
+                        className="text-foreground hover:text-foreground/80 hover:bg-foreground/10"
+                        onClick={handleLogout}
+                        title="Logout"
+                    >
+                        <LogOut className="h-5 w-5 md:h-6 md:w-6" />
+                    </Button>
+                ) : (
+                    <Button
+                        variant="ghost"
+                        className="text-foreground hover:text-foreground/80 hover:bg-foreground/10"
+                        onClick={() => setIsLoginDialogOpen(true)}
+                        title="Login"
+                    >
+                        <LogIn className="h-5 w-5 md:h-6 md:w-6" />
+                    </Button>
+                )}
+            </div>
         </header>
 
-        <nav className="fixed top-[88px] md:top-[96px] left-0 w-full z-10 py-2 glassmorphic flex items-center">
+        <nav className="fixed top-[88px] md:top-[96px] left-0 w-full z-10 py-2 glassmorphic flex items-center justify-center">
             <div className="overflow-x-auto hide-scrollbar">
                 <div className="flex justify-start md:justify-center gap-5 px-4">
                   {TABS.map((tab) => (
@@ -114,8 +118,8 @@ export default function Home() {
           </Tabs>
         </main>
         
-        <footer className="fixed bottom-0 left-0 w-full p-4 text-center glassmorphic border-t border-white/30 text-[#f9e1c0] font-medium text-sm">
-            Created by <a href="https://twitter.com/Agung_styb" target="_blank" rel="noopener noreferrer" className="font-bold underline text-[#ffdd99] hover:text-[#ffbb66]">Agung Setia Budi</a>
+        <footer className="fixed bottom-0 left-0 w-full p-4 text-center glassmorphic border-t border-foreground/30 text-primary-foreground font-medium text-sm">
+            Created by <a href="https://twitter.com/Agung_styb" target="_blank" rel="noopener noreferrer" className="font-bold underline text-accent-foreground/80 hover:text-accent-foreground">Agung Setia Budi</a>
         </footer>
       </div>
       <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>

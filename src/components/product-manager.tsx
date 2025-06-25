@@ -11,7 +11,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { type ProductIngredients } from "@/lib/productIngredients";
 import { Edit, PlusCircle, ShieldAlert, Trash2 } from "lucide-react";
-import { ScrollArea } from "./ui/scroll-area";
 import { useToast } from '@/hooks/use-toast';
 import { ProductForm } from './product-form';
 import { capitalize } from '@/lib/utils';
@@ -88,78 +87,76 @@ export default function ProductManager({ products, setProducts, isLoggedIn }: Pr
                         </AlertDescription>
                     </Alert>
                 )}
-                 <ScrollArea className="h-[70vh]">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pr-4">
-                        {Object.entries(products).sort(([a], [b]) => a.localeCompare(b)).map(([productName, ingredients]) => (
-                            <Card key={productName} className="flex flex-col glassmorphic">
-                                <CardHeader>
-                                    <CardTitle className="text-lg">{capitalize(productName)}</CardTitle>
-                                    <CardDescription>{Object.keys(ingredients).length} ingredients</CardDescription>
-                                </CardHeader>
-                                <CardContent className="flex-grow pb-0">
-                                     <Accordion type="single" collapsible className="w-full">
-                                        <AccordionItem value={productName} className="border-b-0">
-                                            <AccordionTrigger className="py-2 hover:no-underline">View Details</AccordionTrigger>
-                                            <AccordionContent>
-                                                <Table>
-                                                    <TableHeader>
-                                                        <TableRow>
-                                                        <TableHead className="p-2 h-auto">Ingredient</TableHead>
-                                                        <TableHead className="p-2 h-auto text-right">Amount</TableHead>
-                                                        <TableHead className="p-2 h-auto">Unit</TableHead>
-                                                        </TableRow>
-                                                    </TableHeader>
-                                                    <TableBody>
-                                                        {Object.entries(ingredients).map(([ingredientName, amount]) => (
-                                                        <TableRow key={ingredientName}>
-                                                            <TableCell className="p-2">{capitalize(ingredientName)}</TableCell>
-                                                            <TableCell className="p-2 text-right">{typeof amount === 'number' ? amount.toFixed(3) : amount}</TableCell>
-                                                            <TableCell className="p-2 text-muted-foreground">{ingredientName.toLowerCase() === 'tusuk sate' ? 'pcs' : 'g'}</TableCell>
-                                                        </TableRow>
-                                                        ))}
-                                                    </TableBody>
-                                                </Table>
-                                            </AccordionContent>
-                                        </AccordionItem>
-                                    </Accordion>
-                                </CardContent>
-                                <CardFooter className="mt-auto flex justify-end gap-2 pt-4">
-                                    <Button variant="outline" size="sm" disabled={!isLoggedIn} onClick={() => handleEditClick(productName, ingredients)}>
-                                        <Edit className="mr-2 h-4 w-4" /> Edit
-                                    </Button>
-                                    <AlertDialog>
-                                        <AlertDialogTrigger asChild>
-                                            <Button variant="destructive" size="sm" disabled={!isLoggedIn}>
-                                                <Trash2 className="mr-2 h-4 w-4" /> Delete
-                                            </Button>
-                                        </AlertDialogTrigger>
-                                        <AlertDialogContent className="glassmorphic">
-                                            <AlertDialogHeader>
-                                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                                <AlertDialogDescription>
-                                                    This action cannot be undone. This will permanently delete the product "{capitalize(productName)}".
-                                                </AlertDialogDescription>
-                                            </AlertDialogHeader>
-                                            <AlertDialogFooter>
-                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                <AlertDialogAction onClick={() => handleDelete(productName)} className="bg-destructive hover:bg-destructive/90">
-                                                    Delete
-                                                </AlertDialogAction>
-                                            </AlertDialogFooter>
-                                        </AlertDialogContent>
-                                    </AlertDialog>
-                                </CardFooter>
-                            </Card>
-                        ))}
-                    </div>
-                </ScrollArea>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {Object.entries(products).sort(([a], [b]) => a.localeCompare(b)).map(([productName, ingredients]) => (
+                        <Card key={productName} className="flex flex-col glassmorphic">
+                            <CardHeader>
+                                <CardTitle className="text-lg">{capitalize(productName)}</CardTitle>
+                                <CardDescription>{Object.keys(ingredients).length} ingredients</CardDescription>
+                            </CardHeader>
+                            <CardContent className="flex-grow pb-0">
+                                 <Accordion type="single" collapsible className="w-full">
+                                    <AccordionItem value={productName} className="border-b-0">
+                                        <AccordionTrigger className="py-2 hover:no-underline">View Details</AccordionTrigger>
+                                        <AccordionContent>
+                                            <Table>
+                                                <TableHeader>
+                                                    <TableRow>
+                                                    <TableHead className="p-2 h-auto">Ingredient</TableHead>
+                                                    <TableHead className="p-2 h-auto text-right">Amount</TableHead>
+                                                    <TableHead className="p-2 h-auto">Unit</TableHead>
+                                                    </TableRow>
+                                                </TableHeader>
+                                                <TableBody>
+                                                    {Object.entries(ingredients).map(([ingredientName, amount]) => (
+                                                    <TableRow key={ingredientName}>
+                                                        <TableCell className="p-2">{capitalize(ingredientName)}</TableCell>
+                                                        <TableCell className="p-2 text-right">{typeof amount === 'number' ? amount.toFixed(3) : amount}</TableCell>
+                                                        <TableCell className="p-2 text-muted-foreground">{ingredientName.toLowerCase() === 'tusuk sate' ? 'pcs' : 'g'}</TableCell>
+                                                    </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
+                            </CardContent>
+                            <CardFooter className="mt-auto flex justify-end gap-2 pt-4">
+                                <Button variant="outline" size="sm" disabled={!isLoggedIn} onClick={() => handleEditClick(productName, ingredients)}>
+                                    <Edit className="mr-2 h-4 w-4" /> Edit
+                                </Button>
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button variant="destructive" size="sm" disabled={!isLoggedIn}>
+                                            <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent className="glassmorphic">
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                This action cannot be undone. This will permanently delete the product "{capitalize(productName)}".
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction onClick={() => handleDelete(productName)} className="bg-destructive hover:bg-destructive/90">
+                                                Delete
+                                            </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                            </CardFooter>
+                        </Card>
+                    ))}
+                </div>
 
                 <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
                     <DialogContent className="md:max-w-[600px] max-h-[90vh] flex flex-col p-0 glassmorphic">
                         <DialogHeader className="p-6 pb-0">
                             <DialogTitle>{productToEdit ? 'Edit Product' : 'Add New Product'}</DialogTitle>
                         </DialogHeader>
-                        <div className="flex-grow overflow-hidden px-6">
+                        <div className="flex-grow overflow-y-auto px-6">
                             <ProductForm
                                 productToEdit={productToEdit}
                                 onSubmit={handleFormSubmit}

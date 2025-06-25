@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm, useFieldArray } from 'react-hook-form';
@@ -7,7 +8,6 @@ import type { Recipe } from '@/lib/recipes';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { PlusCircle, Trash2 } from 'lucide-react';
 import { Textarea } from './ui/textarea';
 
@@ -58,131 +58,129 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-                <ScrollArea className="h-[70vh] p-1">
-                    <div className="space-y-6 pr-4">
-                        <FormField
-                            control={form.control}
-                            name="name"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Recipe Name</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="e.g. Chocolate Chip Cookies" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                <div className="space-y-6">
+                    <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Recipe Name</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="e.g. Chocolate Chip Cookies" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
-                        <div>
-                            <h3 className="text-lg font-medium mb-2">Ingredients</h3>
-                            <div className="space-y-4">
-                                {ingredientFields.map((field, index) => (
-                                    <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto_auto] gap-4 md:gap-2 p-2 border rounded-md md:items-end">
-                                        <FormField
-                                            control={form.control}
-                                            name={`ingredients.${index}.name`}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Name</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="Flour" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name={`ingredients.${index}.amount`}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Amount</FormLabel>
-                                                    <FormControl>
-                                                        <Input type="number" step="0.01" {...field} className="md:w-24"/>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name={`ingredients.${index}.unit`}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Unit</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="grams" {...field} className="md:w-24" />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <Button
-                                            type="button"
-                                            variant="destructive"
-                                            size="icon"
-                                            onClick={() => removeIngredient(index)}
-                                            disabled={ingredientFields.length <= 1}
-                                            className="justify-self-end md:justify-self-auto"
-                                        >
-                                            <Trash2 />
-                                        </Button>
-                                    </div>
-                                ))}
-                            </div>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => appendIngredient({ name: '', amount: 1, unit: '' })}
-                                className="mt-2"
-                            >
-                                <PlusCircle className="mr-2" /> Add Ingredient
-                            </Button>
+                    <div>
+                        <h3 className="text-lg font-medium mb-2">Ingredients</h3>
+                        <div className="space-y-4">
+                            {ingredientFields.map((field, index) => (
+                                <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto_auto] gap-4 md:gap-2 p-2 border rounded-md md:items-end">
+                                    <FormField
+                                        control={form.control}
+                                        name={`ingredients.${index}.name`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Name</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="Flour" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name={`ingredients.${index}.amount`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Amount</FormLabel>
+                                                <FormControl>
+                                                    <Input type="number" step="0.01" {...field} className="md:w-24"/>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name={`ingredients.${index}.unit`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Unit</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="grams" {...field} className="md:w-24" />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="destructive"
+                                        size="icon"
+                                        onClick={() => removeIngredient(index)}
+                                        disabled={ingredientFields.length <= 1}
+                                        className="justify-self-end md:justify-self-auto"
+                                    >
+                                        <Trash2 />
+                                    </Button>
+                                </div>
+                            ))}
                         </div>
-
-                         <div>
-                            <h3 className="text-lg font-medium mb-2">Instructions</h3>
-                            <div className="space-y-4">
-                                {stepFields.map((field, index) => (
-                                     <div key={field.id} className="flex items-start gap-2">
-                                        <span className="font-bold pt-2">{index + 1}.</span>
-                                        <FormField
-                                            control={form.control}
-                                            name={`steps.${index}`}
-                                            render={({ field }) => (
-                                                <FormItem className="flex-grow">
-                                                    <FormControl>
-                                                        <Textarea placeholder="Mix all dry ingredients..." {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                         <Button
-                                            type="button"
-                                            variant="destructive"
-                                            size="icon"
-                                            onClick={() => removeStep(index)}
-                                            disabled={stepFields.length <= 1}
-                                            className="shrink-0 mt-1"
-                                        >
-                                            <Trash2 />
-                                        </Button>
-                                    </div>
-                                ))}
-                            </div>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => appendStep('')}
-                                className="mt-2"
-                            >
-                                <PlusCircle className="mr-2" /> Add Step
-                            </Button>
-                        </div>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => appendIngredient({ name: '', amount: 1, unit: '' })}
+                            className="mt-2"
+                        >
+                            <PlusCircle className="mr-2" /> Add Ingredient
+                        </Button>
                     </div>
-                </ScrollArea>
+
+                     <div>
+                        <h3 className="text-lg font-medium mb-2">Instructions</h3>
+                        <div className="space-y-4">
+                            {stepFields.map((field, index) => (
+                                 <div key={field.id} className="flex items-start gap-2">
+                                    <span className="font-bold pt-2">{index + 1}.</span>
+                                    <FormField
+                                        control={form.control}
+                                        name={`steps.${index}`}
+                                        render={({ field }) => (
+                                            <FormItem className="flex-grow">
+                                                <FormControl>
+                                                    <Textarea placeholder="Mix all dry ingredients..." {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                     <Button
+                                        type="button"
+                                        variant="destructive"
+                                        size="icon"
+                                        onClick={() => removeStep(index)}
+                                        disabled={stepFields.length <= 1}
+                                        className="shrink-0 mt-1"
+                                    >
+                                        <Trash2 />
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => appendStep('')}
+                            className="mt-2"
+                        >
+                            <PlusCircle className="mr-2" /> Add Step
+                        </Button>
+                    </div>
+                </div>
 
                 <div className="flex justify-end gap-2 pt-4 border-t">
                     <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>

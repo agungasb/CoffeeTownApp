@@ -3,7 +3,6 @@
 
 import { useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { type ProductIngredients } from "@/lib/productIngredients";
 import { capitalize } from "@/lib/utils";
 
@@ -29,15 +28,13 @@ export default function Inventory({ products }: InventoryProps) {
                 <CardDescription>A complete list of all unique ingredients used across all products.</CardDescription>
             </CardHeader>
             <CardContent>
-                <ScrollArea className="h-[70vh] pr-4">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                        {sortedIngredients.map(ingredient => (
-                            <div key={ingredient} className="flex items-center justify-center p-3 bg-muted/50 rounded-md text-center h-20 transition-all hover:bg-muted hover:scale-105">
-                                <span className="font-medium text-card-foreground">{capitalize(ingredient)}</span>
-                            </div>
-                        ))}
-                    </div>
-                </ScrollArea>
+                <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    {sortedIngredients.map(ingredient => (
+                        <li key={ingredient} className="flex items-center justify-center p-3 bg-muted/50 rounded-md text-center h-20 transition-all hover:bg-muted hover:scale-105">
+                            <span className="font-medium text-card-foreground">{capitalize(ingredient)}</span>
+                        </li>
+                    ))}
+                </ul>
             </CardContent>
         </Card>
     );

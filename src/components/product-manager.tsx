@@ -63,7 +63,8 @@ export default function ProductManager({ isLoggedIn }: ProductManagerProps) {
                                                         <TableHeader>
                                                             <TableRow>
                                                             <TableHead className="p-2 h-auto">Ingredient</TableHead>
-                                                            <TableHead className="p-2 h-auto text-right">Amount (g)</TableHead>
+                                                            <TableHead className="p-2 h-auto text-right">Amount</TableHead>
+                                                            <TableHead className="p-2 h-auto">Unit</TableHead>
                                                             </TableRow>
                                                         </TableHeader>
                                                         <TableBody>
@@ -71,6 +72,7 @@ export default function ProductManager({ isLoggedIn }: ProductManagerProps) {
                                                             <TableRow key={ingredientName}>
                                                                 <TableCell className="p-2">{ingredientName}</TableCell>
                                                                 <TableCell className="p-2 text-right">{typeof amount === 'number' ? amount.toFixed(3) : amount}</TableCell>
+                                                                <TableCell className="p-2">{ingredientName === 'Tusuk Sate' ? 'pcs' : 'g'}</TableCell>
                                                             </TableRow>
                                                             ))}
                                                         </TableBody>

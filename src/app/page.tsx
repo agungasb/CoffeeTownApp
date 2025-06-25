@@ -33,50 +33,38 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex flex-col items-center min-h-screen p-4 sm:p-6 md:p-8">
-        <header className="w-full max-w-7xl flex justify-between items-start mb-8">
-          <div className="text-center flex-grow">
-            <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl font-bold text-primary" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
-              COFFEE TOWN BAKERY
-            </h1>
-            <p className="text-sm sm:text-base text-primary-foreground/90 italic mt-2" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
-              Not What You Want, But Surely What You Need
-            </p>
-          </div>
-          {isLoggedIn ? (
-             <Button
-                variant="ghost"
-                className="text-primary-foreground hover:text-primary-foreground/80 hover:bg-white/10"
-                onClick={handleLogout}
-              >
-                <LogOut />
-                <span className="ml-2">Logout</span>
-              </Button>
-          ) : (
-             <Button
-                variant="ghost"
-                className="text-primary-foreground hover:text-primary-foreground/80 hover:bg-white/10"
-                onClick={() => setIsLoginDialogOpen(true)}
-              >
-                <LogIn />
-                <span className="ml-2">Login</span>
-              </Button>
-          )}
+      <div className="flex flex-col items-center min-h-screen p-4 sm:p-6 md:p-8 pb-20">
+        <header className="fixed top-0 right-0 p-4 md:p-8 z-20 text-right">
+          <h1 className="font-headline text-3xl text-[#f9e1c0]" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+            Coffee Town Bakery
+          </h1>
+          <p className="text-sm text-white/90 italic" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
+            Not What You Want, But Surely What You Need
+          </p>
         </header>
-
-        <main className="w-full max-w-7xl">
-          <Tabs defaultValue="calculator" className="w-full">
-            <div className="flex justify-center">
-              <div className="overflow-x-auto pb-2 -mb-2 hide-scrollbar">
-                <TabsList className="bg-primary text-primary-foreground">
-                  <TabsTrigger value="calculator" className="text-sm sm:text-base px-2 sm:px-3">Production Calculator</TabsTrigger>
-                  <TabsTrigger value="recipe" className="text-sm sm:text-base px-2 sm:px-3">Recipe Scaler</TabsTrigger>
-                  <TabsTrigger value="manager" className="text-sm sm:text-base px-2 sm:px-3">Recipe Management</TabsTrigger>
-                  <TabsTrigger value="product_management" className="text-sm sm:text-base px-2 sm:px-3">Product Management</TabsTrigger>
-                  <TabsTrigger value="inventory" className="text-sm sm:text-base px-2 sm:px-3">Inventory</TabsTrigger>
-                </TabsList>
-              </div>
+        
+        <nav className="fixed top-[80px] left-0 w-full z-10 py-2 glassmorphic">
+            <div className="overflow-x-auto hide-scrollbar">
+                <div className="flex justify-center gap-5 px-4">
+                  <button className="nav-button active" onClick={() => document.querySelector('[data-radix-collection-item][value=calculator]')?.click()}>Production Calculator</button>
+                  <button className="nav-button" onClick={() => document.querySelector('[data-radix-collection-item][value=recipe]')?.click()}>Recipe Scaler</button>
+                  <button className="nav-button" onClick={() => document.querySelector('[data-radix-collection-item][value=manager]')?.click()}>Recipe Management</button>
+                  <button className="nav-button" onClick={() => document.querySelector('[data-radix-collection-item][value=product_management]')?.click()}>Product Management</button>
+                   <button className="nav-button" onClick={() => document.querySelector('[data-radix-collection-item][value=inventory]')?.click()}>Inventory</button>
+                </div>
             </div>
+        </nav>
+
+
+        <main className="w-full max-w-7xl mt-[140px]">
+          <Tabs defaultValue="calculator" className="w-full">
+            <TabsList className="hidden">
+              <TabsTrigger value="calculator">Production Calculator</TabsTrigger>
+              <TabsTrigger value="recipe">Recipe Scaler</TabsTrigger>
+              <TabsTrigger value="manager">Recipe Management</TabsTrigger>
+              <TabsTrigger value="product_management">Product Management</TabsTrigger>
+              <TabsTrigger value="inventory">Inventory</TabsTrigger>
+            </TabsList>
             <TabsContent value="calculator">
               <ProductionCalculator products={products}/>
             </TabsContent>
@@ -98,11 +86,29 @@ export default function Home() {
             </TabsContent>
           </Tabs>
         </main>
+        
+        {isLoggedIn ? (
+             <Button
+                variant="ghost"
+                className="fixed top-4 left-4 z-20 text-white hover:text-white/80 hover:bg-white/10"
+                onClick={handleLogout}
+                title="Logout"
+              >
+                <LogOut />
+              </Button>
+          ) : (
+             <Button
+                variant="ghost"
+                className="fixed top-4 left-4 z-20 text-white hover:text-white/80 hover:bg-white/10"
+                onClick={() => setIsLoginDialogOpen(true)}
+                title="Login"
+              >
+                <LogIn />
+              </Button>
+          )}
 
-        <footer className="w-full text-center mt-auto pt-8 text-primary-foreground/80">
-          <p>
-            Created by <a href="https://twitter.com/Agung_styb" target="_blank" rel="noopener noreferrer" className="font-bold underline hover:text-primary-foreground">Agung Setia Budi</a>
-          </p>
+        <footer className="fixed bottom-0 left-0 w-full p-4 text-center glassmorphic border-t border-white/30 text-[#f9e1c0] font-medium text-sm">
+            Created by <a href="https://twitter.com/Agung_styb" target="_blank" rel="noopener noreferrer" className="font-bold underline text-[#ffdd99] hover:text-[#ffbb66]">Agung Setia Budi</a>
         </footer>
       </div>
       <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
@@ -119,3 +125,4 @@ export default function Home() {
     </>
   );
 }
+

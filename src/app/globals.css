@@ -76,7 +76,15 @@
 
 @layer components {
   .glassmorphic {
-    @apply bg-card/60 backdrop-blur-lg;
+    @apply bg-white/20 backdrop-blur-xl;
+  }
+
+  .nav-button {
+    @apply bg-[#5a3e2b] text-white border-none rounded-md py-2 px-4 text-sm cursor-pointer transition-all duration-300 ease-in-out;
+  }
+
+  .nav-button:hover, .nav-button.active {
+    @apply bg-[#7a5a42] scale-105;
   }
 }
 

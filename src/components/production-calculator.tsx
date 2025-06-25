@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { UploadCloud, Loader2, Calculator, ShoppingBasket } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -60,6 +60,7 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
       const photoDataUri = e.target?.result as string;
       if (photoDataUri) {
         startTransition(async () => {
+          toast({ title: "Processing...", description: "AI is analyzing your image." });
           const { data, error } = await getQuantitiesFromImage(photoDataUri);
           if (error) {
             toast({ variant: "destructive", title: "OCR Failed", description: error });
@@ -72,7 +73,7 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
                 filledCount++;
               }
             }
-            setHasCalculated(false); // Reset calculation state after auto-fill
+            setHasCalculated(false); 
             toast({ title: "Success", description: `Auto-filled ${filledCount} items. Press Calculate to see results.` });
           }
         });
@@ -83,61 +84,64 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
   };
 
   return (
-    <Card className="glassmorphic border-2 border-border/30 w-full max-w-4xl mx-auto">
-      <CardHeader>
-        <CardTitle>Production Quantities</CardTitle>
-        <CardDescription>Enter product quantities or upload an image to auto-fill.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-col gap-8">
+    <Card className="glassmorphic border-none shadow-lg w-full max-w-[600px] mx-auto">
+      <CardContent className="pt-6">
+        <div className="flex flex-col gap-6">
           
-          <div>
-            <div className="mb-4">
-              <input
+          <div className="p-4 bg-white/10 rounded-lg">
+            <label className="block mb-2 text-center text-[#f9e1c0] font-medium">Upload Screenshot for Auto-Fill</label>
+             <input
                 type="file"
                 accept="image/*"
                 ref={fileInputRef}
                 onChange={handleFileChange}
                 className="hidden"
               />
-              <Button type="button" onClick={() => fileInputRef.current?.click()} disabled={isPending} className="w-full">
-                {isPending ? <Loader2 className="animate-spin" /> : <UploadCloud />}
-                Upload Screenshot for Auto-Fill
-              </Button>
-            </div>
+            <Button 
+              type="button" 
+              onClick={() => fileInputRef.current?.click()} 
+              disabled={isPending} 
+              className="w-full bg-[#5a3e2b] text-white hover:bg-[#7a5a42] hover:scale-105 transition-all text-base font-medium"
+            >
+              {isPending ? <Loader2 className="animate-spin" /> : <UploadCloud />}
+              {isPending ? 'Analyzing...' : 'Upload & Map Quantities'}
+            </Button>
+          </div>
+
+          <div>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleCalculate)} className="space-y-6">
-                <ScrollArea className="h-[50vh] pr-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+              <form onSubmit={form.handleSubmit(handleCalculate)} className="space-y-4">
+                <ScrollArea className="h-[45vh] pr-2">
+                  <div className="space-y-2">
                     {productList.map((item) => (
                       <FormField
                         key={item}
                         control={form.control}
                         name={item as any}
                         render={({ field }) => (
-                          <FormItem>
-                            <div className="flex items-center justify-between">
-                              <FormLabel>{item.split(' ').map(capitalize).join(' ')}</FormLabel>
+                          <FormItem className="flex justify-between items-center py-2 border-b border-white/30">
+                              <FormLabel className="flex-grow text-left text-[#f9e1c0] font-medium text-sm">
+                                {capitalize(item)}
+                              </FormLabel>
                               <FormControl>
                                 <Input 
                                   type="number" 
                                   {...field} 
                                   placeholder="0"
-                                  className="w-24"
+                                  className="flex-none w-24 text-center bg-white/80 text-black rounded-md py-1 px-2 h-auto focus:shadow-[0_0_8px_rgba(255,255,255,0.5)] focus:ring-0 focus:outline-none border-none"
                                   onChange={e => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
                                   value={field.value === 0 ? '' : field.value}
                                 />
                               </FormControl>
-                            </div>
                           </FormItem>
                         )}
                       />
                     ))}
                   </div>
                 </ScrollArea>
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full mt-4 bg-[#5a3e2b] text-white hover:bg-[#7a5a42] hover:scale-105 transition-all text-base font-medium p-6">
                     <Calculator className="mr-2"/>
-                    Calculate
+                    CALCULATE
                 </Button>
               </form>
             </Form>
@@ -145,24 +149,24 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
 
           {hasCalculated ? (
             <Accordion type="multiple" defaultValue={['results', 'summary']} className="w-full space-y-4">
-                <AccordionItem value="results" className="glassmorphic border rounded-lg">
-                    <AccordionTrigger className="p-4 hover:no-underline">
-                        <h3 className="text-lg font-semibold flex items-center gap-2"><Calculator /> Calculation Results</h3>
+                <AccordionItem value="results" className="glassmorphic border-none rounded-lg text-black">
+                    <AccordionTrigger className="p-4 hover:no-underline text-white font-semibold text-lg">
+                        <h3 className="flex items-center gap-2"><Calculator /> Calculation Results</h3>
                     </AccordionTrigger>
                     <AccordionContent className="p-4 pt-0">
                         <ScrollArea className="h-auto max-h-[40vh]">
                           <Table>
                             <TableHeader>
-                              <TableRow>
-                                <TableHead>Metric</TableHead>
-                                <TableHead className="text-right">Result</TableHead>
+                              <TableRow className="border-white/30">
+                                <TableHead className="text-black font-semibold">Metric</TableHead>
+                                <TableHead className="text-right text-black font-semibold">Result</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
                               {results.productionCalculations.map(([key, value]) => (
-                                <TableRow key={key}>
-                                    <TableCell className="font-medium">{key}</TableCell>
-                                    <TableCell className="text-right">{value}</TableCell>
+                                <TableRow key={key} className="border-white/30">
+                                    <TableCell className="font-medium text-black">{key}</TableCell>
+                                    <TableCell className="text-right text-black">{value}</TableCell>
                                 </TableRow>
                               ))}
                             </TableBody>
@@ -171,30 +175,30 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
                     </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="summary" className="glassmorphic border rounded-lg">
-                    <AccordionTrigger className="p-4 hover:no-underline">
-                         <h3 className="text-lg font-semibold flex items-center gap-2"><ShoppingBasket /> Ingredient Summary</h3>
+                <AccordionItem value="summary" className="glassmorphic border-none rounded-lg text-black">
+                    <AccordionTrigger className="p-4 hover:no-underline text-white font-semibold text-lg">
+                         <h3 className="flex items-center gap-2"><ShoppingBasket /> Ingredient Summary</h3>
                     </AccordionTrigger>
                     <AccordionContent className="p-4 pt-0">
                         <ScrollArea className="h-auto max-h-[40vh]">
                         <Table>
                             <TableHeader>
-                            <TableRow>
-                                <TableHead>Ingredient</TableHead>
-                                <TableHead className="text-right">Total Amount</TableHead>
+                            <TableRow className="border-white/30">
+                                <TableHead className="text-black font-semibold">Ingredient</TableHead>
+                                <TableHead className="text-right text-black font-semibold">Total Amount</TableHead>
                             </TableRow>
                             </TableHeader>
                             <TableBody>
                             {results.ingredientSummary.length > 0 ? (
                                 results.ingredientSummary.map(([key, value, unit]) => (
-                                <TableRow key={key}>
-                                    <TableCell className="font-medium">{capitalize(key)}</TableCell>
-                                    <TableCell className="text-right">{value} {unit}</TableCell>
+                                <TableRow key={key} className="border-white/30">
+                                    <TableCell className="font-medium text-black">{capitalize(key)}</TableCell>
+                                    <TableCell className="text-right text-black">{value} {unit}</TableCell>
                                 </TableRow>
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={2} className="text-center h-24 text-muted-foreground italic">
+                                    <TableCell colSpan={2} className="text-center h-24 text-black italic">
                                         No ingredients for the entered quantities.
                                     </TableCell>
                                 </TableRow>
@@ -206,7 +210,7 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
                 </AccordionItem>
             </Accordion>
           ) : (
-            <div className="text-center text-muted-foreground italic py-8 border-2 border-dashed rounded-lg">
+            <div className="text-center text-white/80 italic py-8 border-2 border-dashed border-white/30 rounded-lg">
               <p>Click "Calculate" to see the results.</p>
             </div>
           )}

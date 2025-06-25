@@ -1,9 +1,10 @@
+
 "use client";
 
 import { useState, useTransition, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UploadCloud, Loader2, Calculator } from "lucide-react";
+import { UploadCloud, Loader2, Calculator, ShoppingBasket } from "lucide-react";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -13,9 +14,10 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { productItems } from "@/lib/products";
-import { productionSchema, calculateProductionMetrics, initialCalculations } from "@/lib/calculations";
+import { productionSchema, calculateProductionMetrics, initialMetrics } from "@/lib/calculations";
 import type { ProductionInputs } from "@/lib/calculations";
 import { getQuantitiesFromImage } from "@/app/actions";
+import { ScrollArea } from "./ui/scroll-area";
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
@@ -28,7 +30,7 @@ export default function ProductionCalculator() {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [results, setResults] = useState(initialCalculations);
+  const [results, setResults] = useState(initialMetrics);
 
   const form = useForm<ProductionFormValues>({
     resolver: zodResolver(productionSchema),
@@ -38,9 +40,6 @@ export default function ProductionCalculator() {
   const watchedValues = form.watch();
 
   useEffect(() => {
-    // calculateProductionMetrics expects all values to be numbers.
-    // The `calculateProductionMetrics` function already handles this by using `Number()`,
-    // so we can safely cast the type.
     const newResults = calculateProductionMetrics(watchedValues as ProductionInputs);
     setResults(newResults);
   }, [JSON.stringify(watchedValues)]);
@@ -76,13 +75,13 @@ export default function ProductionCalculator() {
   };
 
   return (
-    <Card className="glassmorphic border-2 border-border/30 w-full max-w-6xl mx-auto">
+    <Card className="glassmorphic border-2 border-border/30 w-full max-w-7xl mx-auto">
       <CardHeader>
         <CardTitle>Production Quantities</CardTitle>
         <CardDescription>Enter product quantities or upload an image to auto-fill.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-8">
           <div>
             <div className="mb-4">
               <input
@@ -99,47 +98,82 @@ export default function ProductionCalculator() {
             </div>
             <Form {...form}>
               <form>
-                <div className="space-y-4">
-                  {productItems.map((item) => (
-                    <FormField
-                      key={item}
-                      control={form.control}
-                      name={item as keyof ProductionFormValues}
-                      render={({ field }) => (
-                        <FormItem>
-                          <div className="flex items-center justify-between">
-                            <FormLabel>{item.split('_').map(capitalize).join(' ')}</FormLabel>
-                            <FormControl>
-                              <Input type="number" {...field} className="w-24" />
-                            </FormControl>
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                  ))}
-                </div>
+                <ScrollArea className="h-[70vh] pr-4">
+                  <div className="space-y-4">
+                    {productItems.map((item) => (
+                      <FormField
+                        key={item}
+                        control={form.control}
+                        name={item as keyof ProductionFormValues}
+                        render={({ field }) => (
+                          <FormItem>
+                            <div className="flex items-center justify-between">
+                              <FormLabel>{item.split('_').map(capitalize).join(' ')}</FormLabel>
+                              <FormControl>
+                                <Input type="number" {...field} className="w-24" />
+                              </FormControl>
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                    ))}
+                  </div>
+                </ScrollArea>
               </form>
             </Form>
           </div>
 
-          <div>
-            <h3 className="font-headline text-xl md:text-2xl mb-4 text-center flex items-center justify-center gap-2"><Calculator/> Calculation Results</h3>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Metric</TableHead>
-                  <TableHead className="text-right">Result</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {results.map(([key, value]) => (
-                  <TableRow key={key}>
-                    <TableCell className="font-medium">{key}</TableCell>
-                    <TableCell className="text-right">{value}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+          <div className="space-y-8">
+            <div>
+              <h3 className="font-headline text-xl md:text-2xl mb-4 text-center flex items-center justify-center gap-2"><Calculator /> Calculation Results</h3>
+              <ScrollArea className="h-[calc(35vh-2rem)] border rounded-md">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Metric</TableHead>
+                      <TableHead className="text-right">Result</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {results.productionCalculations.map(([key, value]) => (
+                      <TableRow key={key}>
+                        <TableCell className="font-medium">{key}</TableCell>
+                        <TableCell className="text-right">{value}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </ScrollArea>
+            </div>
+            <div>
+              <h3 className="font-headline text-xl md:text-2xl mb-4 text-center flex items-center justify-center gap-2"><ShoppingBasket /> Ingredient Summary</h3>
+               <ScrollArea className="h-[calc(35vh-2rem)] border rounded-md">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Ingredient</TableHead>
+                      <TableHead className="text-right">Total Amount (g)</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {results.ingredientSummary.length > 0 ? (
+                      results.ingredientSummary.map(([key, value]) => (
+                        <TableRow key={key}>
+                          <TableCell className="font-medium">{key}</TableCell>
+                          <TableCell className="text-right">{value}</TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                          <TableCell colSpan={2} className="text-center h-24 text-muted-foreground italic">
+                              Enter quantities to see ingredient summary.
+                          </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+               </ScrollArea>
+            </div>
           </div>
         </div>
       </CardContent>

@@ -1,5 +1,7 @@
+
 import { z } from "zod";
 import { productItems } from "./products";
+import { productIngredientsData } from "./productIngredients";
 
 export const productionSchema = z.object(
     productItems.reduce((acc, item) => {
@@ -53,10 +55,29 @@ export function calculateProductionMetrics(inputs: ProductionInputs) {
         "Adonan Abon Taiwan": `${(numInputs['abon taiwan'] / 4).toFixed(2)} resep`,
     };
 
-    return Object.entries(calculations);
+    const ingredientTotals: Record<string, number> = {};
+
+    for (const [productName, quantity] of Object.entries(numInputs)) {
+        const productKey = productName as keyof typeof productIngredientsData;
+        if (quantity > 0 && productIngredientsData[productKey]) {
+            const ingredients = productIngredientsData[productKey];
+            for (const [ingredient, amount] of Object.entries(ingredients)) {
+                ingredientTotals[ingredient] = (ingredientTotals[ingredient] || 0) + (amount * quantity);
+            }
+        }
+    }
+
+    const ingredientSummary = Object.entries(ingredientTotals)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([name, total]) => [name, total.toFixed(2)]);
+
+    return {
+        productionCalculations: Object.entries(calculations),
+        ingredientSummary: ingredientSummary,
+    };
 }
 
-export const initialCalculations = [
+const productionCalculations = [
     ["Abon Ayam Pedas", "0.00 loyang"],
     ["Abon Piramid", "0.00 loyang"],
     ["Abon Roll Pedas", "0.00 loyang"],
@@ -92,3 +113,8 @@ export const initialCalculations = [
     ["Fla Abon Taiwan", "0.00 resep"],
     ["Adonan Abon Taiwan", "0.00 resep"],
 ];
+
+export const initialMetrics = {
+    productionCalculations,
+    ingredientSummary: [] as [string, string][]
+};

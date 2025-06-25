@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,12 +6,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { type ProductIngredients } from "@/lib/productIngredients";
 import { ScrollArea } from "./ui/scroll-area";
 import { useMemo } from "react";
+import { capitalize } from "@/lib/utils";
 
 interface InventoryProps {
     products: ProductIngredients;
 }
-
-const capitalize = (s: string) => s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
 export default function Inventory({ products }: InventoryProps) {
 

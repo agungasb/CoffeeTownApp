@@ -14,14 +14,13 @@ import { Edit, PlusCircle, ShieldAlert, Trash2 } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
 import { useToast } from '@/hooks/use-toast';
 import { ProductForm } from './product-form';
+import { capitalize } from '@/lib/utils';
 
 interface ProductManagerProps {
     products: ProductIngredients;
     setProducts: (products: ProductIngredients) => void;
     isLoggedIn: boolean;
 }
-
-const capitalize = (s: string) => s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
 export default function ProductManager({ products, setProducts, isLoggedIn }: ProductManagerProps) {
     const { toast } = useToast();

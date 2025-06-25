@@ -3,9 +3,8 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Card, CardContent } from '@/components/ui/card';
 import ProductionCalculator from "@/components/production-calculator";
 import RecipeScaler from "@/components/recipe-scaler";
 import RecipeManager from "@/components/recipe-manager";
@@ -21,6 +20,7 @@ export default function Home() {
   const [products, setProducts] = useState<ProductIngredients>(productIngredientsData);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('calculator');
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
@@ -46,25 +46,18 @@ export default function Home() {
         <nav className="fixed top-[80px] left-0 w-full z-10 py-2 glassmorphic">
             <div className="overflow-x-auto hide-scrollbar">
                 <div className="flex justify-center gap-5 px-4">
-                  <button className="nav-button active" onClick={() => document.querySelector('[data-radix-collection-item][value=calculator]')?.click()}>Production Calculator</button>
-                  <button className="nav-button" onClick={() => document.querySelector('[data-radix-collection-item][value=recipe]')?.click()}>Recipe Scaler</button>
-                  <button className="nav-button" onClick={() => document.querySelector('[data-radix-collection-item][value=manager]')?.click()}>Recipe Management</button>
-                  <button className="nav-button" onClick={() => document.querySelector('[data-radix-collection-item][value=product_management]')?.click()}>Product Management</button>
-                   <button className="nav-button" onClick={() => document.querySelector('[data-radix-collection-item][value=inventory]')?.click()}>Inventory</button>
+                  <button className={`nav-button ${activeTab === 'calculator' ? 'active' : ''}`} onClick={() => setActiveTab('calculator')}>Production Calculator</button>
+                  <button className={`nav-button ${activeTab === 'recipe' ? 'active' : ''}`} onClick={() => setActiveTab('recipe')}>Recipe Scaler</button>
+                  <button className={`nav-button ${activeTab === 'manager' ? 'active' : ''}`} onClick={() => setActiveTab('manager')}>Recipe Management</button>
+                  <button className={`nav-button ${activeTab === 'product_management' ? 'active' : ''}`} onClick={() => setActiveTab('product_management')}>Product Management</button>
+                  <button className={`nav-button ${activeTab === 'inventory' ? 'active' : ''}`} onClick={() => setActiveTab('inventory')}>Inventory</button>
                 </div>
             </div>
         </nav>
 
 
         <main className="w-full max-w-7xl mt-[140px]">
-          <Tabs defaultValue="calculator" className="w-full">
-            <TabsList className="hidden">
-              <TabsTrigger value="calculator">Production Calculator</TabsTrigger>
-              <TabsTrigger value="recipe">Recipe Scaler</TabsTrigger>
-              <TabsTrigger value="manager">Recipe Management</TabsTrigger>
-              <TabsTrigger value="product_management">Product Management</TabsTrigger>
-              <TabsTrigger value="inventory">Inventory</TabsTrigger>
-            </TabsList>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsContent value="calculator">
               <ProductionCalculator products={products}/>
             </TabsContent>
@@ -125,4 +118,3 @@ export default function Home() {
     </>
   );
 }
-

@@ -19,8 +19,7 @@ import { ScrollArea } from "./ui/scroll-area";
 import type { ProductIngredients } from "@/lib/productIngredients";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { productItems } from "@/lib/products";
-
-const capitalize = (s: string) => s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+import { capitalize } from "@/lib/utils";
 
 type ProductionFormValues = {
   [K in keyof ProductionInputs]: number | '';

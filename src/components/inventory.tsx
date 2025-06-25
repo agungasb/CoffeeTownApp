@@ -2,9 +2,10 @@
 "use client";
 
 import { useMemo } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { type ProductIngredients } from "@/lib/productIngredients";
 import { capitalize } from "@/lib/utils";
+import { Warehouse } from "lucide-react";
 
 interface InventoryProps {
     products: ProductIngredients;
@@ -25,13 +26,11 @@ export default function Inventory({ products }: InventoryProps) {
         <Card className="glassmorphic border-2 border-border/30 w-full max-w-6xl mx-auto">
             <CardHeader>
                 <CardTitle>Inventory Master List</CardTitle>
-                <CardDescription>A complete list of all unique ingredients used across all products.</CardDescription>
             </CardHeader>
             <CardContent>
-                 <div className="p-3 mb-4 rounded-lg border bg-muted/30">
-                    <p className="text-sm text-muted-foreground">
-                        A total of <span className="font-bold text-foreground">{sortedIngredients.length}</span> unique ingredients are used across all your products.
-                    </p>
+                 <div className="flex items-center gap-2 mb-4 text-foreground">
+                    <Warehouse className="h-6 w-6 text-muted-foreground" />
+                    <h3 className="text-xl font-semibold">Unique Ingredients ({sortedIngredients.length})</h3>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     {sortedIngredients.map(ingredient => (

@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { type ProductIngredients } from "@/lib/productIngredients";
-import { Edit, PlusCircle, ShieldAlert, Trash2 } from "lucide-react";
+import { Edit, PlusCircle, ShieldAlert, Trash2, Archive } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
 import { ProductForm } from './product-form';
 import { capitalize } from '@/lib/utils';
@@ -69,20 +69,16 @@ export default function ProductManager({ products, setProducts, isLoggedIn }: Pr
 
     return (
         <Card className="glassmorphic border-2 border-border/30 w-full max-w-6xl mx-auto">
-            <CardHeader className="flex-col items-start sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                    <CardTitle>Product Management</CardTitle>
-                    <CardDescription>View and manage ingredients for each product.</CardDescription>
-                </div>
+            <CardHeader className="flex flex-row items-center justify-between gap-4">
+                <CardTitle>Product Management</CardTitle>
                 <Button onClick={handleAddClick} disabled={!isLoggedIn}>
                     <PlusCircle className="mr-2" /> Add New Product
                 </Button>
             </CardHeader>
             <CardContent>
-                <div className="p-3 mb-4 rounded-lg border bg-muted/30">
-                    <p className="text-sm text-muted-foreground">
-                        There are <span className="font-bold text-foreground">{productCount}</span> products in your list. Each product's ingredients can be managed here.
-                    </p>
+                <div className="flex items-center gap-2 mb-4 text-foreground">
+                    <Archive className="h-6 w-6 text-muted-foreground" />
+                    <h3 className="text-xl font-semibold">Managed Products ({productCount})</h3>
                 </div>
                 {!isLoggedIn && (
                     <Alert variant="destructive" className="mb-4 bg-destructive/20 border-destructive/50">

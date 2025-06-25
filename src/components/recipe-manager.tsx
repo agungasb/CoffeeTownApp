@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { PlusCircle, Edit, Trash2, ShieldAlert } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, ShieldAlert, BookHeart } from 'lucide-react';
 import { RecipeForm } from './recipe-form';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -67,20 +67,16 @@ export default function RecipeManager({ recipes, setRecipes, isLoggedIn }: Recip
 
     return (
         <Card className="glassmorphic border-2 border-border/30 w-full max-w-6xl mx-auto">
-            <CardHeader className="flex-col items-start sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                    <CardTitle>Recipe Management</CardTitle>
-                    <CardDescription>Add, edit, or delete your custom recipes.</CardDescription>
-                </div>
+            <CardHeader className="flex flex-row items-center justify-between gap-4">
+                <CardTitle>Recipe Management</CardTitle>
                  <Button onClick={handleAddClick} disabled={!isLoggedIn}>
                     <PlusCircle className="mr-2" /> Add New Recipe
                 </Button>
             </CardHeader>
             <CardContent>
-                <div className="p-3 mb-4 rounded-lg border bg-muted/30">
-                    <p className="text-sm text-muted-foreground">
-                        You are currently managing <span className="font-bold text-foreground">{recipes.length}</span> unique recipes. Add new creations or modify existing ones below.
-                    </p>
+                <div className="flex items-center gap-2 mb-4 text-foreground">
+                    <BookHeart className="h-6 w-6 text-muted-foreground" />
+                    <h3 className="text-xl font-semibold">Existing Recipes ({recipes.length})</h3>
                 </div>
                 {!isLoggedIn && (
                      <Alert variant="destructive" className="mb-4 bg-destructive/20 border-destructive/50">

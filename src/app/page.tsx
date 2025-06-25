@@ -15,6 +15,14 @@ import { recipes as initialRecipes, type Recipe } from '@/lib/recipes';
 import { productIngredientsData, type ProductIngredients } from '@/lib/productIngredients';
 import { LogIn, LogOut } from 'lucide-react';
 
+const TABS = [
+  { id: 'calculator', label: 'Production Calculator' },
+  { id: 'recipe', label: 'Recipe Scaler' },
+  { id: 'manager', label: 'Recipe Management' },
+  { id: 'product_management', label: 'Product Management' },
+  { id: 'inventory', label: 'Inventory' },
+];
+
 export default function Home() {
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
   const [products, setProducts] = useState<ProductIngredients>(productIngredientsData);
@@ -46,11 +54,15 @@ export default function Home() {
         <nav className="fixed top-[80px] left-0 w-full z-10 py-2 glassmorphic">
             <div className="overflow-x-auto hide-scrollbar">
                 <div className="flex justify-start md:justify-center gap-5 px-4">
-                  <button className={`nav-button ${activeTab === 'calculator' ? 'active' : ''}`} onClick={() => setActiveTab('calculator')}>Production Calculator</button>
-                  <button className={`nav-button ${activeTab === 'recipe' ? 'active' : ''}`} onClick={() => setActiveTab('recipe')}>Recipe Scaler</button>
-                  <button className={`nav-button ${activeTab === 'manager' ? 'active' : ''}`} onClick={() => setActiveTab('manager')}>Recipe Management</button>
-                  <button className={`nav-button ${activeTab === 'product_management' ? 'active' : ''}`} onClick={() => setActiveTab('product_management')}>Product Management</button>
-                  <button className={`nav-button ${activeTab === 'inventory' ? 'active' : ''}`} onClick={() => setActiveTab('inventory')}>Inventory</button>
+                  {TABS.map((tab) => (
+                     <button 
+                        key={tab.id}
+                        className={`nav-button ${activeTab === tab.id ? 'active' : ''}`} 
+                        onClick={() => setActiveTab(tab.id)}
+                      >
+                        {tab.label}
+                      </button>
+                  ))}
                 </div>
             </div>
         </nav>

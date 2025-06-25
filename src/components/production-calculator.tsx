@@ -18,6 +18,7 @@ import type { ProductionInputs } from "@/lib/calculations";
 import { getQuantitiesFromImage } from "@/app/actions";
 import { ScrollArea } from "./ui/scroll-area";
 import type { ProductIngredients } from "@/lib/productIngredients";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const capitalize = (s: string) => s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
@@ -89,13 +90,13 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
   };
 
   return (
-    <Card className="glassmorphic border-2 border-border/30 w-full max-w-7xl mx-auto">
+    <Card className="glassmorphic border-2 border-border/30 w-full max-w-4xl mx-auto">
       <CardHeader>
         <CardTitle>Production Quantities</CardTitle>
         <CardDescription>Enter product quantities or upload an image to auto-fill.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="flex flex-col gap-8">
           
           <div>
             <div className="mb-4">
@@ -112,9 +113,9 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
               </Button>
             </div>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleCalculate)}>
-                <ScrollArea className="h-[calc(70vh-5rem)] pr-4">
-                  <div className="space-y-4">
+              <form onSubmit={form.handleSubmit(handleCalculate)} className="space-y-6">
+                <ScrollArea className="h-[50vh] pr-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                     {productList.map((item) => (
                       <FormField
                         key={item}
@@ -141,83 +142,81 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
                     ))}
                   </div>
                 </ScrollArea>
-                <div className="mt-6">
-                    <Button type="submit" className="w-full">
-                        <Calculator className="mr-2"/>
-                        Calculate
-                    </Button>
-                </div>
+                <Button type="submit" className="w-full">
+                    <Calculator className="mr-2"/>
+                    Calculate
+                </Button>
               </form>
             </Form>
           </div>
 
-          <div className="space-y-8">
-            <Card className="shadow-lg">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Calculator /> Calculation Results</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <ScrollArea className="h-[calc(35vh-4rem)]">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Metric</TableHead>
-                            <TableHead className="text-right">Result</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {hasCalculated ? results.productionCalculations.map(([key, value]) => (
-                            <TableRow key={key}>
-                                <TableCell className="font-medium">{key}</TableCell>
-                                <TableCell className="text-right">{value}</TableCell>
-                            </TableRow>
-                          )) : (
-                            <TableRow>
-                                <TableCell colSpan={2} className="text-center h-24 text-muted-foreground italic">
-                                    Click "Calculate" to see results.
-                                </TableCell>
-                            </TableRow>
-                          )}
-                        </TableBody>
-                      </Table>
-                    </ScrollArea>
-                </CardContent>
-            </Card>
+          {hasCalculated ? (
+            <Accordion type="multiple" defaultValue={['results', 'summary']} className="w-full space-y-4">
+                <AccordionItem value="results" className="glassmorphic border rounded-lg">
+                    <AccordionTrigger className="p-4 hover:no-underline">
+                        <h3 className="text-lg font-semibold flex items-center gap-2"><Calculator /> Calculation Results</h3>
+                    </AccordionTrigger>
+                    <AccordionContent className="p-4 pt-0">
+                        <ScrollArea className="h-auto max-h-[40vh]">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>Metric</TableHead>
+                                <TableHead className="text-right">Result</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {results.productionCalculations.map(([key, value]) => (
+                                <TableRow key={key}>
+                                    <TableCell className="font-medium">{key}</TableCell>
+                                    <TableCell className="text-right">{value}</TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </ScrollArea>
+                    </AccordionContent>
+                </AccordionItem>
 
-            <Card className="shadow-lg">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><ShoppingBasket /> Ingredient Summary</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <ScrollArea className="h-[calc(35vh-4rem)]">
-                    <Table>
-                        <TableHeader>
-                        <TableRow>
-                            <TableHead>Ingredient</TableHead>
-                            <TableHead className="text-right">Total Amount</TableHead>
-                        </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                        {hasCalculated && results.ingredientSummary.length > 0 ? (
-                            results.ingredientSummary.map(([key, value, unit]) => (
-                            <TableRow key={key}>
-                                <TableCell className="font-medium">{capitalize(key)}</TableCell>
-                                <TableCell className="text-right">{value} {unit}</TableCell>
-                            </TableRow>
-                            ))
-                        ) : (
+                <AccordionItem value="summary" className="glassmorphic border rounded-lg">
+                    <AccordionTrigger className="p-4 hover:no-underline">
+                         <h3 className="text-lg font-semibold flex items-center gap-2"><ShoppingBasket /> Ingredient Summary</h3>
+                    </AccordionTrigger>
+                    <AccordionContent className="p-4 pt-0">
+                        <ScrollArea className="h-auto max-h-[40vh]">
+                        <Table>
+                            <TableHeader>
                             <TableRow>
-                                <TableCell colSpan={2} className="text-center h-24 text-muted-foreground italic">
-                                    {hasCalculated ? "No ingredients for the entered quantities." : 'Click "Calculate" to see results.'}
-                                </TableCell>
+                                <TableHead>Ingredient</TableHead>
+                                <TableHead className="text-right">Total Amount</TableHead>
                             </TableRow>
-                        )}
-                        </TableBody>
-                    </Table>
-                    </ScrollArea>
-                </CardContent>
-            </Card>
-          </div>
+                            </TableHeader>
+                            <TableBody>
+                            {results.ingredientSummary.length > 0 ? (
+                                results.ingredientSummary.map(([key, value, unit]) => (
+                                <TableRow key={key}>
+                                    <TableCell className="font-medium">{capitalize(key)}</TableCell>
+                                    <TableCell className="text-right">{value} {unit}</TableCell>
+                                </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={2} className="text-center h-24 text-muted-foreground italic">
+                                        No ingredients for the entered quantities.
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                            </TableBody>
+                        </Table>
+                        </ScrollArea>
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
+          ) : (
+            <div className="text-center text-muted-foreground italic py-8 border-2 border-dashed rounded-lg">
+              <p>Click "Calculate" to see the results.</p>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

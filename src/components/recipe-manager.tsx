@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -89,7 +90,7 @@ export default function RecipeManager({ recipes, setRecipes, isLoggedIn }: Recip
                 <ScrollArea className="h-[70vh]">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pr-4">
                         {recipes.map((recipe) => (
-                            <Card key={recipe.id} className="flex flex-col">
+                            <Card key={recipe.id} className="flex flex-col glassmorphic">
                                 <CardHeader>
                                     <CardTitle className="text-lg">{recipe.name}</CardTitle>
                                     <CardDescription>{recipe.ingredients.length} ingredients, {recipe.steps.length} steps</CardDescription>
@@ -146,7 +147,7 @@ export default function RecipeManager({ recipes, setRecipes, isLoggedIn }: Recip
                                                 <Trash2 className="mr-2 h-4 w-4" /> Delete
                                             </Button>
                                         </AlertDialogTrigger>
-                                        <AlertDialogContent>
+                                        <AlertDialogContent className="glassmorphic">
                                             <AlertDialogHeader>
                                                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                                                 <AlertDialogDescription>
@@ -168,7 +169,7 @@ export default function RecipeManager({ recipes, setRecipes, isLoggedIn }: Recip
                 </ScrollArea>
                 
                 <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
-                    <DialogContent className="md:max-w-[700px] max-h-[90vh] flex flex-col p-0">
+                    <DialogContent className="md:max-w-[700px] max-h-[90vh] flex flex-col p-0 glassmorphic">
                         <DialogHeader className="p-6 pb-0">
                             <DialogTitle>{recipeToEdit ? 'Edit Recipe' : 'Add New Recipe'}</DialogTitle>
                         </DialogHeader>
@@ -183,7 +184,7 @@ export default function RecipeManager({ recipes, setRecipes, isLoggedIn }: Recip
                 </Dialog>
 
                 <AlertDialog open={isConfirmingSave} onOpenChange={setIsConfirmingSave}>
-                    <AlertDialogContent>
+                    <AlertDialogContent className="glassmorphic">
                         <AlertDialogHeader>
                             <AlertDialogTitle>Confirm Save</AlertDialogTitle>
                             <AlertDialogDescription>

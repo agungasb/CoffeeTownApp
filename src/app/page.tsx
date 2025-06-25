@@ -117,7 +117,7 @@ export default function Home() {
         </footer>
       </div>
       <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md glassmorphic">
           <DialogHeader>
             <DialogTitle>Login</DialogTitle>
           </DialogHeader>

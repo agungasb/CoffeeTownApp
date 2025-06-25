@@ -91,7 +91,7 @@ export default function ProductManager({ products, setProducts, isLoggedIn }: Pr
                  <ScrollArea className="h-[70vh]">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pr-4">
                         {Object.entries(products).sort(([a], [b]) => a.localeCompare(b)).map(([productName, ingredients]) => (
-                            <Card key={productName} className="flex flex-col">
+                            <Card key={productName} className="flex flex-col glassmorphic">
                                 <CardHeader>
                                     <CardTitle className="text-lg">{capitalize(productName)}</CardTitle>
                                     <CardDescription>{Object.keys(ingredients).length} ingredients</CardDescription>
@@ -135,7 +135,7 @@ export default function ProductManager({ products, setProducts, isLoggedIn }: Pr
                                                 <Trash2 className="mr-2 h-4 w-4" /> Delete
                                             </Button>
                                         </AlertDialogTrigger>
-                                        <AlertDialogContent>
+                                        <AlertDialogContent className="glassmorphic">
                                             <AlertDialogHeader>
                                                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                                                 <AlertDialogDescription>
@@ -157,7 +157,7 @@ export default function ProductManager({ products, setProducts, isLoggedIn }: Pr
                 </ScrollArea>
 
                 <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
-                    <DialogContent className="md:max-w-[600px] max-h-[90vh] flex flex-col p-0">
+                    <DialogContent className="md:max-w-[600px] max-h-[90vh] flex flex-col p-0 glassmorphic">
                         <DialogHeader className="p-6 pb-0">
                             <DialogTitle>{productToEdit ? 'Edit Product' : 'Add New Product'}</DialogTitle>
                         </DialogHeader>

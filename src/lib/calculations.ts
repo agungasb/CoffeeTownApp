@@ -1,7 +1,7 @@
 
 import { z } from "zod";
 import { productItems } from "./products";
-import { productIngredientsData } from "./productIngredients";
+import type { ProductIngredients } from "./productIngredients";
 
 export const productionSchema = z.object(
     productItems.reduce((acc, item) => {
@@ -12,9 +12,9 @@ export const productionSchema = z.object(
 
 export type ProductionInputs = z.infer<typeof productionSchema>;
 
-export function calculateProductionMetrics(inputs: ProductionInputs) {
+export function calculateProductionMetrics(inputs: ProductionInputs, productIngredientsData: ProductIngredients) {
     const numInputs: { [key: string]: number } = {};
-    for (const key of productItems) {
+    for (const key of Object.keys(productIngredientsData)) {
         numInputs[key] = Number(inputs[key as keyof ProductionInputs]) || 0;
     }
 
@@ -69,7 +69,11 @@ export function calculateProductionMetrics(inputs: ProductionInputs) {
 
     const ingredientSummary = Object.entries(ingredientTotals)
         .sort(([a], [b]) => a.localeCompare(b))
-        .map(([name, total]) => [name, total.toFixed(2)]);
+        .map(([name, total]) => {
+            const unit = name.toLowerCase() === 'tusuk sate' ? 'pcs' : 'g';
+            return [name, total.toFixed(2), unit];
+        });
+
 
     return {
         productionCalculations: Object.entries(calculations),
@@ -116,5 +120,5 @@ const productionCalculations = [
 
 export const initialMetrics = {
     productionCalculations,
-    ingredientSummary: [] as [string, string][]
+    ingredientSummary: [] as [string, string, string][]
 };

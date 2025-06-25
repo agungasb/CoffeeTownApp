@@ -11,6 +11,8 @@ import { RecipeForm } from './recipe-form';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ScrollArea } from './ui/scroll-area';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 
 interface RecipeManagerProps {
     recipes: Recipe[];
@@ -90,16 +92,58 @@ export default function RecipeManager({ recipes, setRecipes, isLoggedIn }: Recip
                             <Card key={recipe.id} className="flex flex-col">
                                 <CardHeader>
                                     <CardTitle className="text-lg">{recipe.name}</CardTitle>
-                                    <CardDescription>{recipe.ingredients.length} ingredients</CardDescription>
+                                    <CardDescription>{recipe.ingredients.length} ingredients, {recipe.steps.length} steps</CardDescription>
                                 </CardHeader>
-                                <CardFooter className="mt-auto flex justify-end gap-2">
-                                    <Button variant="ghost" size="icon" onClick={() => handleEditClick(recipe)} disabled={!isLoggedIn}>
-                                        <Edit className="h-4 w-4" />
+                                 <CardContent className="flex-grow pb-0">
+                                    <Accordion type="single" collapsible className="w-full">
+                                        <AccordionItem value={recipe.id} className="border-b-0">
+                                            <AccordionTrigger className="py-2 hover:no-underline">View Details</AccordionTrigger>
+                                            <AccordionContent>
+                                                <ScrollArea className="h-48 pr-3">
+                                                    <div className="space-y-4">
+                                                        <div>
+                                                            <h4 className="font-semibold mb-2">Ingredients</h4>
+                                                            <Table>
+                                                                <TableHeader>
+                                                                    <TableRow>
+                                                                    <TableHead className="p-2 h-auto">Name</TableHead>
+                                                                    <TableHead className="p-2 h-auto text-right">Amount</TableHead>
+                                                                    <TableHead className="p-2 h-auto">Unit</TableHead>
+                                                                    </TableRow>
+                                                                </TableHeader>
+                                                                <TableBody>
+                                                                    {recipe.ingredients.map((ing) => (
+                                                                    <TableRow key={ing.name}>
+                                                                        <TableCell className="p-2">{ing.name}</TableCell>
+                                                                        <TableCell className="p-2 text-right">{ing.amount}</TableCell>
+                                                                        <TableCell className="p-2">{ing.unit}</TableCell>
+                                                                    </TableRow>
+                                                                    ))}
+                                                                </TableBody>
+                                                            </Table>
+                                                        </div>
+                                                        <div>
+                                                            <h4 className="font-semibold mb-2">Steps</h4>
+                                                            <ol className="list-decimal list-inside space-y-2 text-sm">
+                                                                {recipe.steps.map((step, index) => (
+                                                                    <li key={index}>{step}</li>
+                                                                ))}
+                                                            </ol>
+                                                        </div>
+                                                    </div>
+                                                </ScrollArea>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    </Accordion>
+                                </CardContent>
+                                <CardFooter className="mt-auto flex justify-end gap-2 pt-4">
+                                    <Button variant="outline" size="sm" onClick={() => handleEditClick(recipe)} disabled={!isLoggedIn}>
+                                        <Edit className="mr-2 h-4 w-4" /> Edit
                                     </Button>
                                     <AlertDialog>
                                         <AlertDialogTrigger asChild disabled={!isLoggedIn}>
-                                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" disabled={!isLoggedIn}>
-                                                <Trash2 className="h-4 w-4" />
+                                             <Button variant="destructive" size="sm" disabled={!isLoggedIn}>
+                                                <Trash2 className="mr-2 h-4 w-4" /> Delete
                                             </Button>
                                         </AlertDialogTrigger>
                                         <AlertDialogContent>
@@ -123,14 +167,12 @@ export default function RecipeManager({ recipes, setRecipes, isLoggedIn }: Recip
                     </div>
                 </ScrollArea>
                 
-
-                {/* Form Dialog */}
                 <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
-                    <DialogContent className="md:max-w-[600px] max-h-[90vh] flex flex-col">
-                        <DialogHeader>
+                    <DialogContent className="md:max-w-[700px] max-h-[90vh] flex flex-col p-0">
+                        <DialogHeader className="p-6 pb-0">
                             <DialogTitle>{recipeToEdit ? 'Edit Recipe' : 'Add New Recipe'}</DialogTitle>
                         </DialogHeader>
-                        <div className="flex-grow overflow-hidden">
+                        <div className="flex-grow overflow-hidden px-6">
                            <RecipeForm
                                 recipeToEdit={recipeToEdit}
                                 onSubmit={handleFormSubmit}
@@ -140,7 +182,6 @@ export default function RecipeManager({ recipes, setRecipes, isLoggedIn }: Recip
                     </DialogContent>
                 </Dialog>
 
-                {/* Save/Edit Confirmation Dialog */}
                 <AlertDialog open={isConfirmingSave} onOpenChange={setIsConfirmingSave}>
                     <AlertDialogContent>
                         <AlertDialogHeader>

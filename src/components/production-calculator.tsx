@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useTransition, useRef, useEffect } from "react";
+import { useState, useTransition, useRef, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UploadCloud, Loader2, Calculator, ShoppingBasket } from "lucide-react";
@@ -14,10 +14,11 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { productItems } from "@/lib/products";
-import { productionSchema, calculateProductionMetrics, initialMetrics } from "@/lib/calculations";
+import { calculateProductionMetrics, initialMetrics } from "@/lib/calculations";
 import type { ProductionInputs } from "@/lib/calculations";
 import { getQuantitiesFromImage } from "@/app/actions";
 import { ScrollArea } from "./ui/scroll-area";
+import type { ProductIngredients } from "@/lib/productIngredients";
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
@@ -26,23 +27,36 @@ type ProductionFormValues = {
   [K in keyof ProductionInputs]: number | '';
 };
 
-export default function ProductionCalculator() {
+interface ProductionCalculatorProps {
+    products: ProductIngredients;
+}
+
+export default function ProductionCalculator({ products }: ProductionCalculatorProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [results, setResults] = useState(initialMetrics);
 
+  const productList = useMemo(() => Object.keys(products).sort((a,b) => a.localeCompare(b)), [products]);
+
+  const productionSchema = useMemo(() => z.object(
+    productList.reduce((acc, item) => {
+        acc[item] = z.coerce.number().min(0).default(0);
+        return acc;
+    }, {} as Record<string, z.ZodType<number, any, number>>)
+  ), [productList]);
+
   const form = useForm<ProductionFormValues>({
     resolver: zodResolver(productionSchema),
-    defaultValues: productItems.reduce((acc, item) => ({ ...acc, [item]: '' }), {}),
+    defaultValues: productList.reduce((acc, item) => ({ ...acc, [item]: '' }), {}),
   });
 
   const watchedValues = form.watch();
 
   useEffect(() => {
-    const newResults = calculateProductionMetrics(watchedValues as ProductionInputs);
+    const newResults = calculateProductionMetrics(watchedValues as ProductionInputs, products);
     setResults(newResults);
-  }, [JSON.stringify(watchedValues)]);
+  }, [JSON.stringify(watchedValues), products]);
 
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,9 +73,10 @@ export default function ProductionCalculator() {
             toast({ variant: "destructive", title: "OCR Failed", description: error });
           } else if (data) {
             let filledCount = 0;
+            form.reset(); // Clear form before setting new values
             for (const [key, value] of Object.entries(data)) {
-              if (productItems.includes(key)) {
-                form.setValue(key as keyof ProductionFormValues, value, { shouldValidate: true });
+              if (productList.includes(key)) {
+                form.setValue(key as any, value, { shouldValidate: true });
                 filledCount++;
               }
             }
@@ -100,17 +115,24 @@ export default function ProductionCalculator() {
               <form>
                 <ScrollArea className="h-[70vh] pr-4">
                   <div className="space-y-4">
-                    {productItems.map((item) => (
+                    {productList.map((item) => (
                       <FormField
                         key={item}
                         control={form.control}
-                        name={item as keyof ProductionFormValues}
+                        name={item as any}
                         render={({ field }) => (
                           <FormItem>
                             <div className="flex items-center justify-between">
-                              <FormLabel>{item.split('_').map(capitalize).join(' ')}</FormLabel>
+                              <FormLabel>{item.split(' ').map(capitalize).join(' ')}</FormLabel>
                               <FormControl>
-                                <Input type="number" {...field} className="w-24" />
+                                <Input 
+                                  type="number" 
+                                  {...field} 
+                                  placeholder="0"
+                                  className="w-24"
+                                  onChange={e => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
+                                  value={field.value === 0 ? '' : field.value}
+                                />
                               </FormControl>
                             </div>
                           </FormItem>
@@ -152,15 +174,15 @@ export default function ProductionCalculator() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Ingredient</TableHead>
-                      <TableHead className="text-right">Total Amount (g)</TableHead>
+                      <TableHead className="text-right">Total Amount</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {results.ingredientSummary.length > 0 ? (
-                      results.ingredientSummary.map(([key, value]) => (
+                      results.ingredientSummary.map(([key, value, unit]) => (
                         <TableRow key={key}>
-                          <TableCell className="font-medium">{key}</TableCell>
-                          <TableCell className="text-right">{value}</TableCell>
+                          <TableCell className="font-medium">{capitalize(key)}</TableCell>
+                          <TableCell className="text-right">{value} {unit}</TableCell>
                         </TableRow>
                       ))
                     ) : (

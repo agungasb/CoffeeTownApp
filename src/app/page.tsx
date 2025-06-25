@@ -13,10 +13,12 @@ import ProductManager from '@/components/product-manager';
 import Inventory from '@/components/inventory';
 import LoginForm from '@/components/login-form';
 import { recipes as initialRecipes, type Recipe } from '@/lib/recipes';
+import { productIngredientsData, type ProductIngredients } from '@/lib/productIngredients';
 import { LogIn, LogOut } from 'lucide-react';
 
 export default function Home() {
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
+  const [products, setProducts] = useState<ProductIngredients>(productIngredientsData);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
 
@@ -34,7 +36,7 @@ export default function Home() {
       <div className="flex flex-col items-center min-h-screen p-4 sm:p-6 md:p-8">
         <header className="w-full max-w-7xl flex justify-between items-start mb-8">
           <div className="text-center flex-grow">
-            <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl font-bold text-primary-foreground" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+            <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl font-bold text-primary" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
               COFFEE TOWN BAKERY
             </h1>
             <p className="text-sm sm:text-base text-primary-foreground/90 italic mt-2" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
@@ -76,7 +78,7 @@ export default function Home() {
               </div>
             </div>
             <TabsContent value="calculator">
-              <ProductionCalculator />
+              <ProductionCalculator products={products}/>
             </TabsContent>
             <TabsContent value="recipe">
               <RecipeScaler recipes={recipes} />
@@ -85,10 +87,14 @@ export default function Home() {
               <RecipeManager recipes={recipes} setRecipes={setRecipes} isLoggedIn={isLoggedIn} />
             </TabsContent>
             <TabsContent value="product_management">
-              <ProductManager isLoggedIn={isLoggedIn} />
+              <ProductManager 
+                products={products}
+                setProducts={setProducts}
+                isLoggedIn={isLoggedIn} 
+              />
             </TabsContent>
             <TabsContent value="inventory">
-              <Inventory />
+              <Inventory products={products} />
             </TabsContent>
           </Tabs>
         </main>

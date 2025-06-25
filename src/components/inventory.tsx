@@ -36,15 +36,15 @@ export default function Inventory({ products }: InventoryProps) {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Ingredient Name</TableHead>
-                                <TableHead className="text-right">Current Stock</TableHead>
+                                <TableHead className="text-white font-semibold">Ingredient Name</TableHead>
+                                <TableHead className="text-right text-white font-semibold">Current Stock</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {sortedIngredients.map(ingredient => (
                                 <TableRow key={ingredient}>
                                     <TableCell className="font-medium">{capitalize(ingredient)}</TableCell>
-                                    <TableCell className="text-right text-muted-foreground italic">
+                                    <TableCell className="text-right">
                                         Not tracked
                                     </TableCell>
                                 </TableRow>

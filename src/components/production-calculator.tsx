@@ -145,7 +145,7 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
 
           {hasCalculated ? (
             <Accordion type="multiple" defaultValue={['results', 'summary']} className="w-full space-y-4">
-                <AccordionItem value="results" className="glassmorphic border-none rounded-lg text-black">
+                <AccordionItem value="results" className="glassmorphic border-none rounded-lg">
                     <AccordionTrigger className="p-4 hover:no-underline text-white font-semibold text-lg">
                         <h3 className="flex items-center gap-2"><Calculator /> Calculation Results</h3>
                     </AccordionTrigger>
@@ -153,15 +153,15 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
                       <Table>
                         <TableHeader>
                           <TableRow className="border-white/30">
-                            <TableHead className="text-black font-semibold">Metric</TableHead>
-                            <TableHead className="text-right text-black font-semibold">Result</TableHead>
+                            <TableHead className="font-semibold text-white">Metric</TableHead>
+                            <TableHead className="text-right font-semibold text-white">Result</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {results.productionCalculations.map(([key, value]) => (
                             <TableRow key={key} className="border-white/30">
-                                <TableCell className="font-medium text-black">{key}</TableCell>
-                                <TableCell className="text-right text-black">{value}</TableCell>
+                                <TableCell className="font-medium text-white">{key}</TableCell>
+                                <TableCell className="text-right text-white">{value}</TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
@@ -169,7 +169,7 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
                     </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="summary" className="glassmorphic border-none rounded-lg text-black">
+                <AccordionItem value="summary" className="glassmorphic border-none rounded-lg">
                     <AccordionTrigger className="p-4 hover:no-underline text-white font-semibold text-lg">
                          <h3 className="flex items-center gap-2"><ShoppingBasket /> Ingredient Summary</h3>
                     </AccordionTrigger>
@@ -177,21 +177,21 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
                       <Table>
                           <TableHeader>
                           <TableRow className="border-white/30">
-                              <TableHead className="text-black font-semibold">Ingredient</TableHead>
-                              <TableHead className="text-right text-black font-semibold">Total Amount</TableHead>
+                              <TableHead className="font-semibold text-white">Ingredient</TableHead>
+                              <TableHead className="text-right font-semibold text-white">Total Amount</TableHead>
                           </TableRow>
                           </TableHeader>
                           <TableBody>
                           {results.ingredientSummary.length > 0 ? (
                               results.ingredientSummary.map(([key, value, unit]) => (
                               <TableRow key={key} className="border-white/30">
-                                  <TableCell className="font-medium text-black">{capitalize(key)}</TableCell>
-                                  <TableCell className="text-right text-black">{value} {unit}</TableCell>
+                                  <TableCell className="font-medium text-white">{capitalize(key)}</TableCell>
+                                  <TableCell className="text-right text-white">{value} {unit}</TableCell>
                               </TableRow>
                               ))
                           ) : (
                               <TableRow>
-                                  <TableCell colSpan={2} className="text-center h-24 text-black italic">
+                                  <TableCell colSpan={2} className="text-center h-24 text-white italic">
                                       No ingredients for the entered quantities.
                                   </TableCell>
                               </TableRow>

@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useTransition, useRef, useEffect, useMemo } from "react";
+import { useState, useTransition, useRef, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UploadCloud, Loader2, Calculator, ShoppingBasket } from "lucide-react";
@@ -13,16 +13,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { productItems } from "@/lib/products";
 import { calculateProductionMetrics, initialMetrics } from "@/lib/calculations";
 import type { ProductionInputs } from "@/lib/calculations";
 import { getQuantitiesFromImage } from "@/app/actions";
 import { ScrollArea } from "./ui/scroll-area";
 import type { ProductIngredients } from "@/lib/productIngredients";
 
-const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const capitalize = (s: string) => s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
-// Allow empty strings for form state, which will render as empty inputs
 type ProductionFormValues = {
   [K in keyof ProductionInputs]: number | '';
 };
@@ -36,6 +34,7 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [results, setResults] = useState(initialMetrics);
+  const [hasCalculated, setHasCalculated] = useState(false);
 
   const productList = useMemo(() => Object.keys(products).sort((a,b) => a.localeCompare(b)), [products]);
 
@@ -51,13 +50,12 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
     defaultValues: productList.reduce((acc, item) => ({ ...acc, [item]: '' }), {}),
   });
 
-  const watchedValues = form.watch();
-
-  useEffect(() => {
-    const newResults = calculateProductionMetrics(watchedValues as ProductionInputs, products);
+  const handleCalculate = (data: ProductionFormValues) => {
+    const newResults = calculateProductionMetrics(data as ProductionInputs, products);
     setResults(newResults);
-  }, [JSON.stringify(watchedValues), products]);
-
+    setHasCalculated(true);
+    toast({ title: "Success", description: "Calculations complete." });
+  };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -73,14 +71,15 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
             toast({ variant: "destructive", title: "OCR Failed", description: error });
           } else if (data) {
             let filledCount = 0;
-            form.reset(); // Clear form before setting new values
+            form.reset();
             for (const [key, value] of Object.entries(data)) {
               if (productList.includes(key)) {
                 form.setValue(key as any, value, { shouldValidate: true });
                 filledCount++;
               }
             }
-            toast({ title: "Success", description: `Auto-filled ${filledCount} items.` });
+            setHasCalculated(false); // Reset calculation state after auto-fill
+            toast({ title: "Success", description: `Auto-filled ${filledCount} items. Press Calculate to see results.` });
           }
         });
       }
@@ -97,6 +96,7 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
       </CardHeader>
       <CardContent>
         <div className="grid lg:grid-cols-2 gap-8">
+          
           <div>
             <div className="mb-4">
               <input
@@ -106,14 +106,14 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
                 onChange={handleFileChange}
                 className="hidden"
               />
-              <Button onClick={() => fileInputRef.current?.click()} disabled={isPending} className="w-full">
+              <Button type="button" onClick={() => fileInputRef.current?.click()} disabled={isPending} className="w-full">
                 {isPending ? <Loader2 className="animate-spin" /> : <UploadCloud />}
                 Upload Screenshot for Auto-Fill
               </Button>
             </div>
             <Form {...form}>
-              <form>
-                <ScrollArea className="h-[70vh] pr-4">
+              <form onSubmit={form.handleSubmit(handleCalculate)}>
+                <ScrollArea className="h-[calc(70vh-5rem)] pr-4">
                   <div className="space-y-4">
                     {productList.map((item) => (
                       <FormField
@@ -141,61 +141,82 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
                     ))}
                   </div>
                 </ScrollArea>
+                <div className="mt-6">
+                    <Button type="submit" className="w-full">
+                        <Calculator className="mr-2"/>
+                        Calculate
+                    </Button>
+                </div>
               </form>
             </Form>
           </div>
 
           <div className="space-y-8">
-            <div>
-              <h3 className="font-headline text-xl md:text-2xl mb-4 text-center flex items-center justify-center gap-2"><Calculator /> Calculation Results</h3>
-              <ScrollArea className="h-[calc(35vh-2rem)] border rounded-md">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Metric</TableHead>
-                      <TableHead className="text-right">Result</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {results.productionCalculations.map(([key, value]) => (
-                      <TableRow key={key}>
-                        <TableCell className="font-medium">{key}</TableCell>
-                        <TableCell className="text-right">{value}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </ScrollArea>
-            </div>
-            <div>
-              <h3 className="font-headline text-xl md:text-2xl mb-4 text-center flex items-center justify-center gap-2"><ShoppingBasket /> Ingredient Summary</h3>
-               <ScrollArea className="h-[calc(35vh-2rem)] border rounded-md">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Ingredient</TableHead>
-                      <TableHead className="text-right">Total Amount</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {results.ingredientSummary.length > 0 ? (
-                      results.ingredientSummary.map(([key, value, unit]) => (
-                        <TableRow key={key}>
-                          <TableCell className="font-medium">{capitalize(key)}</TableCell>
-                          <TableCell className="text-right">{value} {unit}</TableCell>
+            <Card className="shadow-lg">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><Calculator /> Calculation Results</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <ScrollArea className="h-[calc(35vh-4rem)]">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Metric</TableHead>
+                            <TableHead className="text-right">Result</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {hasCalculated ? results.productionCalculations.map(([key, value]) => (
+                            <TableRow key={key}>
+                                <TableCell className="font-medium">{key}</TableCell>
+                                <TableCell className="text-right">{value}</TableCell>
+                            </TableRow>
+                          )) : (
+                            <TableRow>
+                                <TableCell colSpan={2} className="text-center h-24 text-muted-foreground italic">
+                                    Click "Calculate" to see results.
+                                </TableCell>
+                            </TableRow>
+                          )}
+                        </TableBody>
+                      </Table>
+                    </ScrollArea>
+                </CardContent>
+            </Card>
+
+            <Card className="shadow-lg">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><ShoppingBasket /> Ingredient Summary</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <ScrollArea className="h-[calc(35vh-4rem)]">
+                    <Table>
+                        <TableHeader>
+                        <TableRow>
+                            <TableHead>Ingredient</TableHead>
+                            <TableHead className="text-right">Total Amount</TableHead>
                         </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                          <TableCell colSpan={2} className="text-center h-24 text-muted-foreground italic">
-                              Enter quantities to see ingredient summary.
-                          </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-               </ScrollArea>
-            </div>
+                        </TableHeader>
+                        <TableBody>
+                        {hasCalculated && results.ingredientSummary.length > 0 ? (
+                            results.ingredientSummary.map(([key, value, unit]) => (
+                            <TableRow key={key}>
+                                <TableCell className="font-medium">{capitalize(key)}</TableCell>
+                                <TableCell className="text-right">{value} {unit}</TableCell>
+                            </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={2} className="text-center h-24 text-muted-foreground italic">
+                                    {hasCalculated ? "No ingredients for the entered quantities." : 'Click "Calculate" to see results.'}
+                                </TableCell>
+                            </TableRow>
+                        )}
+                        </TableBody>
+                    </Table>
+                    </ScrollArea>
+                </CardContent>
+            </Card>
           </div>
         </div>
       </CardContent>

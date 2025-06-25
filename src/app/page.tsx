@@ -51,7 +51,7 @@ export default function Home() {
           </p>
         </header>
         
-        <nav className="fixed top-[80px] left-0 w-full z-10 py-2 glassmorphic">
+        <nav className="fixed top-[80px] left-0 w-full z-10 py-2 glassmorphic flex items-center">
             <div className="overflow-x-auto hide-scrollbar">
                 <div className="flex justify-start md:justify-center gap-5 px-4">
                   {TABS.map((tab) => (

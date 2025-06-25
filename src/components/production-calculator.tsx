@@ -110,34 +110,32 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
           <div>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleCalculate)} className="space-y-4">
-                <ScrollArea className="h-[45vh] pr-2">
-                  <div className="space-y-2">
-                    {productList.map((item) => (
-                      <FormField
-                        key={item}
-                        control={form.control}
-                        name={item as any}
-                        render={({ field }) => (
-                          <FormItem className="flex justify-between items-center py-2 border-b border-white/30">
-                              <FormLabel className="flex-grow text-left text-[#f9e1c0] font-medium text-sm">
-                                {capitalize(item)}
-                              </FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="number" 
-                                  {...field} 
-                                  placeholder="0"
-                                  className="flex-none w-24 text-center bg-white/80 text-black rounded-md py-1 px-2 h-auto focus:shadow-[0_0_8px_rgba(255,255,255,0.5)] focus:ring-0 focus:outline-none border-none"
-                                  onChange={e => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
-                                  value={field.value === 0 ? '' : field.value}
-                                />
-                              </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                    ))}
-                  </div>
-                </ScrollArea>
+                <div className="space-y-2">
+                  {productList.map((item) => (
+                    <FormField
+                      key={item}
+                      control={form.control}
+                      name={item as any}
+                      render={({ field }) => (
+                        <FormItem className="flex justify-between items-center py-2 border-b border-white/30">
+                            <FormLabel className="flex-grow text-left text-[#f9e1c0] font-medium text-sm">
+                              {capitalize(item)}
+                            </FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number" 
+                                {...field} 
+                                placeholder="0"
+                                className="flex-none w-24 text-center bg-white/80 text-black rounded-md py-1 px-2 h-auto focus:shadow-[0_0_8px_rgba(255,255,255,0.5)] focus:ring-0 focus:outline-none border-none"
+                                onChange={e => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
+                                value={field.value === 0 ? '' : field.value}
+                              />
+                            </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  ))}
+                </div>
                 <Button type="submit" className="w-full mt-4 bg-[#5a3e2b] text-white hover:bg-[#7a5a42] hover:scale-105 transition-all text-base font-medium p-6">
                     <Calculator className="mr-2"/>
                     CALCULATE

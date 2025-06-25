@@ -86,7 +86,7 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
       <CardContent className="pt-6">
         <div className="flex flex-col gap-6">
           
-          <div className="p-4 bg-white/10 rounded-lg">
+          <div className="p-4 bg-muted/50 rounded-lg">
             <label className="block mb-2 text-center text-[#f9e1c0] font-medium">Upload Screenshot for Auto-Fill</label>
              <input
                 type="file"
@@ -99,7 +99,7 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
               type="button" 
               onClick={() => fileInputRef.current?.click()} 
               disabled={isPending} 
-              className="w-full bg-[#5a3e2b] text-white hover:bg-[#7a5a42] hover:scale-105 transition-all text-base font-medium"
+              className="w-full hover:scale-105 transition-all text-base font-medium"
             >
               {isPending ? <Loader2 className="animate-spin" /> : <UploadCloud />}
               {isPending ? 'Analyzing...' : 'Upload & Map Quantities'}
@@ -116,7 +116,7 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
                       control={form.control}
                       name={item as any}
                       render={({ field }) => (
-                        <FormItem className="flex justify-between items-center py-2 border-b border-white/30">
+                        <FormItem className="flex justify-between items-center py-2 border-b border-border">
                             <FormLabel className="flex-grow text-left text-[#f9e1c0] font-medium text-sm">
                               {capitalize(item)}
                             </FormLabel>
@@ -125,7 +125,7 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
                                 type="number" 
                                 {...field} 
                                 placeholder="0"
-                                className="flex-none w-24 text-center bg-white/80 text-black rounded-md py-1 px-2 h-auto focus:shadow-[0_0_8px_rgba(255,255,255,0.5)] focus:ring-0 focus:outline-none border-none"
+                                className="flex-none w-24 text-center rounded-md py-1 px-2 h-auto focus:shadow-[0_0_8px_rgba(255,255,255,0.5)] focus:ring-0 focus:outline-none"
                                 onChange={e => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
                                 value={field.value === 0 ? '' : field.value}
                               />
@@ -135,7 +135,7 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
                     />
                   ))}
                 </div>
-                <Button type="submit" className="w-full mt-4 bg-[#5a3e2b] text-white hover:bg-[#7a5a42] hover:scale-105 transition-all text-base font-medium p-6">
+                <Button type="submit" className="w-full mt-4 hover:scale-105 transition-all text-base font-medium p-6">
                     <Calculator className="mr-2"/>
                     CALCULATE
                 </Button>
@@ -146,22 +146,22 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
           {hasCalculated ? (
             <Accordion type="multiple" defaultValue={['results', 'summary']} className="w-full space-y-4">
                 <AccordionItem value="results" className="glassmorphic border-none rounded-lg">
-                    <AccordionTrigger className="p-4 hover:no-underline text-white font-semibold text-lg">
+                    <AccordionTrigger className="p-4 hover:no-underline text-foreground font-semibold text-lg">
                         <h3 className="flex items-center gap-2"><Calculator /> Calculation Results</h3>
                     </AccordionTrigger>
                     <AccordionContent className="p-4 pt-0">
                       <Table>
                         <TableHeader>
-                          <TableRow className="border-white/30">
-                            <TableHead className="font-semibold text-white">Metric</TableHead>
-                            <TableHead className="text-right font-semibold text-white">Result</TableHead>
+                          <TableRow className="border-border">
+                            <TableHead className="font-semibold text-foreground">Metric</TableHead>
+                            <TableHead className="text-right font-semibold text-foreground">Result</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {results.productionCalculations.map(([key, value]) => (
-                            <TableRow key={key} className="border-white/30">
-                                <TableCell className="font-medium text-white">{key}</TableCell>
-                                <TableCell className="text-right text-white">{value}</TableCell>
+                            <TableRow key={key} className="border-border">
+                                <TableCell className="font-medium text-card-foreground">{key}</TableCell>
+                                <TableCell className="text-right text-card-foreground">{value}</TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
@@ -170,28 +170,28 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
                 </AccordionItem>
 
                 <AccordionItem value="summary" className="glassmorphic border-none rounded-lg">
-                    <AccordionTrigger className="p-4 hover:no-underline text-white font-semibold text-lg">
+                    <AccordionTrigger className="p-4 hover:no-underline text-foreground font-semibold text-lg">
                          <h3 className="flex items-center gap-2"><ShoppingBasket /> Ingredient Summary</h3>
                     </AccordionTrigger>
                     <AccordionContent className="p-4 pt-0">
                       <Table>
                           <TableHeader>
-                          <TableRow className="border-white/30">
-                              <TableHead className="font-semibold text-white">Ingredient</TableHead>
-                              <TableHead className="text-right font-semibold text-white">Total Amount</TableHead>
+                          <TableRow className="border-border">
+                              <TableHead className="font-semibold text-foreground">Ingredient</TableHead>
+                              <TableHead className="text-right font-semibold text-foreground">Total Amount</TableHead>
                           </TableRow>
                           </TableHeader>
                           <TableBody>
                           {results.ingredientSummary.length > 0 ? (
                               results.ingredientSummary.map(([key, value, unit]) => (
-                              <TableRow key={key} className="border-white/30">
-                                  <TableCell className="font-medium text-white">{capitalize(key)}</TableCell>
-                                  <TableCell className="text-right text-white">{value} {unit}</TableCell>
+                              <TableRow key={key} className="border-border">
+                                  <TableCell className="font-medium text-card-foreground">{capitalize(key)}</TableCell>
+                                  <TableCell className="text-right text-card-foreground">{value} {unit}</TableCell>
                               </TableRow>
                               ))
                           ) : (
                               <TableRow>
-                                  <TableCell colSpan={2} className="text-center h-24 text-white italic">
+                                  <TableCell colSpan={2} className="text-center h-24 text-muted-foreground italic">
                                       No ingredients for the entered quantities.
                                   </TableCell>
                               </TableRow>
@@ -202,7 +202,7 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
                 </AccordionItem>
             </Accordion>
           ) : (
-            <div className="text-center text-white/80 italic py-8 border-2 border-dashed border-white/30 rounded-lg">
+            <div className="text-center text-muted-foreground italic py-8 border-2 border-dashed border-border rounded-lg">
               <p>Click "Calculate" to see the results.</p>
             </div>
           )}

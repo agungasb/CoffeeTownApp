@@ -32,8 +32,8 @@ export default function Inventory({ products }: InventoryProps) {
                 <ScrollArea className="h-[70vh] pr-4">
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                         {sortedIngredients.map(ingredient => (
-                            <div key={ingredient} className="flex items-center justify-center p-3 bg-black/20 rounded-md text-center h-20 transition-all hover:bg-black/40 hover:scale-105">
-                                <span className="font-medium text-white">{capitalize(ingredient)}</span>
+                            <div key={ingredient} className="flex items-center justify-center p-3 bg-muted/50 rounded-md text-center h-20 transition-all hover:bg-muted hover:scale-105">
+                                <span className="font-medium text-card-foreground">{capitalize(ingredient)}</span>
                             </div>
                         ))}
                     </div>

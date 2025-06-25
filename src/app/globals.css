@@ -4,25 +4,35 @@
 
 @layer base {
   :root {
-    --background: 60 56% 94%; /* beige - #F5F5DC */
-    --foreground: 25 76% 21%; /* A dark brown for text, derived from accent */
-    --card: 60 40% 98%; /* a slightly whiter beige */
-    --card-foreground: 25 76% 21%;
-    --popover: 60 40% 98%;
-    --popover-foreground: 25 76% 21%;
-    --primary: 25 76% 31%; /* saddlebrown - #8B4513 */
-    --primary-foreground: 60 56% 94%;
-    --secondary: 34 44% 70%; /* tan - #D2B48C */
-    --secondary-foreground: 25 76% 21%;
-    --muted: 60 56% 90%; /* slightly darker beige */
-    --muted-foreground: 25 76% 41%;
-    --accent: 25 76% 31%; /* saddlebrown - #8B4513 */
-    --accent-foreground: 60 56% 94%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 34 44% 85%; /* very light tan */
-    --input: 34 44% 88%;
-    --ring: 25 76% 31%; /* saddlebrown for rings */
+    --background: 25 15% 8%; /* Very dark brown, almost black */
+    --foreground: 30 40% 92%; /* Creamy off-white text */
+
+    /* Glassmorphic card base will be bg-black/30, so its background is dynamic */
+    --card: 25 15% 12%; /* Fallback card color */
+    --card-foreground: 30 40% 92%; /* Text on cards */
+
+    --popover: 25 15% 8%;
+    --popover-foreground: 30 40% 92%;
+
+    --primary: 30 70% 35%; /* A rich, medium-dark brown for buttons */
+    --primary-foreground: 30 40% 95%; /* Creamy text on buttons */
+
+    --secondary: 34 30% 50%; /* Muted tan/brown */
+    --secondary-foreground: 30 40% 95%;
+
+    --muted: 25 15% 15%;
+    --muted-foreground: 30 20% 65%;
+
+    --accent: 30 70% 45%; /* A slightly brighter brown for hover/active states */
+    --accent-foreground: 30 40% 95%;
+
+    --destructive: 0 63% 45%; /* Deep red */
+    --destructive-foreground: 30 40% 95%;
+
+    --border: 25 15% 20%; /* Subtle border for elements */
+    --input: 25 15% 22%; /* Input background color */
+    --ring: 30 70% 50%; /* Focus ring color */
+
     --radius: 0.8rem;
 
     --chart-1: 12 76% 61%;
@@ -30,34 +40,6 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-  }
-
-  .dark {
-    --background: 25 20% 10%; /* dark brown */
-    --foreground: 60 56% 94%; /* beige text */
-    --card: 25 20% 12%;
-    --card-foreground: 60 56% 94%;
-    --popover: 25 20% 10%;
-    --popover-foreground: 60 56% 94%;
-    --primary: 25 76% 31%; /* saddlebrown */
-    --primary-foreground: 60 56% 94%;
-    --secondary: 34 44% 70%; /* tan */
-    --secondary-foreground: 25 76% 21%;
-    --muted: 25 20% 18%;
-    --muted-foreground: 60 56% 84%;
-    --accent: 34 44% 70%; /* tan */
-    --accent-foreground: 25 76% 21%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 25 20% 20%;
-    --input: 25 20% 20%;
-    --ring: 34 44% 70%;
-
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
   }
 }
 
@@ -67,7 +49,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    background-image: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1950&q=80');
+    background-image: url('https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=1950&q=80');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -76,15 +58,15 @@
 
 @layer components {
   .glassmorphic {
-    @apply bg-white/20 backdrop-blur-xl;
+    @apply bg-black/40 backdrop-blur-lg rounded-lg border border-white/10;
   }
 
   .nav-button {
-    @apply bg-[#5a3e2b] text-white border-none rounded-md py-2 px-4 text-sm cursor-pointer transition-all duration-300 ease-in-out;
+    @apply bg-primary text-primary-foreground border-none rounded-md py-2 px-4 text-sm cursor-pointer transition-all duration-300 ease-in-out;
   }
 
   .nav-button:hover, .nav-button.active {
-    @apply bg-[#7a5a42] scale-105;
+    @apply bg-accent scale-105;
   }
 }
 

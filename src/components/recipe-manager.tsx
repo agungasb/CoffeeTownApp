@@ -3,14 +3,14 @@
 import { useState } from 'react';
 import { type Recipe } from '@/lib/recipes';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { PlusCircle, Edit, Trash2, ShieldAlert } from 'lucide-react';
 import { RecipeForm } from './recipe-form';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { ScrollArea } from './ui/scroll-area';
 
 interface RecipeManagerProps {
     recipes: Recipe[];
@@ -84,51 +84,45 @@ export default function RecipeManager({ recipes, setRecipes, isLoggedIn }: Recip
                         </AlertDescription>
                     </Alert>
                 )}
-                <div className="rounded-md border">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="w-[60%]">Recipe Name</TableHead>
-                                <TableHead className="text-center w-[20%]">Ingredient Count</TableHead>
-                                <TableHead className="text-right w-[20%]">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {recipes.map((recipe) => (
-                                <TableRow key={recipe.id}>
-                                    <TableCell className="font-medium">{recipe.name}</TableCell>
-                                    <TableCell className="text-center">{recipe.ingredients.length}</TableCell>
-                                    <TableCell className="text-right space-x-2">
-                                        <Button variant="ghost" size="icon" onClick={() => handleEditClick(recipe)} disabled={!isLoggedIn}>
-                                            <Edit className="h-4 w-4" />
-                                        </Button>
-                                        <AlertDialog>
-                                            <AlertDialogTrigger asChild disabled={!isLoggedIn}>
-                                                <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" disabled={!isLoggedIn}>
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </AlertDialogTrigger>
-                                            <AlertDialogContent>
-                                                <AlertDialogHeader>
-                                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                                    <AlertDialogDescription>
-                                                        This action cannot be undone. This will permanently delete the recipe "{recipe.name}".
-                                                    </AlertDialogDescription>
-                                                </AlertDialogHeader>
-                                                <AlertDialogFooter>
-                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                    <AlertDialogAction onClick={() => handleDelete(recipe.id)} className="bg-destructive hover:bg-destructive/90">
-                                                        Delete
-                                                    </AlertDialogAction>
-                                                </AlertDialogFooter>
-                                            </AlertDialogContent>
-                                        </AlertDialog>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </div>
+                <ScrollArea className="h-[70vh]">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pr-4">
+                        {recipes.map((recipe) => (
+                            <Card key={recipe.id} className="flex flex-col">
+                                <CardHeader>
+                                    <CardTitle className="text-lg">{recipe.name}</CardTitle>
+                                    <CardDescription>{recipe.ingredients.length} ingredients</CardDescription>
+                                </CardHeader>
+                                <CardFooter className="mt-auto flex justify-end gap-2">
+                                    <Button variant="ghost" size="icon" onClick={() => handleEditClick(recipe)} disabled={!isLoggedIn}>
+                                        <Edit className="h-4 w-4" />
+                                    </Button>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild disabled={!isLoggedIn}>
+                                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" disabled={!isLoggedIn}>
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    This action cannot be undone. This will permanently delete the recipe "{recipe.name}".
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => handleDelete(recipe.id)} className="bg-destructive hover:bg-destructive/90">
+                                                    Delete
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                </CardFooter>
+                            </Card>
+                        ))}
+                    </div>
+                </ScrollArea>
+                
 
                 {/* Form Dialog */}
                 <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>

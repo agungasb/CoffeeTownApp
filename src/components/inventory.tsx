@@ -1,21 +1,48 @@
-
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Construction } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { productIngredientsData } from "@/lib/productIngredients";
+import { ScrollArea } from "./ui/scroll-area";
+
+
+const allIngredients = new Set<string>();
+Object.values(productIngredientsData).forEach(product => {
+    Object.keys(product).forEach(ingredient => {
+        allIngredients.add(ingredient);
+    });
+});
+const sortedIngredients = Array.from(allIngredients).sort((a, b) => a.localeCompare(b));
+
 
 export default function Inventory() {
     return (
         <Card className="glassmorphic border-2 border-border/30 w-full max-w-6xl mx-auto">
             <CardHeader>
                 <CardTitle>Inventory</CardTitle>
-                <CardDescription>Manage your ingredient stock levels.</CardDescription>
+                <CardDescription>Master list of all ingredients used across products.</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="flex flex-col items-center justify-center h-40 text-muted-foreground italic border-2 border-dashed rounded-lg">
-                    <Construction className="h-12 w-12 mb-4" />
-                    <p>Inventory Management Feature Coming Soon</p>
-                </div>
+                <ScrollArea className="h-[70vh]">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Ingredient Name</TableHead>
+                                <TableHead className="text-right">Current Stock</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {sortedIngredients.map(ingredient => (
+                                <TableRow key={ingredient}>
+                                    <TableCell className="font-medium">{ingredient}</TableCell>
+                                    <TableCell className="text-right text-muted-foreground italic">
+                                        Not tracked
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </ScrollArea>
             </CardContent>
         </Card>
     );

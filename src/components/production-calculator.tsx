@@ -1,11 +1,10 @@
 
 "use client";
 
-import { useState, useTransition, useRef, useMemo } from "react";
+import { useState, useTransition, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UploadCloud, Loader2, Calculator, ShoppingBasket } from "lucide-react";
-import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,12 +12,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { calculateProductionMetrics, initialMetrics } from "@/lib/calculations";
+import { calculateProductionMetrics, initialMetrics, productionSchema } from "@/lib/calculations";
 import type { ProductionInputs } from "@/lib/calculations";
 import { getQuantitiesFromImage } from "@/app/actions";
 import { ScrollArea } from "./ui/scroll-area";
 import type { ProductIngredients } from "@/lib/productIngredients";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { productItems } from "@/lib/products";
 
 const capitalize = (s: string) => s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
@@ -37,14 +37,7 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
   const [results, setResults] = useState(initialMetrics);
   const [hasCalculated, setHasCalculated] = useState(false);
 
-  const productList = useMemo(() => Object.keys(products).sort((a,b) => a.localeCompare(b)), [products]);
-
-  const productionSchema = useMemo(() => z.object(
-    productList.reduce((acc, item) => {
-        acc[item] = z.coerce.number().min(0).default(0);
-        return acc;
-    }, {} as Record<string, z.ZodType<number, any, number>>)
-  ), [productList]);
+  const productList = productItems;
 
   const form = useForm<ProductionFormValues>({
     resolver: zodResolver(productionSchema),

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -8,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Label } from "@/components/ui/label";
 import { type Recipe } from "@/lib/recipes";
-import { ScrollArea } from './ui/scroll-area';
 
 interface ScaledIngredient {
     name: string;
@@ -86,7 +86,6 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
                         {scaledIngredients.length > 0 ? (
                            <div className='pl-4'>
                                 <h3 className="font-headline text-xl md:text-2xl mb-4">Scaled: {recipeTitle}</h3>
-                                <ScrollArea className="h-[40vh] md:h-[50vh] pr-4">
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
@@ -105,7 +104,6 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
                                         ))}
                                     </TableBody>
                                 </Table>
-                                </ScrollArea>
                            </div>
                         ) : (
                             <div className="flex items-center justify-center h-full min-h-[40vh] text-muted-foreground italic border-2 border-dashed rounded-lg">

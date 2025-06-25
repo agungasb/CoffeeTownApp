@@ -100,39 +100,37 @@ export default function RecipeManager({ recipes, setRecipes, isLoggedIn }: Recip
                                         <AccordionItem value={recipe.id} className="border-b-0">
                                             <AccordionTrigger className="py-2 hover:no-underline">View Details</AccordionTrigger>
                                             <AccordionContent>
-                                                <ScrollArea className="h-48 pr-3">
-                                                    <div className="space-y-4">
-                                                        <div>
-                                                            <h4 className="font-semibold mb-2">Ingredients</h4>
-                                                            <Table>
-                                                                <TableHeader>
-                                                                    <TableRow>
-                                                                    <TableHead className="p-2 h-auto">Name</TableHead>
-                                                                    <TableHead className="p-2 h-auto text-right">Amount</TableHead>
-                                                                    <TableHead className="p-2 h-auto">Unit</TableHead>
-                                                                    </TableRow>
-                                                                </TableHeader>
-                                                                <TableBody>
-                                                                    {recipe.ingredients.map((ing) => (
-                                                                    <TableRow key={ing.name}>
-                                                                        <TableCell className="p-2">{ing.name}</TableCell>
-                                                                        <TableCell className="p-2 text-right">{ing.amount}</TableCell>
-                                                                        <TableCell className="p-2">{ing.unit}</TableCell>
-                                                                    </TableRow>
-                                                                    ))}
-                                                                </TableBody>
-                                                            </Table>
-                                                        </div>
-                                                        <div>
-                                                            <h4 className="font-semibold mb-2">Steps</h4>
-                                                            <ol className="list-decimal list-inside space-y-2 text-sm">
-                                                                {recipe.steps.map((step, index) => (
-                                                                    <li key={index}>{step}</li>
+                                                <div className="space-y-4">
+                                                    <div>
+                                                        <h4 className="font-semibold mb-2">Ingredients</h4>
+                                                        <Table>
+                                                            <TableHeader>
+                                                                <TableRow>
+                                                                <TableHead className="p-2 h-auto">Name</TableHead>
+                                                                <TableHead className="p-2 h-auto text-right">Amount</TableHead>
+                                                                <TableHead className="p-2 h-auto">Unit</TableHead>
+                                                                </TableRow>
+                                                            </TableHeader>
+                                                            <TableBody>
+                                                                {recipe.ingredients.map((ing) => (
+                                                                <TableRow key={ing.name}>
+                                                                    <TableCell className="p-2">{ing.name}</TableCell>
+                                                                    <TableCell className="p-2 text-right">{ing.amount}</TableCell>
+                                                                    <TableCell className="p-2">{ing.unit}</TableCell>
+                                                                </TableRow>
                                                                 ))}
-                                                            </ol>
-                                                        </div>
+                                                            </TableBody>
+                                                        </Table>
                                                     </div>
-                                                </ScrollArea>
+                                                    <div>
+                                                        <h4 className="font-semibold mb-2">Steps</h4>
+                                                        <ol className="list-decimal list-inside space-y-2 text-sm">
+                                                            {recipe.steps.map((step, index) => (
+                                                                <li key={index}>{step}</li>
+                                                            ))}
+                                                        </ol>
+                                                    </div>
+                                                </div>
                                             </AccordionContent>
                                         </AccordionItem>
                                     </Accordion>

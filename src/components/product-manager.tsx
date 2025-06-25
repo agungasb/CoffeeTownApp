@@ -101,26 +101,24 @@ export default function ProductManager({ products, setProducts, isLoggedIn }: Pr
                                         <AccordionItem value={productName} className="border-b-0">
                                             <AccordionTrigger className="py-2 hover:no-underline">View Details</AccordionTrigger>
                                             <AccordionContent>
-                                                <ScrollArea className="h-48">
-                                                    <Table>
-                                                        <TableHeader>
-                                                            <TableRow>
-                                                            <TableHead className="p-2 h-auto">Ingredient</TableHead>
-                                                            <TableHead className="p-2 h-auto text-right">Amount</TableHead>
-                                                            <TableHead className="p-2 h-auto">Unit</TableHead>
-                                                            </TableRow>
-                                                        </TableHeader>
-                                                        <TableBody>
-                                                            {Object.entries(ingredients).map(([ingredientName, amount]) => (
-                                                            <TableRow key={ingredientName}>
-                                                                <TableCell className="p-2">{capitalize(ingredientName)}</TableCell>
-                                                                <TableCell className="p-2 text-right">{typeof amount === 'number' ? amount.toFixed(3) : amount}</TableCell>
-                                                                <TableCell className="p-2 text-muted-foreground">{ingredientName.toLowerCase() === 'tusuk sate' ? 'pcs' : 'g'}</TableCell>
-                                                            </TableRow>
-                                                            ))}
-                                                        </TableBody>
-                                                    </Table>
-                                                </ScrollArea>
+                                                <Table>
+                                                    <TableHeader>
+                                                        <TableRow>
+                                                        <TableHead className="p-2 h-auto">Ingredient</TableHead>
+                                                        <TableHead className="p-2 h-auto text-right">Amount</TableHead>
+                                                        <TableHead className="p-2 h-auto">Unit</TableHead>
+                                                        </TableRow>
+                                                    </TableHeader>
+                                                    <TableBody>
+                                                        {Object.entries(ingredients).map(([ingredientName, amount]) => (
+                                                        <TableRow key={ingredientName}>
+                                                            <TableCell className="p-2">{capitalize(ingredientName)}</TableCell>
+                                                            <TableCell className="p-2 text-right">{typeof amount === 'number' ? amount.toFixed(3) : amount}</TableCell>
+                                                            <TableCell className="p-2 text-muted-foreground">{ingredientName.toLowerCase() === 'tusuk sate' ? 'pcs' : 'g'}</TableCell>
+                                                        </TableRow>
+                                                        ))}
+                                                    </TableBody>
+                                                </Table>
                                             </AccordionContent>
                                         </AccordionItem>
                                     </Accordion>

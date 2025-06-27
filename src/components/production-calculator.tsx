@@ -108,7 +108,7 @@ export default function ProductionCalculator({ products, addDailyUsageRecord }: 
   };
 
   return (
-    <Card className="w-full max-w-[600px] mx-auto bg-card/90">
+    <Card className="w-full max-w-[600px] mx-auto glassmorphic">
       <CardContent className="pt-6">
         <div className="flex flex-col gap-6">
           

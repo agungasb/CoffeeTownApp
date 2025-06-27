@@ -80,7 +80,7 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
 
     return (
         <>
-            <Card className="w-full max-w-7xl mx-auto bg-card/90">
+            <Card className="w-full max-w-7xl mx-auto glassmorphic">
                 <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                     <CardTitle>Inventory Management</CardTitle>
                     <div className="flex flex-wrap gap-2">

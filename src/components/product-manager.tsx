@@ -64,7 +64,7 @@ export default function ProductManager({ products, updateProducts, isLoggedIn }:
     };
 
     return (
-        <Card className="w-full max-w-6xl mx-auto bg-card/90">
+        <Card className="w-full max-w-6xl mx-auto glassmorphic">
             <CardHeader className="flex flex-row items-center justify-between gap-4">
                 <CardTitle>Product Management</CardTitle>
                 <Button onClick={handleAddClick} disabled={!isLoggedIn} variant="success">

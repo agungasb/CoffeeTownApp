@@ -19,6 +19,7 @@ import type { ProductIngredients } from "@/lib/productIngredients";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { productItems } from "@/lib/products";
 import { capitalize } from "@/lib/utils";
+import type { DailyUsageRecord } from "@/app/page";
 
 type ProductionFormValues = {
   [K in keyof ProductionInputs]: number | '';
@@ -26,7 +27,7 @@ type ProductionFormValues = {
 
 interface ProductionCalculatorProps {
     products: ProductIngredients;
-    setDailyUsage: (usage: [string, number, string][]) => void;
+    setDailyUsage: (updater: (prevRecords: DailyUsageRecord[]) => DailyUsageRecord[]) => void;
 }
 
 export default function ProductionCalculator({ products, setDailyUsage }: ProductionCalculatorProps) {
@@ -95,10 +96,18 @@ export default function ProductionCalculator({ products, setDailyUsage }: Produc
         ([name, amountStr, unit]) =>
             [name, parseFloat(amountStr) || 0, unit] as [string, number, string]
     );
-    setDailyUsage(parsedUsage);
+    
+    const newRecord: DailyUsageRecord = {
+        id: new Date().toISOString(),
+        date: new Date(),
+        usage: parsedUsage
+    };
+
+    setDailyUsage(prevRecords => [newRecord, ...prevRecords]);
+
     toast({
         title: "Success",
-        description: "Ingredient summary has been saved as daily usage.",
+        description: "Ingredient summary has been saved to usage history.",
     });
   };
 

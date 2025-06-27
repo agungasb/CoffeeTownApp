@@ -13,7 +13,6 @@ import DailyUsageDashboard from '@/components/daily-usage-dashboard';
 import LoginForm from '@/components/login-form';
 import { recipes as initialRecipes, type Recipe } from '@/lib/recipes';
 import { productIngredientsData, type ProductIngredients } from '@/lib/productIngredients';
-import { inventoryData as initialInventory, type InventoryItem } from '@/lib/inventoryData';
 import { 
   LogIn, 
   LogOut, 
@@ -25,19 +24,24 @@ import {
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
+export type DailyUsageRecord = {
+  id: string;
+  date: Date;
+  usage: [string, number, string][];
+};
+
 const TABS = [
   { id: 'calculator', label: 'Production Calculator', icon: <Calculator /> },
   { id: 'recipe', label: 'Recipe Scaler', icon: <Scaling /> },
   { id: 'manager', label: 'Recipe Management', icon: <BookHeart /> },
   { id: 'product_management', label: 'Product Management', icon: <Archive /> },
-  { id: 'dashboard', label: 'Daily Usage Dashboard', icon: <LayoutDashboard /> },
+  { id: 'dashboard', label: 'Usage History', icon: <LayoutDashboard /> },
 ];
 
 export default function Home() {
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
   const [products, setProducts] = useState<ProductIngredients>(productIngredientsData);
-  const [inventory, setInventory] = useState<InventoryItem[]>(initialInventory);
-  const [dailyUsage, setDailyUsage] = useState<[string, number, string][]>([]);
+  const [dailyUsage, setDailyUsage] = useState<DailyUsageRecord[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('calculator');
@@ -125,7 +129,7 @@ export default function Home() {
               />
             </TabsContent>
             <TabsContent value="dashboard">
-              <DailyUsageDashboard inventory={inventory} setInventory={setInventory} dailyUsage={dailyUsage} isLoggedIn={isLoggedIn} />
+              <DailyUsageDashboard dailyUsageRecords={dailyUsage} />
             </TabsContent>
           </Tabs>
         </main>

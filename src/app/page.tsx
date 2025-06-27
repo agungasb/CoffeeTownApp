@@ -58,15 +58,25 @@ export default function Home() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
-          toast({
-              variant: 'destructive',
-              title: 'Firebase Not Configured',
-              description: 'Please set up your Firebase credentials in the .env file.',
-              duration: 10000,
-          });
-          setLoading(false);
-          return;
+      const requiredEnvVars = [
+        'NEXT_PUBLIC_FIREBASE_API_KEY',
+        'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
+        'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
+        'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET',
+        'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
+        'NEXT_PUBLIC_FIREBASE_APP_ID',
+      ];
+      const missingVars = requiredEnvVars.filter(key => !process.env[key]);
+
+      if (missingVars.length > 0) {
+        toast({
+            variant: 'destructive',
+            title: 'Firebase Not Configured',
+            description: `The following environment variables are missing in your .env file: ${missingVars.join(', ')}. Please get them from your Firebase project settings.`,
+            duration: 15000,
+        });
+        setLoading(false);
+        return;
       }
 
       setLoading(true);

@@ -19,7 +19,7 @@ import type { ProductIngredients } from "@/lib/productIngredients";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { productItems } from "@/lib/products";
 import { capitalize } from "@/lib/utils";
-import type { DailyUsageRecord } from "@/components/bakery-app";
+import type { DailyUsageRecord, DailyUsageIngredient } from "@/components/bakery-app";
 
 type ProductionFormValues = {
   [K in keyof ProductionInputs]: number | '';
@@ -27,7 +27,7 @@ type ProductionFormValues = {
 
 interface ProductionCalculatorProps {
     products: ProductIngredients;
-    addDailyUsageRecord: (record: Omit<DailyUsageRecord, 'id' | 'date'>) => Promise<void>;
+    addDailyUsageRecord: (record: { usage: DailyUsageIngredient[] }) => Promise<void>;
 }
 
 export default function ProductionCalculator({ products, addDailyUsageRecord }: ProductionCalculatorProps) {
@@ -93,8 +93,11 @@ export default function ProductionCalculator({ products, addDailyUsageRecord }: 
         return;
     }
     const parsedUsage = results.ingredientSummary.map(
-        ([name, amountStr, unit]) =>
-            [name, parseFloat(amountStr) || 0, unit] as [string, number, string]
+        ([name, amountStr, unit]) => ({
+            name: name,
+            amount: parseFloat(amountStr) || 0,
+            unit: unit
+        })
     );
     
     const newRecord = {

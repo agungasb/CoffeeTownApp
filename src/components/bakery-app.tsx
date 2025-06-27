@@ -28,10 +28,16 @@ import {
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
+export type DailyUsageIngredient = {
+  name: string;
+  amount: number;
+  unit: string;
+};
+
 export type DailyUsageRecord = {
   id: string;
   date: Date;
-  usage: [string, number, string][];
+  usage: DailyUsageIngredient[];
 };
 
 const TABS = [
@@ -56,7 +62,7 @@ interface BakeryAppProps {
         addInventoryItem: (item: Omit<InventoryItem, 'id'>) => Promise<void>;
         updateInventoryItem: (item: InventoryItem) => Promise<void>;
         deleteInventoryItem: (itemId: string) => Promise<void>;
-        addDailyUsageRecord: (record: { usage: [string, number, string][] }) => Promise<void>;
+        addDailyUsageRecord: (record: { usage: DailyUsageIngredient[] }) => Promise<void>;
     };
 }
 
@@ -98,21 +104,24 @@ export default function BakeryApp({
     };
 
     const updateRecipeHandler = async (recipe: Recipe) => {
-        await actions.updateRecipe(recipe);
         setRecipes(prev => prev.map(r => r.id === recipe.id ? recipe : r));
+        await actions.updateRecipe(recipe);
         toast({ title: 'Success', description: 'Recipe updated successfully.' });
+        router.refresh(); 
     };
 
     const deleteRecipeHandler = async (recipeId: string) => {
-        await actions.deleteRecipe(recipeId);
         setRecipes(prev => prev.filter(r => r.id !== recipeId));
+        await actions.deleteRecipe(recipeId);
         toast({ title: 'Success', description: 'Recipe deleted.' });
+        router.refresh(); 
     };
     
     const updateProductsHandler = async (newProducts: ProductIngredients) => {
-        await actions.updateProducts(newProducts);
         setProducts(newProducts);
+        await actions.updateProducts(newProducts);
         toast({ title: 'Success', description: 'Product list updated.' });
+        router.refresh(); 
     };
     
     const addInventoryItemHandler = async (itemData: IngredientFormData) => {
@@ -122,15 +131,17 @@ export default function BakeryApp({
     };
 
     const updateInventoryItemHandler = async (item: InventoryItem) => {
-        await actions.updateInventoryItem(item);
         setInventory(prev => prev.map(i => i.id === item.id ? item : i));
+        await actions.updateInventoryItem(item);
         toast({ title: 'Success', description: 'Ingredient updated.' });
+        router.refresh();
     };
 
     const deleteInventoryItemHandler = async (itemId: string) => {
-        await actions.deleteInventoryItem(itemId);
         setInventory(prev => prev.filter(i => i.id !== itemId));
+        await actions.deleteInventoryItem(itemId);
         toast({ title: 'Success', description: 'Ingredient deleted.' });
+        router.refresh();
     };
     
     const addDailyUsageRecordHandler = async (record: Omit<DailyUsageRecord, 'id' | 'date'>) => {

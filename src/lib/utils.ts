@@ -40,7 +40,7 @@ export function calculateAverageDailyUsage(
 
   // Aggregate usage from the relevant records
   for (const record of relevantRecords) {
-    for (const [name, amount, unit] of record.usage) {
+    for (const { name, amount, unit } of record.usage) {
       if (!totals[name]) {
         totals[name] = { sum: 0, unit, count: 0 };
       }
@@ -52,7 +52,7 @@ export function calculateAverageDailyUsage(
   // Since some ingredients might not be in every record, we create a map of ingredient appearances.
   const ingredientCounts: Record<string, number> = {};
   for (const record of relevantRecords) {
-      for (const [name] of record.usage) {
+      for (const { name } of record.usage) {
           if (!ingredientCounts[name]) {
               ingredientCounts[name] = 0;
           }

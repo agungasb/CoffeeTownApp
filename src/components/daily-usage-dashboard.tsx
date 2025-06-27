@@ -45,11 +45,11 @@ export default function DailyUsageDashboard({ dailyUsageRecords }: DailyUsageDas
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {record.usage.sort((a,b) => a[0].localeCompare(b[0])).map(([name, amount, unit]) => (
-                                                <TableRow key={name}>
-                                                    <TableCell className="font-medium">{capitalize(name)}</TableCell>
-                                                    <TableCell className="text-right">{amount.toFixed(2)}</TableCell>
-                                                    <TableCell>{unit}</TableCell>
+                                            {record.usage.sort((a,b) => a.name.localeCompare(b.name)).map((item) => (
+                                                <TableRow key={item.name}>
+                                                    <TableCell className="font-medium">{capitalize(item.name)}</TableCell>
+                                                    <TableCell className="text-right">{item.amount.toFixed(2)}</TableCell>
+                                                    <TableCell>{item.unit}</TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>

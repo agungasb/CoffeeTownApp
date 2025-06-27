@@ -63,7 +63,7 @@ export async function deleteInventoryItem(itemId: string) {
 }
 
 // --- Daily Usage Actions ---
-export async function addDailyUsageRecord(record: { usage: [string, number, string][] }) {
+export async function addDailyUsageRecord(record: { usage: { name: string, amount: number, unit: string }[] }) {
     checkDb();
     await addDoc(collection(db!, 'dailyUsage'), {
         date: Timestamp.now(),

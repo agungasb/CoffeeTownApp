@@ -9,49 +9,63 @@ import type { InventoryItem } from '@/lib/inventoryData';
 import type { OcrProductionMappingOutput } from '@/ai/flows/ocr-production-mapping';
 import { ocrProductionMapping } from '@/ai/flows/ocr-production-mapping';
 
+const checkDb = () => {
+    if (!db) {
+        throw new Error("Database is not configured. Please check your Firebase credentials in .env.");
+    }
+}
+
 // --- Recipe Actions ---
 export async function addRecipe(recipe: Omit<Recipe, 'id'>) {
-    await addDoc(collection(db, 'recipes'), recipe);
+    checkDb();
+    await addDoc(collection(db!, 'recipes'), recipe);
     revalidatePath('/');
 }
 
 export async function updateRecipe(recipe: Recipe) {
+    checkDb();
     const { id, ...recipeData } = recipe;
-    await updateDoc(doc(db, 'recipes', id), recipeData);
+    await updateDoc(doc(db!, 'recipes', id), recipeData);
     revalidatePath('/');
 }
 
 export async function deleteRecipe(recipeId: string) {
-    await deleteDoc(doc(db, 'recipes', recipeId));
+    checkDb();
+    await deleteDoc(doc(db!, 'recipes', recipeId));
     revalidatePath('/');
 }
 
 // --- Product Actions ---
 export async function updateProducts(products: ProductIngredients) {
-    await setDoc(doc(db, 'appData', 'products'), { data: products });
+    checkDb();
+    await setDoc(doc(db!, 'appData', 'products'), { data: products });
     revalidatePath('/');
 }
 
 // --- Inventory Actions ---
 export async function addInventoryItem(item: Omit<InventoryItem, 'id'>) {
-    await addDoc(collection(db, 'inventory'), item);
+    checkDb();
+    await addDoc(collection(db!, 'inventory'), item);
     revalidatePath('/');
 }
 
 export async function updateInventoryItem(item: InventoryItem) {
+    checkDb();
     const { id, ...itemData } = item;
-    await updateDoc(doc(db, 'inventory', id), itemData);
+    await updateDoc(doc(db!, 'inventory', id), itemData);
     revalidatePath('/');
 }
 
 export async function deleteInventoryItem(itemId: string) {
-    await deleteDoc(doc(db, 'inventory', itemId));
+    checkDb();
+    await deleteDoc(doc(db!, 'inventory', itemId));
     revalidatePath('/');
 }
 
 // --- Daily Usage Actions ---
 export async function addDailyUsageRecord(record: { usage: [string, number, string][] }) {
-    await addDoc(collection(db, 'dailyUsage'), {
+    checkDb();
+    await addDoc(collection(db!, 'dailyUsage'), {
         date: Timestamp.now(),
         usage: record.usage,
     });

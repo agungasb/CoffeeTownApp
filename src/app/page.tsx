@@ -20,6 +20,8 @@ import { Loader2 } from 'lucide-react';
 
 
 async function seedDatabase() {
+    if (!db) return; // Guard against null db
+
     try {
         const batch = writeBatch(db);
         let operations = 0;
@@ -69,6 +71,10 @@ async function seedDatabase() {
 
 
 async function fetchData() {
+    if (!db) {
+        throw new Error("Firebase config is incomplete. Please make sure all 6 NEXT_PUBLIC_FIREBASE_... variables are correctly set in your .env file.");
+    }
+    
     await seedDatabase();
 
     const recipesSnapshot = await getDocs(collection(db, 'recipes'));
@@ -95,30 +101,51 @@ async function fetchData() {
 
 
 export default async function Page() {
-    const { recipes, products, inventory, dailyUsage } = await fetchData();
+    try {
+        const { recipes, products, inventory, dailyUsage } = await fetchData();
 
-    const serverActions = {
-        addRecipe,
-        updateRecipe,
-        deleteRecipe,
-        updateProducts,
-        addInventoryItem,
-        updateInventoryItem,
-        deleteInventoryItem,
-        addDailyUsageRecord
-    };
+        const serverActions = {
+            addRecipe,
+            updateRecipe,
+            deleteRecipe,
+            updateProducts,
+            addInventoryItem,
+            updateInventoryItem,
+            deleteInventoryItem,
+            addDailyUsageRecord
+        };
 
-    return (
-        <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="h-12 w-12 animate-spin" /></div>}>
-            <BakeryApp
-                initialRecipes={recipes}
-                initialProducts={products}
-                initialInventory={inventory}
-                initialDailyUsage={dailyUsage}
-                actions={serverActions}
-            />
-        </Suspense>
-    );
+        return (
+            <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="h-12 w-12 animate-spin" /></div>}>
+                <BakeryApp
+                    initialRecipes={recipes}
+                    initialProducts={products}
+                    initialInventory={inventory}
+                    initialDailyUsage={dailyUsage}
+                    actions={serverActions}
+                />
+            </Suspense>
+        );
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
+        return (
+            <div className="flex items-center justify-center min-h-screen p-4">
+                <div className="w-full max-w-2xl p-8 text-center text-red-200 bg-red-900/50 rounded-lg shadow-lg glassmorphic border border-red-500">
+                    <h1 className="text-2xl font-bold mb-4">Application Error</h1>
+                    <p className="mb-2">Could not connect to the database. Please check the following:</p>
+                    <ul className="text-left list-disc list-inside mb-6 space-y-2">
+                        <li>Ensure all 6 <strong>NEXT_PUBLIC_FIREBASE_...</strong> variables are correctly set in your <code>.env</code> file.</li>
+                        <li>Make sure you have created a <strong>Firestore Database</strong> in your Firebase project and started it in <strong>test mode</strong>.</li>
+                        <li>Verify that the <strong>Cloud Firestore API</strong> is enabled in your Google Cloud console.</li>
+                    </ul>
+                    <div className="p-4 mt-4 text-xs text-left bg-black/30 rounded-md overflow-x-auto">
+                        <p className="font-bold">Error Details:</p>
+                        <pre className="whitespace-pre-wrap">{errorMessage}</pre>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 }
 
 // Add a loading component for better user experience

@@ -1,5 +1,5 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
+import { getFirestore, type Firestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -10,12 +10,19 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-if (!firebaseConfig.apiKey) {
-    console.warn("Firebase API key is missing. Please check your .env file.");
-}
+let app: FirebaseApp | null = null;
+let db: Firestore | null = null;
 
-// Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const db = getFirestore(app);
+// Only initialize if the config is valid.
+// This prevents the app from crashing at module load time.
+if (firebaseConfig.apiKey && firebaseConfig.projectId) {
+    try {
+        app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+        db = getFirestore(app);
+    } catch (e) {
+        console.error("Failed to initialize Firebase", e);
+        // db and app will remain null
+    }
+}
 
 export { db, app };

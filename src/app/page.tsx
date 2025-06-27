@@ -138,10 +138,12 @@ export default function Home() {
 
       } catch (error) {
         console.error("Error fetching data from Firestore:", error);
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
         toast({
             variant: 'destructive',
             title: 'Error Loading Data',
-            description: 'Could not connect to the database. Check console for details.'
+            description: `Failed to fetch or seed data: ${errorMessage}. Check browser console and Firebase rules.`,
+            duration: 15000,
         });
       } finally {
         setLoading(false);

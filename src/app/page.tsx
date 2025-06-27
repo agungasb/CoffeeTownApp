@@ -72,7 +72,7 @@ export default function Home() {
         toast({
             variant: 'destructive',
             title: 'Firebase Not Configured',
-            description: `The following environment variables are missing in your .env file: ${missingVars.join(', ')}. Please get them from your Firebase project settings.`,
+            description: `The following environment variables are missing: ${missingVars.join(', ')}. Please add them to your .env file from your Firebase project settings.`,
             duration: 15000,
         });
         setLoading(false);
@@ -141,8 +141,8 @@ export default function Home() {
         const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
         toast({
             variant: 'destructive',
-            title: 'Error Loading Data',
-            description: `Failed to fetch or seed data: ${errorMessage}. Check browser console and Firebase rules.`,
+            title: 'Firestore Error',
+            description: `Failed to load or seed data: ${errorMessage}. Please check your Firestore security rules and internet connection.`,
             duration: 15000,
         });
       } finally {
@@ -327,3 +327,5 @@ export default function Home() {
     </>
   );
 }
+
+    

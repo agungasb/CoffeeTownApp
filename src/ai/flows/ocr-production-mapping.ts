@@ -29,7 +29,7 @@ export async function ocrProductionMapping(input: OcrProductionMappingInput): Pr
 
 const prompt = ai.definePrompt({
   name: 'ocrProductionMappingPrompt',
-  model: 'googleai/gemini-pro-vision',
+  model: 'googleai/gemini-1.5-flash-latest',
   input: {schema: OcrProductionMappingInputSchema},
   output: {
     schema: OcrProductionMappingOutputSchema,

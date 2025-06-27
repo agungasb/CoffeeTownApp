@@ -63,6 +63,7 @@ interface BakeryAppProps {
         updateInventoryItem: (item: InventoryItem) => Promise<void>;
         deleteInventoryItem: (itemId: string) => Promise<void>;
         addDailyUsageRecord: (record: { usage: DailyUsageIngredient[] }) => Promise<void>;
+        resetDailyUsage: () => Promise<void>;
     };
 }
 
@@ -98,6 +99,7 @@ export default function BakeryApp({
   // --- CRUD Handlers (wrappers for server actions to show toasts and update state) ---
 
     const addRecipeHandler = async (recipe: Omit<Recipe, 'id'>) => {
+        setRecipes(prev => [...prev, { ...recipe, id: 'temp-id' }]); // Optimistic add
         await actions.addRecipe(recipe);
         toast({ title: 'Success', description: 'Recipe added successfully.' });
         router.refresh(); // Refresh to get new item with DB-generated ID
@@ -125,6 +127,7 @@ export default function BakeryApp({
     };
     
     const addInventoryItemHandler = async (itemData: IngredientFormData) => {
+        setInventory(prev => [...prev, { ...itemData, id: 'temp-id' } as InventoryItem]); // Optimistic add
         await actions.addInventoryItem(itemData);
         toast({ title: 'Success', description: 'Ingredient added.' });
         router.refresh(); // Refresh to get new item with DB-generated ID
@@ -148,6 +151,12 @@ export default function BakeryApp({
         await actions.addDailyUsageRecord(record);
         toast({ title: 'Success', description: 'Daily usage saved.' });
         router.refresh(); // Refresh to get updated usage records
+    };
+
+    const resetDailyUsageHandler = async () => {
+        await actions.resetDailyUsage();
+        toast({ title: 'Success', description: 'All historical usage data has been deleted.' });
+        router.refresh();
     };
 
   return (
@@ -236,6 +245,7 @@ export default function BakeryApp({
                     updateInventoryItem={updateInventoryItemHandler}
                     deleteInventoryItem={deleteInventoryItemHandler}
                     dailyUsageRecords={initialDailyUsage}
+                    resetDailyUsage={resetDailyUsageHandler}
                     isLoggedIn={isLoggedIn}
                 />
             </TabsContent>

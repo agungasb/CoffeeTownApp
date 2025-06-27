@@ -13,8 +13,9 @@ import {
   updateInventoryItem,
   deleteInventoryItem,
   addDailyUsageRecord,
+  resetDailyUsage,
 } from './actions';
-import { DailyUsageRecord } from '@/components/bakery-app';
+import type { DailyUsageRecord } from '@/components/bakery-app';
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 
@@ -119,7 +120,8 @@ export default async function Page() {
             addInventoryItem,
             updateInventoryItem,
             deleteInventoryItem,
-            addDailyUsageRecord
+            addDailyUsageRecord,
+            resetDailyUsage
         };
 
         return (

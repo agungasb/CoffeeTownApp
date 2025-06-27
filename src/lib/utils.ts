@@ -1,7 +1,7 @@
 
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import type { DailyUsageRecord } from '@/components/bakery-app';
+import type { DailyUsageRecord, DailyUsageIngredient } from '@/components/bakery-app';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -20,12 +20,12 @@ export const capitalize = (s: string) => {
  * Calculates the average daily usage for a specific day of the week from historical records.
  * @param records - An array of daily usage records.
  * @param targetDay - The target day of the week (0 for Sunday, 1 for Monday, etc.).
- * @returns An array of [ingredientName, averageAmount, unit].
+ * @returns An array of ingredient usage objects.
  */
 export function calculateAverageDailyUsage(
   records: DailyUsageRecord[],
   targetDay: number
-): [string, number, string][] {
+): DailyUsageIngredient[] {
   // Filter records for the target day of the week and sort them by date descending
   const relevantRecords = records
     .filter(record => new Date(record.date).getDay() === targetDay)
@@ -62,13 +62,13 @@ export function calculateAverageDailyUsage(
 
 
   // Calculate the average
-  const averages: [string, number, string][] = Object.entries(totals).map(
+  const averages: DailyUsageIngredient[] = Object.entries(totals).map(
     ([name, data]) => {
       const divisor = relevantRecords.length; // Average over the number of days found
       const averageAmount = data.sum / divisor;
-      return [name, averageAmount, data.unit];
+      return {name, amount: averageAmount, unit: data.unit};
     }
   );
 
-  return averages.sort((a,b) => a[0].localeCompare(b[0]));
+  return averages.sort((a,b) => a.name.localeCompare(b.name));
 }

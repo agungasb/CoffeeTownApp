@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/lib/firebase';
-import { collection, doc, addDoc, updateDoc, deleteDoc, setDoc, Timestamp } from 'firebase/firestore';
+import { collection, doc, addDoc, updateDoc, deleteDoc, setDoc, Timestamp, writeBatch, getDocs } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 import type { Recipe } from '@/lib/recipes';
 import type { ProductIngredients } from '@/lib/productIngredients';
@@ -69,6 +69,18 @@ export async function addDailyUsageRecord(record: { usage: { name: string, amoun
         date: Timestamp.now(),
         usage: record.usage,
     });
+    revalidatePath('/');
+}
+
+export async function resetDailyUsage() {
+    checkDb();
+    const usageCollectionRef = collection(db!, 'dailyUsage');
+    const querySnapshot = await getDocs(usageCollectionRef);
+    const batch = writeBatch(db!);
+    querySnapshot.forEach((doc) => {
+        batch.delete(doc.ref);
+    });
+    await batch.commit();
     revalidatePath('/');
 }
 

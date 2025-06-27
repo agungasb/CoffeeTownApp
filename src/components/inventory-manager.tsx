@@ -22,10 +22,11 @@ interface InventoryManagerProps {
     updateInventoryItem: (item: InventoryItem) => Promise<void>;
     deleteInventoryItem: (itemId: string) => Promise<void>;
     dailyUsageRecords: DailyUsageRecord[];
+    resetDailyUsage: () => Promise<void>;
     isLoggedIn: boolean;
 }
 
-export default function InventoryManager({ inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, dailyUsageRecords, isLoggedIn }: InventoryManagerProps) {
+export default function InventoryManager({ inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, dailyUsageRecords, resetDailyUsage, isLoggedIn }: InventoryManagerProps) {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isOrderOpen, setIsOrderOpen] = useState(false);
     const [itemToEdit, setItemToEdit] = useState<InventoryItem | null>(null);
@@ -63,7 +64,7 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
     };
 
     const getStatus = (item: InventoryItem): { text: string, variant: "default" | "secondary" | "destructive" } => {
-        const usage = averageUsageToday.find(u => u[0] === item.name)?.[1] || 0;
+        const usage = averageUsageToday.find(u => u.name === item.name)?.[1] || 0;
         if (item.currentStock < item.minimumStock) {
             return { text: "Critical", variant: "destructive" };
         }
@@ -73,18 +74,44 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
         return { text: "In Stock", variant: "default" };
     }
 
+    const handleResetUsage = async () => {
+        await resetDailyUsage();
+    };
+
     return (
         <>
             <Card className="w-full max-w-7xl mx-auto bg-card/90">
                 <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                     <CardTitle>Inventory Management</CardTitle>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                         <Button onClick={handleAddClick} disabled={!isLoggedIn} size="sm">
                             <PlusCircle className="mr-2" /> Add New Ingredient
                         </Button>
                         <Button onClick={() => setIsOrderOpen(true)} variant="secondary" size="sm">
                             <Package className="mr-2" /> Order
                         </Button>
+                         <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="destructive" size="sm" disabled={!isLoggedIn}>
+                                    <Trash2 className="mr-2" /> Reset Usage Data
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className="glassmorphic">
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will permanently delete all
+                                        historical daily usage records. This data is used for the Order Recommendation Calculator.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={handleResetUsage} className="bg-destructive hover:bg-destructive/90">
+                                        Yes, delete all usage data
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </div>
                 </CardHeader>
                 <CardContent>
@@ -114,14 +141,14 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
                         </TableHeader>
                         <TableBody>
                             {sortedInventory.map(item => {
-                                const usage = averageUsageToday.find(u => u[0] === item.name);
+                                const usage = averageUsageToday.find(u => u.name === item.name);
                                 const status = getStatus(item);
                                 return (
                                 <TableRow key={item.id}>
                                     <TableCell className="font-medium">{capitalize(item.name)}</TableCell>
                                     <TableCell>{item.currentStock.toLocaleString()} {item.unit}</TableCell>
                                     <TableCell>{item.minimumStock.toLocaleString()} {item.unit}</TableCell>
-                                    <TableCell>{usage ? `${usage[1].toFixed(2)} ${usage[2]}` : 'N/A'}</TableCell>
+                                    <TableCell>{usage ? `${usage.amount.toFixed(2)} ${usage.unit}` : 'N/A'}</TableCell>
                                     <TableCell><Badge variant={status.variant}>{status.text}</Badge></TableCell>
                                     <TableCell className="text-right">
                                         <Button variant="ghost" size="icon" onClick={() => handleEditClick(item)} disabled={!isLoggedIn}>

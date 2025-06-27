@@ -67,7 +67,7 @@ export default function ProductManager({ products, updateProducts, isLoggedIn }:
         <Card className="w-full max-w-6xl mx-auto bg-card/90">
             <CardHeader className="flex flex-row items-center justify-between gap-4">
                 <CardTitle>Product Management</CardTitle>
-                <Button onClick={handleAddClick} disabled={!isLoggedIn}>
+                <Button onClick={handleAddClick} disabled={!isLoggedIn} variant="success">
                     <PlusCircle className="mr-2" /> Add New Product
                 </Button>
             </CardHeader>
@@ -120,7 +120,7 @@ export default function ProductManager({ products, updateProducts, isLoggedIn }:
                                 </Accordion>
                             </CardContent>
                             <CardFooter className="mt-auto flex justify-end gap-2 pt-4">
-                                <Button variant="outline" size="sm" disabled={!isLoggedIn} onClick={() => handleEditClick(productName, ingredients)}>
+                                <Button variant="info" size="sm" disabled={!isLoggedIn} onClick={() => handleEditClick(productName, ingredients)}>
                                     <Edit className="mr-2 h-4 w-4" /> Edit
                                 </Button>
                                 <AlertDialog>

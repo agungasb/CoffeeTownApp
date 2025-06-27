@@ -53,7 +53,7 @@ export default function RecipeManager({ recipes, addRecipe, updateRecipe, delete
         <Card className="w-full max-w-6xl mx-auto bg-card/90">
             <CardHeader className="flex flex-row items-center justify-between gap-4">
                 <CardTitle>Recipe Management</CardTitle>
-                 <Button onClick={handleAddClick} disabled={!isLoggedIn}>
+                 <Button onClick={handleAddClick} disabled={!isLoggedIn} variant="success">
                     <PlusCircle className="mr-2" /> Add New Recipe
                 </Button>
             </CardHeader>
@@ -119,7 +119,7 @@ export default function RecipeManager({ recipes, addRecipe, updateRecipe, delete
                                 </Accordion>
                             </CardContent>
                             <CardFooter className="mt-auto flex justify-end gap-2 pt-4">
-                                <Button variant="outline" size="sm" onClick={() => handleEditClick(recipe)} disabled={!isLoggedIn}>
+                                <Button variant="info" size="sm" onClick={() => handleEditClick(recipe)} disabled={!isLoggedIn}>
                                     <Edit className="mr-2 h-4 w-4" /> Edit
                                 </Button>
                                 <AlertDialog>

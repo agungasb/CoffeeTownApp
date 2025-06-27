@@ -84,7 +84,7 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
                 <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                     <CardTitle>Inventory Management</CardTitle>
                     <div className="flex flex-wrap gap-2">
-                        <Button onClick={handleAddClick} disabled={!isLoggedIn} size="sm">
+                        <Button onClick={handleAddClick} disabled={!isLoggedIn} size="sm" variant="success">
                             <PlusCircle className="mr-2" /> Add New Ingredient
                         </Button>
                         <Button onClick={() => setIsOrderOpen(true)} variant="secondary" size="sm">
@@ -151,7 +151,7 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
                                     <TableCell>{usage ? `${usage.amount.toFixed(2)} ${usage.unit}` : 'N/A'}</TableCell>
                                     <TableCell><Badge variant={status.variant}>{status.text}</Badge></TableCell>
                                     <TableCell className="text-right">
-                                        <Button variant="ghost" size="icon" onClick={() => handleEditClick(item)} disabled={!isLoggedIn}>
+                                        <Button variant="info" size="icon" onClick={() => handleEditClick(item)} disabled={!isLoggedIn}>
                                             <Edit className="h-4 w-4" />
                                         </Button>
                                         <AlertDialog>

@@ -64,7 +64,7 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
     };
 
     const getStatus = (item: InventoryItem): { text: string, variant: "default" | "secondary" | "destructive" } => {
-        const usage = averageUsageToday.find(u => u.name === item.name)?.[1] || 0;
+        const usage = averageUsageToday.find(u => u.name.toLowerCase() === item.name.toLowerCase())?.amount || 0;
         if (item.currentStock < item.minimumStock) {
             return { text: "Critical", variant: "destructive" };
         }
@@ -141,7 +141,7 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
                         </TableHeader>
                         <TableBody>
                             {sortedInventory.map(item => {
-                                const usage = averageUsageToday.find(u => u.name === item.name);
+                                const usage = averageUsageToday.find(u => u.name.toLowerCase() === item.name.toLowerCase());
                                 const status = getStatus(item);
                                 return (
                                 <TableRow key={item.id}>

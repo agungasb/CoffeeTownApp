@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Calculator, PackagePlus, ArrowLeft, CalendarDays } from "lucide-react";
 import type { InventoryItem } from "@/lib/inventoryData";
-import type { DailyUsageRecord } from "@/components/bakery-app";
+import type { DailyUsageRecord, DailyUsageIngredient } from "@/components/bakery-app";
 import { capitalize, calculateAverageDailyUsage } from "@/lib/utils";
 
 interface OrderCalculatorProps {
@@ -35,7 +35,7 @@ const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Fri
 export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculatorProps) {
     const [recommendations, setRecommendations] = useState<OrderRecommendation[] | null>(null);
     const [selectedDay, setSelectedDay] = useState<number>(new Date().getDay());
-    const [averageUsage, setAverageUsage] = useState<[string, number, string][]>([]);
+    const [averageUsage, setAverageUsage] = useState<DailyUsageIngredient[]>([]);
     
     useEffect(() => {
         const usage = calculateAverageDailyUsage(dailyUsageRecords, selectedDay);
@@ -71,7 +71,7 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
                 ? stockInput * item.orderUnitConversion
                 : stockInput;
                 
-            const usageAmount = averageUsage.find(u => u[0].toLowerCase() === item.name.toLowerCase())?.[1] || 0;
+            const usageAmount = averageUsage.find(u => u.name.toLowerCase() === item.name.toLowerCase())?.amount || 0;
             const stockAfterUsage = currentStock - usageAmount;
 
             if (stockAfterUsage < item.minimumStock) {

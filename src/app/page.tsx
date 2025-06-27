@@ -80,11 +80,19 @@ export default function Home() {
       }
 
       setLoading(true);
+      toast({ title: 'Connecting to Firestore...', description: 'Attempting to fetch data.' });
+      console.log("Connecting to Firestore...");
+
       try {
         // --- Recipes ---
+        console.log("Checking for recipes...");
         const recipesCol = collection(db, 'recipes');
         const recipeSnapshot = await getDocs(recipesCol);
+        console.log(`Found ${recipeSnapshot.docs.length} recipes in Firestore.`);
+        
         if (recipeSnapshot.docs.length === 0) {
+          console.log('No recipes found. Seeding initial recipes...');
+          toast({ title: 'Seeding Data', description: 'Adding initial recipes...' });
           const batch = writeBatch(db);
           initialRecipes.forEach(recipe => {
             const docRef = doc(db, 'recipes', recipe.id);
@@ -92,25 +100,41 @@ export default function Home() {
           });
           await batch.commit();
           setRecipes(initialRecipes);
+          console.log('Successfully seeded recipes.');
+          toast({ title: 'Success', description: 'Initial recipes have been saved.' });
         } else {
           const recipesList = recipeSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Recipe));
           setRecipes(recipesList);
+          console.log('Recipes loaded from Firestore.');
         }
 
         // --- Products ---
+        console.log("Checking for products...");
         const productsDocRef = doc(db, 'products', 'allProducts');
         const productsSnapshot = await getDoc(productsDocRef);
+        console.log(`Products document exists: ${productsSnapshot.exists()}`);
+
         if (!productsSnapshot.exists()) {
+            console.log('No products found. Seeding initial products...');
+            toast({ title: 'Seeding Data', description: 'Adding initial products...' });
             await setDoc(productsDocRef, { data: initialProductData });
             setProducts(initialProductData);
+            console.log('Successfully seeded products.');
+            toast({ title: 'Success', description: 'Initial products have been saved.' });
         } else {
             setProducts(productsSnapshot.data().data as ProductIngredients);
+            console.log('Products loaded from Firestore.');
         }
 
         // --- Inventory ---
+        console.log("Checking for inventory...");
         const inventoryCol = collection(db, 'inventory');
         const inventorySnapshot = await getDocs(inventoryCol);
+        console.log(`Found ${inventorySnapshot.docs.length} inventory items in Firestore.`);
+
         if (inventorySnapshot.docs.length === 0) {
+            console.log('No inventory found. Seeding initial inventory...');
+            toast({ title: 'Seeding Data', description: 'Adding initial inventory...' });
             const batch = writeBatch(db);
             initialInventory.forEach(item => {
                 const docRef = doc(db, 'inventory', item.id);
@@ -118,12 +142,16 @@ export default function Home() {
             });
             await batch.commit();
             setInventory(initialInventory);
+            console.log('Successfully seeded inventory.');
+            toast({ title: 'Success', description: 'Initial inventory has been saved.' });
         } else {
             const inventoryList = inventorySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as InventoryItem));
             setInventory(inventoryList);
+            console.log('Inventory loaded from Firestore.');
         }
 
         // --- Daily Usage ---
+        console.log("Fetching daily usage records...");
         const usageCol = collection(db, 'dailyUsage');
         const usageSnapshot = await getDocs(usageCol);
         const usageList = usageSnapshot.docs.map(doc => {
@@ -135,15 +163,17 @@ export default function Home() {
             } as DailyUsageRecord;
         });
         setDailyUsage(usageList.sort((a,b) => b.date.getTime() - a.date.getTime()));
+        console.log(`Found ${usageList.length} daily usage records.`);
+        toast({ title: 'All Done!', description: 'Data loaded successfully.' });
 
       } catch (error) {
-        console.error("Error fetching data from Firestore:", error);
+        console.error("CRITICAL ERROR during Firestore operation:", error);
         const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
         toast({
             variant: 'destructive',
-            title: 'Firestore Error',
-            description: `Failed to load or seed data: ${errorMessage}. Please check your Firestore security rules and internet connection.`,
-            duration: 15000,
+            title: 'CRITICAL Firestore Error',
+            description: `Operation failed: ${errorMessage}. Check the console (F12) for details.`,
+            duration: 20000,
         });
       } finally {
         setLoading(false);
@@ -327,5 +357,3 @@ export default function Home() {
     </>
   );
 }
-
-    

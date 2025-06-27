@@ -55,23 +55,26 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         "Adonan Abon Taiwan": `${(numInputs['abon taiwan'] / 4).toFixed(2)} resep`,
     };
 
-    const ingredientTotals: Record<string, number> = {};
+    const ingredientTotals: Record<string, { amount: number, unit: string }> = {};
 
     for (const [productName, quantity] of Object.entries(numInputs)) {
         const productKey = productName as keyof typeof productIngredientsData;
         if (quantity > 0 && productIngredientsData[productKey]) {
             const ingredients = productIngredientsData[productKey];
-            for (const [ingredient, amount] of Object.entries(ingredients)) {
-                ingredientTotals[ingredient] = (ingredientTotals[ingredient] || 0) + (amount * quantity);
+            for (const [ingredient, data] of Object.entries(ingredients)) {
+                if (!ingredientTotals[ingredient]) {
+                    ingredientTotals[ingredient] = { amount: 0, unit: data.unit };
+                }
+                ingredientTotals[ingredient].amount += data.amount * quantity;
+                ingredientTotals[ingredient].unit = data.unit; 
             }
         }
     }
 
     const ingredientSummary = Object.entries(ingredientTotals)
         .sort(([a], [b]) => a.localeCompare(b))
-        .map(([name, total]) => {
-            const unit = name.toLowerCase() === 'tusuk sate' ? 'pcs' : 'g';
-            return [name, total.toFixed(2), unit];
+        .map(([name, data]) => {
+            return [name, data.amount.toFixed(2), data.unit];
         });
 
 

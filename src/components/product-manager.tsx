@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { type ProductIngredients } from "@/lib/productIngredients";
+import { type ProductIngredients, type IngredientData } from "@/lib/productIngredients";
 import { Edit, PlusCircle, ShieldAlert, Trash2, Archive } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
 import { ProductForm } from './product-form';
@@ -24,7 +24,7 @@ interface ProductManagerProps {
 export default function ProductManager({ products, setProducts, isLoggedIn }: ProductManagerProps) {
     const { toast } = useToast();
     const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-    const [productToEdit, setProductToEdit] = useState<{ name: string; ingredients: { name: string; amount: number; }[] } | null>(null);
+    const [productToEdit, setProductToEdit] = useState<{ name: string; ingredients: { name: string; amount: number; unit: string }[] } | null>(null);
     const productCount = Object.keys(products).length;
 
     const handleAddClick = () => {
@@ -32,10 +32,10 @@ export default function ProductManager({ products, setProducts, isLoggedIn }: Pr
         setIsFormDialogOpen(true);
     };
 
-    const handleEditClick = (productName: string, ingredients: Record<string, number>) => {
+    const handleEditClick = (productName: string, ingredients: Record<string, IngredientData>) => {
         setProductToEdit({
             name: productName,
-            ingredients: Object.entries(ingredients).map(([name, amount]) => ({ name, amount }))
+            ingredients: Object.entries(ingredients).map(([name, data]) => ({ name, amount: data.amount, unit: data.unit }))
         });
         setIsFormDialogOpen(true);
     };
@@ -47,11 +47,11 @@ export default function ProductManager({ products, setProducts, isLoggedIn }: Pr
         toast({ title: 'Success', description: `Product "${capitalize(productName)}" deleted.` });
     };
 
-    const handleFormSubmit = (data: { name: string; ingredients: { name: string; amount: number }[] }) => {
+    const handleFormSubmit = (data: { name: string; ingredients: { name: string; amount: number; unit: string }[] }) => {
         const newProducts = { ...products };
-        const newIngredients: Record<string, number> = {};
+        const newIngredients: Record<string, IngredientData> = {};
         data.ingredients.forEach(ing => {
-            newIngredients[ing.name] = ing.amount;
+            newIngredients[ing.name] = { amount: ing.amount, unit: ing.unit };
         });
 
         // If editing an old product with a new name, delete the old one
@@ -110,11 +110,11 @@ export default function ProductManager({ products, setProducts, isLoggedIn }: Pr
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
-                                                    {Object.entries(ingredients).map(([ingredientName, amount]) => (
+                                                    {Object.entries(ingredients).map(([ingredientName, ingredientData]) => (
                                                     <TableRow key={ingredientName}>
                                                         <TableCell className="p-2">{capitalize(ingredientName)}</TableCell>
-                                                        <TableCell className="p-2 text-right">{typeof amount === 'number' ? amount.toFixed(3) : amount}</TableCell>
-                                                        <TableCell className="p-2 text-muted-foreground">{ingredientName.toLowerCase() === 'tusuk sate' ? 'pcs' : 'g'}</TableCell>
+                                                        <TableCell className="p-2 text-right">{typeof ingredientData.amount === 'number' ? ingredientData.amount.toFixed(3) : ingredientData.amount}</TableCell>
+                                                        <TableCell className="p-2 text-muted-foreground">{ingredientData.unit}</TableCell>
                                                     </TableRow>
                                                     ))}
                                                 </TableBody>

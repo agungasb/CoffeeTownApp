@@ -57,9 +57,10 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
 
     const form = useForm<FormValues>({ defaultValues });
 
-    useEffect(() => {
-        form.reset(defaultValues);
-    }, [inventory, form, defaultValues]);
+    // The useEffect that called form.reset() was removed.
+    // It was the source of the bug, causing the form to reset on every re-render
+    // and overwriting any user input. The form now correctly initializes
+    // with `defaultValues` when it mounts and maintains its own state after that.
 
     const handleCalculate = (data: FormValues) => {
         const newRecommendations: OrderRecommendation[] = [];

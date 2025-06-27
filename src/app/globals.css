@@ -79,7 +79,7 @@
 
 @layer components {
   .glassmorphic {
-    background-color: hsl(var(--background) / var(--glass-opacity));
+    background-color: hsl(var(--background) / var(--glass-opacity)) !important;
     backdrop-filter: blur(var(--glass-blur));
     @apply rounded-lg border border-foreground/10;
   }

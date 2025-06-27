@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import type { DailyUsageRecord } from '@/app/page';
+import type { DailyUsageRecord } from '@/components/bakery-app';
 import { capitalize } from '@/lib/utils';
 import { LayoutDashboard, Info } from 'lucide-react';
 

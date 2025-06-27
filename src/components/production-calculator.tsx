@@ -19,7 +19,7 @@ import type { ProductIngredients } from "@/lib/productIngredients";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { productItems } from "@/lib/products";
 import { capitalize } from "@/lib/utils";
-import type { DailyUsageRecord } from "@/app/page";
+import type { DailyUsageRecord } from "@/components/bakery-app";
 
 type ProductionFormValues = {
   [K in keyof ProductionInputs]: number | '';
@@ -27,7 +27,7 @@ type ProductionFormValues = {
 
 interface ProductionCalculatorProps {
     products: ProductIngredients;
-    addDailyUsageRecord: (record: Omit<DailyUsageRecord, 'id'>) => Promise<void>;
+    addDailyUsageRecord: (record: Omit<DailyUsageRecord, 'id' | 'date'>) => Promise<void>;
 }
 
 export default function ProductionCalculator({ products, addDailyUsageRecord }: ProductionCalculatorProps) {
@@ -98,16 +98,10 @@ export default function ProductionCalculator({ products, addDailyUsageRecord }: 
     );
     
     const newRecord = {
-        date: new Date(),
         usage: parsedUsage
     };
     
     await addDailyUsageRecord(newRecord);
-
-    toast({
-        title: "Success",
-        description: "Ingredient summary has been saved to usage history.",
-    });
   };
 
   return (

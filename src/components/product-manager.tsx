@@ -11,7 +11,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { type ProductIngredients, type IngredientData } from "@/lib/productIngredients";
 import { Edit, PlusCircle, ShieldAlert, Trash2, Archive } from "lucide-react";
-import { useToast } from '@/hooks/use-toast';
 import { ProductForm } from './product-form';
 import { capitalize } from '@/lib/utils';
 
@@ -22,7 +21,6 @@ interface ProductManagerProps {
 }
 
 export default function ProductManager({ products, updateProducts, isLoggedIn }: ProductManagerProps) {
-    const { toast } = useToast();
     const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
     const [productToEdit, setProductToEdit] = useState<{ name: string; ingredients: { name: string; amount: number; unit: string }[] } | null>(null);
     const productCount = Object.keys(products).length;
@@ -44,7 +42,6 @@ export default function ProductManager({ products, updateProducts, isLoggedIn }:
         const newProducts = { ...products };
         delete newProducts[productName];
         await updateProducts(newProducts);
-        toast({ title: 'Success', description: `Product "${capitalize(productName)}" deleted.` });
     };
 
     const handleFormSubmit = async (data: { name: string; ingredients: { name: string; amount: number; unit: string }[] }) => {
@@ -54,7 +51,6 @@ export default function ProductManager({ products, updateProducts, isLoggedIn }:
             newIngredients[ing.name.toLowerCase()] = { amount: ing.amount, unit: ing.unit };
         });
 
-        // If editing an old product with a new name, delete the old one
         if (productToEdit && productToEdit.name !== data.name) {
             delete newProducts[productToEdit.name];
         }
@@ -63,7 +59,6 @@ export default function ProductManager({ products, updateProducts, isLoggedIn }:
         
         await updateProducts(newProducts);
 
-        toast({ title: 'Success', description: `Product "${capitalize(data.name)}" saved.` });
         setIsFormDialogOpen(false);
         setProductToEdit(null);
     };

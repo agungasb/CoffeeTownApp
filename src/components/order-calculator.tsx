@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Calculator, PackagePlus, ArrowLeft, CalendarDays } from "lucide-react";
 import type { InventoryItem } from "@/lib/inventoryData";
-import type { DailyUsageRecord } from "@/app/page";
+import type { DailyUsageRecord } from "@/components/bakery-app";
 import { capitalize, calculateAverageDailyUsage } from "@/lib/utils";
 
 interface OrderCalculatorProps {

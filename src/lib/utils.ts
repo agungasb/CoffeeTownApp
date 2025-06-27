@@ -1,7 +1,7 @@
 
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import type { DailyUsageRecord } from '@/app/page';
+import type { DailyUsageRecord } from '@/components/bakery-app';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

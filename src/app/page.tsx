@@ -1,219 +1,127 @@
+import BakeryApp from '@/components/bakery-app';
+import { collection, getDocs, writeBatch, doc, getDoc, Timestamp, query, orderBy, limit } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { recipes as initialRecipesData, Recipe } from '@/lib/recipes';
+import { productIngredientsData as initialProductData, ProductIngredients } from '@/lib/productIngredients';
+import { inventoryData as initialInventoryData, InventoryItem } from '@/lib/inventoryData';
+import {
+  addRecipe,
+  updateRecipe,
+  deleteRecipe,
+  updateProducts,
+  addInventoryItem,
+  updateInventoryItem,
+  deleteInventoryItem,
+  addDailyUsageRecord,
+} from './actions';
+import { DailyUsageRecord } from '@/components/bakery-app';
+import { Suspense } from 'react';
+import { Loader2 } from 'lucide-react';
 
-"use client";
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import ProductionCalculator from "@/components/production-calculator";
-import RecipeScaler from "@/components/recipe-scaler";
-import RecipeManager from "@/components/recipe-manager";
-import ProductManager from '@/components/product-manager';
-import InventoryManager from '@/components/inventory-manager';
-import LoginForm from '@/components/login-form';
-import { recipes as initialRecipes, type Recipe } from '@/lib/recipes';
-import { productIngredientsData as initialProductData, type ProductIngredients } from '@/lib/productIngredients';
-import { inventoryData as initialInventory, type InventoryItem } from '@/lib/inventoryData';
-import type { IngredientFormData } from '@/components/ingredient-form';
-import { useToast } from '@/hooks/use-toast';
-import { 
-  LogIn, 
-  LogOut, 
-  Calculator, 
-  Scaling, 
-  BookHeart, 
-  Archive, 
-  Warehouse
-} from 'lucide-react';
-import { ThemeToggle } from '@/components/theme-toggle';
+async function seedDatabase() {
+    try {
+        const batch = writeBatch(db);
+        let operations = 0;
 
-export type DailyUsageRecord = {
-  id: string;
-  date: Date;
-  usage: [string, number, string][];
-};
+        // 1. Seed Recipes
+        const recipesSnapshot = await getDocs(query(collection(db, 'recipes'), limit(1)));
+        if (recipesSnapshot.empty) {
+            console.log("Database empty, seeding recipes...");
+            initialRecipesData.forEach(recipe => {
+                const docRef = doc(db, 'recipes', recipe.id);
+                batch.set(docRef, recipe);
+            });
+            operations++;
+        }
 
-const TABS = [
-  { id: 'calculator', label: 'Production Calculator', icon: <Calculator /> },
-  { id: 'recipe', label: 'Recipe Scaler', icon: <Scaling /> },
-  { id: 'manager', label: 'Recipe Management', icon: <BookHeart /> },
-  { id: 'product_management', label: 'Product Management', icon: <Archive /> },
-  { id: 'inventory', label: 'Inventory Management', icon: <Warehouse /> },
-];
-
-export default function Home() {
-  const { toast } = useToast();
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [products, setProducts] = useState<ProductIngredients>({});
-  const [inventory, setInventory] = useState<InventoryItem[]>([]);
-  const [dailyUsage, setDailyUsage] = useState<DailyUsageRecord[]>([]);
-  
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('calculator');
-
-  useEffect(() => {
-    setRecipes(initialRecipes);
-    setProducts(initialProductData);
-    setInventory(initialInventory);
-  }, []);
-
-  const handleLoginSuccess = () => {
-    setIsLoggedIn(true);
-    setIsLoginDialogOpen(false);
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-  }
-
-  // --- CRUD Handlers (Local State) ---
-
-  const addRecipe = async (recipe: Omit<Recipe, 'id'>) => {
-      const newId = recipe.name.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now();
-      const newRecipe = { ...recipe, id: newId };
-      setRecipes(prev => [...prev, newRecipe]);
-  };
-
-  const updateRecipe = async (recipe: Recipe) => {
-      setRecipes(prev => prev.map(r => r.id === recipe.id ? recipe : r));
-  };
-
-  const deleteRecipe = async (recipeId: string) => {
-      setRecipes(prev => prev.filter(r => r.id !== recipeId));
-  };
-  
-  const updateProducts = async (newProducts: ProductIngredients) => {
-      setProducts(newProducts);
-  };
-  
-  const addInventoryItem = async (itemData: IngredientFormData) => {
-      const newId = 'inv_' + Date.now();
-      const newItem = { ...itemData, id: newId } as InventoryItem;
-      setInventory(prev => [...prev, newItem]);
-  };
-
-  const updateInventoryItem = async (item: InventoryItem) => {
-      setInventory(prev => prev.map(i => i.id === item.id ? item : i));
-  };
-
-  const deleteInventoryItem = async (itemId: string) => {
-      setInventory(prev => prev.filter(i => i.id !== itemId));
-  };
-  
-  const addDailyUsageRecord = async (record: Omit<DailyUsageRecord, 'id'>) => {
-      const newId = 'usage_' + Date.now();
-      const newRecord = { ...record, id: newId };
-      setDailyUsage(prev => [newRecord, ...prev].sort((a,b) => b.date.getTime() - a.date.getTime()));
-  };
-
-  return (
-    <>
-      <div className="flex flex-col items-center min-h-screen pb-20">
+        // 2. Seed Products
+        const productsDocRef = doc(db, 'appData', 'products');
+        const productsDoc = await getDoc(productsDocRef);
+        if (!productsDoc.exists()) {
+            console.log("Database empty, seeding products...");
+            batch.set(productsDocRef, { data: initialProductData });
+            operations++;
+        }
         
-        <header className="fixed top-0 left-0 w-full p-2 md:p-4 z-20 glassmorphic flex justify-between items-center">
-            <div>
-                 <h1 className="font-headline text-2xl md:text-3xl text-primary-foreground" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
-                    Coffee Town Bakery
-                </h1>
-                <p className="hidden md:block text-sm text-foreground/90 italic" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
-                    Not What You Want, But Surely What You Need
-                </p>
-            </div>
-             <div className="flex items-center gap-2">
-                <ThemeToggle />
-                {isLoggedIn ? (
-                    <Button
-                        variant="ghost"
-                        className="text-foreground hover:text-foreground/80 hover:bg-foreground/10"
-                        onClick={handleLogout}
-                        title="Logout"
-                    >
-                        <LogOut className="h-5 w-5 md:h-6 md:w-6" />
-                    </Button>
-                ) : (
-                    <Button
-                        variant="ghost"
-                        className="text-foreground hover:text-foreground/80 hover:bg-foreground/10"
-                        onClick={() => setIsLoginDialogOpen(true)}
-                        title="Login"
-                    >
-                        <LogIn className="h-5 w-5 md:h-6 md:w-6" />
-                    </Button>
-                )}
-            </div>
-        </header>
+        // 3. Seed Inventory
+        const inventorySnapshot = await getDocs(query(collection(db, 'inventory'), limit(1)));
+        if (inventorySnapshot.empty) {
+             console.log("Database empty, seeding inventory...");
+            initialInventoryData.forEach(item => {
+                const docRef = doc(db, 'inventory', item.id);
+                batch.set(docRef, item);
+            });
+            operations++;
+        }
 
-        <nav className="fixed top-[74px] md:top-[96px] left-0 w-full z-10 py-2 glassmorphic flex items-center justify-center">
-            <div className="overflow-x-auto hide-scrollbar">
-                <div className="flex justify-start md:justify-center items-center gap-5 px-4">
-                  {TABS.map((tab) => (
-                     <button 
-                        key={tab.id}
-                        className={`nav-button ${activeTab === tab.id ? 'active' : ''}`} 
-                        onClick={() => setActiveTab(tab.id)}
-                      >
-                        {tab.icon}
-                        <span className="hidden sm:inline">{tab.label}</span>
-                      </button>
-                  ))}
-                </div>
-            </div>
-        </nav>
+        if (operations > 0) {
+            console.log("Committing seed data to database...");
+            await batch.commit();
+            console.log("Seeding complete.");
+        }
+    } catch (error) {
+        console.error("Error seeding database:", error);
+        // We can throw the error to be caught by the error boundary
+        throw new Error("Failed to initialize database. Please check Firestore permissions and configuration.");
+    }
+}
 
 
-        <main className="w-full max-w-7xl mt-[136px] md:mt-[160px] p-4 sm:p-6 md:p-8">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsContent value="calculator">
-              <ProductionCalculator products={products} addDailyUsageRecord={addDailyUsageRecord}/>
-            </TabsContent>
-            <TabsContent value="recipe">
-              <RecipeScaler recipes={recipes} />
-            </TabsContent>
-            <TabsContent value="manager">
-              <RecipeManager 
-                recipes={recipes} 
-                addRecipe={addRecipe}
-                updateRecipe={updateRecipe}
-                deleteRecipe={deleteRecipe}
-                isLoggedIn={isLoggedIn} 
-              />
-            </TabsContent>
-            <TabsContent value="product_management">
-              <ProductManager 
-                products={products}
-                updateProducts={updateProducts}
-                isLoggedIn={isLoggedIn} 
-              />
-            </TabsContent>
-             <TabsContent value="inventory">
-                <InventoryManager 
-                    inventory={inventory}
-                    addInventoryItem={addInventoryItem}
-                    updateInventoryItem={updateInventoryItem}
-                    deleteInventoryItem={deleteInventoryItem}
-                    dailyUsageRecords={dailyUsage}
-                    isLoggedIn={isLoggedIn}
-                />
-            </TabsContent>
-          </Tabs>
-        </main>
-        
-        <footer className="fixed bottom-0 left-0 w-full p-4 text-center glassmorphic border-t border-foreground/30 text-primary-foreground font-medium text-sm">
-            © 2024 Coffee Town Bakery. All Rights Reserved. | Follow me <a href="https://twitter.com/Agung_styb" target="_blank" rel="noopener noreferrer" className="font-bold underline text-accent-foreground/80 hover:text-accent-foreground">@Agung_styb</a>
-        </footer>
-      </div>
-      <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
-        <DialogContent className="sm:max-w-md glassmorphic">
-          <DialogHeader>
-            <DialogTitle>Login</DialogTitle>
-          </DialogHeader>
-          <LoginForm
-            onLoginSuccess={handleLoginSuccess}
-            onCancel={() => setIsLoginDialogOpen(false)}
-          />
-        </DialogContent>
-      </Dialog>
-    </>
-  );
+async function fetchData() {
+    await seedDatabase();
+
+    const recipesSnapshot = await getDocs(collection(db, 'recipes'));
+    const recipes: Recipe[] = recipesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Recipe));
+
+    const productsDoc = await getDoc(doc(db, 'appData', 'products'));
+    const products: ProductIngredients = productsDoc.exists() ? productsDoc.data().data : {};
+
+    const inventorySnapshot = await getDocs(collection(db, 'inventory'));
+    const inventory: InventoryItem[] = inventorySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as InventoryItem));
+
+    const dailyUsageSnapshot = await getDocs(query(collection(db, 'dailyUsage'), orderBy('date', 'desc')));
+    const dailyUsage: DailyUsageRecord[] = dailyUsageSnapshot.docs.map(doc => {
+        const data = doc.data();
+        return { 
+            id: doc.id, 
+            date: (data.date as Timestamp).toDate(),
+            usage: data.usage
+        };
+    });
+
+    return { recipes, products, inventory, dailyUsage };
+}
+
+
+export default async function Page() {
+    const { recipes, products, inventory, dailyUsage } = await fetchData();
+
+    const serverActions = {
+        addRecipe,
+        updateRecipe,
+        deleteRecipe,
+        updateProducts,
+        addInventoryItem,
+        updateInventoryItem,
+        deleteInventoryItem,
+        addDailyUsageRecord
+    };
+
+    return (
+        <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="h-12 w-12 animate-spin" /></div>}>
+            <BakeryApp
+                initialRecipes={recipes}
+                initialProducts={products}
+                initialInventory={inventory}
+                initialDailyUsage={dailyUsage}
+                actions={serverActions}
+            />
+        </Suspense>
+    );
+}
+
+// Add a loading component for better user experience
+Page.Loading = function Loading() {
+    return <div className="flex items-center justify-center min-h-screen"><Loader2 className="h-12 w-12 animate-spin" /></div>;
 }

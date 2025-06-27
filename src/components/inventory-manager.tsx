@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useMemo } from 'react';
-import type { DailyUsageRecord } from '@/app/page';
+import type { DailyUsageRecord } from '@/components/bakery-app';
 import type { InventoryItem } from '@/lib/inventoryData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,7 +12,6 @@ import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { PlusCircle, Edit, Trash2, ShieldAlert, Package, Warehouse, Info } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 import { IngredientForm, type IngredientFormData } from './ingredient-form';
 import { OrderCalculator } from './order-calculator';
 import { capitalize, calculateAverageDailyUsage } from '@/lib/utils';
@@ -27,7 +26,6 @@ interface InventoryManagerProps {
 }
 
 export default function InventoryManager({ inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, dailyUsageRecords, isLoggedIn }: InventoryManagerProps) {
-    const { toast } = useToast();
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isOrderOpen, setIsOrderOpen] = useState(false);
     const [itemToEdit, setItemToEdit] = useState<InventoryItem | null>(null);
@@ -51,20 +49,13 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
 
     const handleDelete = async (itemId: string) => {
         await deleteInventoryItem(itemId);
-        toast({ title: 'Success', description: 'Ingredient deleted.' });
     };
 
     const handleFormSubmit = async (data: IngredientFormData) => {
-        try {
-            if (itemToEdit) {
-                await updateInventoryItem({ ...data, id: itemToEdit.id });
-                toast({ title: 'Success', description: `Ingredient "${capitalize(data.name)}" updated.` });
-            } else {
-                await addInventoryItem(data);
-                toast({ title: 'Success', description: `Ingredient "${capitalize(data.name)}" added.` });
-            }
-        } catch(e) {
-            toast({ variant: 'destructive', title: 'Error', description: 'Failed to save ingredient.' });
+        if (itemToEdit) {
+            await updateInventoryItem({ ...data, id: itemToEdit.id });
+        } else {
+            await addInventoryItem(data);
         }
         
         setIsFormOpen(false);

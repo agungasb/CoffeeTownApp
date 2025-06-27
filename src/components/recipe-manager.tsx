@@ -9,7 +9,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { PlusCircle, Edit, Trash2, ShieldAlert, BookHeart } from 'lucide-react';
 import { RecipeForm } from './recipe-form';
-import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
@@ -25,7 +24,6 @@ interface RecipeManagerProps {
 export default function RecipeManager({ recipes, addRecipe, updateRecipe, deleteRecipe, isLoggedIn }: RecipeManagerProps) {
     const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
     const [recipeToEdit, setRecipeToEdit] = useState<Recipe | null>(null);
-    const { toast } = useToast();
 
     const handleAddClick = () => {
         setRecipeToEdit(null);
@@ -39,21 +37,14 @@ export default function RecipeManager({ recipes, addRecipe, updateRecipe, delete
 
     const handleDelete = async (recipeId: string) => {
         await deleteRecipe(recipeId);
-        toast({ title: 'Success', description: 'Recipe deleted successfully.' });
     };
 
     const handleFormSubmit = async (data: Recipe) => {
         setIsFormDialogOpen(false);
-        try {
-            if (recipeToEdit && data.id) {
-                await updateRecipe(data);
-                toast({ title: 'Success', description: 'Recipe updated successfully.' });
-            } else {
-                await addRecipe(data);
-                toast({ title: 'Success', description: 'Recipe added successfully.' });
-            }
-        } catch (error) {
-             toast({ variant: 'destructive', title: 'Error', description: 'Failed to save recipe.' });
+        if (recipeToEdit && data.id) {
+            await updateRecipe(data);
+        } else {
+            await addRecipe(data);
         }
         setRecipeToEdit(null);
     };

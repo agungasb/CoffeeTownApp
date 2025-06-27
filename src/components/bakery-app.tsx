@@ -70,6 +70,11 @@ export default function BakeryApp({
 }: BakeryAppProps) {
   const { toast } = useToast();
   const router = useRouter();
+
+  // Manage data with component state to allow for optimistic UI updates
+  const [recipes, setRecipes] = useState(initialRecipes);
+  const [products, setProducts] = useState(initialProducts);
+  const [inventory, setInventory] = useState(initialInventory);
   
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
@@ -84,54 +89,54 @@ export default function BakeryApp({
     setIsLoggedIn(false);
   }
 
-  // --- CRUD Handlers (wrappers for server actions to show toasts) ---
+  // --- CRUD Handlers (wrappers for server actions to show toasts and update state) ---
 
     const addRecipeHandler = async (recipe: Omit<Recipe, 'id'>) => {
         await actions.addRecipe(recipe);
         toast({ title: 'Success', description: 'Recipe added successfully.' });
-        router.refresh();
+        router.refresh(); // Refresh to get new item with DB-generated ID
     };
 
     const updateRecipeHandler = async (recipe: Recipe) => {
         await actions.updateRecipe(recipe);
+        setRecipes(prev => prev.map(r => r.id === recipe.id ? recipe : r));
         toast({ title: 'Success', description: 'Recipe updated successfully.' });
-        router.refresh();
     };
 
     const deleteRecipeHandler = async (recipeId: string) => {
         await actions.deleteRecipe(recipeId);
+        setRecipes(prev => prev.filter(r => r.id !== recipeId));
         toast({ title: 'Success', description: 'Recipe deleted.' });
-        router.refresh();
     };
     
     const updateProductsHandler = async (newProducts: ProductIngredients) => {
         await actions.updateProducts(newProducts);
+        setProducts(newProducts);
         toast({ title: 'Success', description: 'Product list updated.' });
-        router.refresh();
     };
     
     const addInventoryItemHandler = async (itemData: IngredientFormData) => {
         await actions.addInventoryItem(itemData);
         toast({ title: 'Success', description: 'Ingredient added.' });
-        router.refresh();
+        router.refresh(); // Refresh to get new item with DB-generated ID
     };
 
     const updateInventoryItemHandler = async (item: InventoryItem) => {
         await actions.updateInventoryItem(item);
+        setInventory(prev => prev.map(i => i.id === item.id ? item : i));
         toast({ title: 'Success', description: 'Ingredient updated.' });
-        router.refresh();
     };
 
     const deleteInventoryItemHandler = async (itemId: string) => {
         await actions.deleteInventoryItem(itemId);
+        setInventory(prev => prev.filter(i => i.id !== itemId));
         toast({ title: 'Success', description: 'Ingredient deleted.' });
-        router.refresh();
     };
     
     const addDailyUsageRecordHandler = async (record: Omit<DailyUsageRecord, 'id' | 'date'>) => {
         await actions.addDailyUsageRecord(record);
         toast({ title: 'Success', description: 'Daily usage saved.' });
-        router.refresh();
+        router.refresh(); // Refresh to get updated usage records
     };
 
   return (
@@ -192,14 +197,14 @@ export default function BakeryApp({
         <main className="w-full max-w-7xl mt-[136px] md:mt-[160px] p-4 sm:p-6 md:p-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsContent value="calculator">
-              <ProductionCalculator products={initialProducts} addDailyUsageRecord={addDailyUsageRecordHandler}/>
+              <ProductionCalculator products={products} addDailyUsageRecord={addDailyUsageRecordHandler}/>
             </TabsContent>
             <TabsContent value="recipe">
-              <RecipeScaler recipes={initialRecipes} />
+              <RecipeScaler recipes={recipes} />
             </TabsContent>
             <TabsContent value="manager">
               <RecipeManager 
-                recipes={initialRecipes} 
+                recipes={recipes} 
                 addRecipe={addRecipeHandler}
                 updateRecipe={updateRecipeHandler}
                 deleteRecipe={deleteRecipeHandler}
@@ -208,14 +213,14 @@ export default function BakeryApp({
             </TabsContent>
             <TabsContent value="product_management">
               <ProductManager 
-                products={initialProducts}
+                products={products}
                 updateProducts={updateProductsHandler}
                 isLoggedIn={isLoggedIn} 
               />
             </TabsContent>
              <TabsContent value="inventory">
                 <InventoryManager 
-                    inventory={initialInventory}
+                    inventory={inventory}
                     addInventoryItem={addInventoryItemHandler}
                     updateInventoryItem={updateInventoryItemHandler}
                     deleteInventoryItem={deleteInventoryItemHandler}

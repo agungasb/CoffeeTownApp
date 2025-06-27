@@ -47,7 +47,11 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
     }, [inventory]);
 
     const defaultValues = useMemo(() => sortedInventory.reduce((acc, item) => {
-        acc[item.id] = item.currentStock || '';
+        if (item.orderUnit && item.orderUnitConversion) {
+            acc[item.id] = (item.currentStock / item.orderUnitConversion) || '';
+        } else {
+            acc[item.id] = item.currentStock || '';
+        }
         return acc;
     }, {} as FormValues), [sortedInventory]);
 
@@ -61,7 +65,11 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
         const newRecommendations: OrderRecommendation[] = [];
 
         inventory.forEach(item => {
-            const currentStock = Number(data[item.id]) || 0;
+            const stockInput = Number(data[item.id]) || 0;
+            const currentStock = (item.orderUnit && item.orderUnitConversion) 
+                ? stockInput * item.orderUnitConversion
+                : stockInput;
+                
             const usageAmount = averageUsage.find(u => u[0].toLowerCase() === item.name.toLowerCase())?.[1] || 0;
             const stockAfterUsage = currentStock - usageAmount;
 
@@ -99,36 +107,36 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
                     </AlertDescription>
                 </Alert>
 
-                {recommendations.length > 0 ? (
-                    <div className="max-h-[50vh] overflow-y-auto pr-4">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Ingredient</TableHead>
-                                    <TableHead className="text-right">Recommended Order Amount</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {recommendations.map(rec => (
-                                    <TableRow key={rec.name}>
-                                        <TableCell>{capitalize(rec.name)}</TableCell>
-                                        <TableCell className="text-right font-bold">
-                                            {Number.isInteger(rec.amountToOrder) ? rec.amountToOrder.toLocaleString() : rec.amountToOrder.toFixed(2)} {rec.unit}
-                                        </TableCell>
+                <div className="max-h-[50vh] overflow-y-auto pr-4">
+                    {recommendations.length > 0 ? (
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Ingredient</TableHead>
+                                        <TableHead className="text-right">Recommended Order Amount</TableHead>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </div>
-                ) : (
-                    <Alert>
-                        <PackagePlus className="h-4 w-4" />
-                        <AlertTitle>All stock is sufficient!</AlertTitle>
-                        <AlertDescription>
-                            No order recommendations at this time based on your current stock and forecast.
-                        </AlertDescription>
-                    </Alert>
-                )}
+                                </TableHeader>
+                                <TableBody>
+                                    {recommendations.map(rec => (
+                                        <TableRow key={rec.name}>
+                                            <TableCell>{capitalize(rec.name)}</TableCell>
+                                            <TableCell className="text-right font-bold">
+                                                {Number.isInteger(rec.amountToOrder) ? rec.amountToOrder.toLocaleString() : rec.amountToOrder.toFixed(2)} {rec.unit}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                    ) : (
+                        <Alert>
+                            <PackagePlus className="h-4 w-4" />
+                            <AlertTitle>All stock is sufficient!</AlertTitle>
+                            <AlertDescription>
+                                No order recommendations at this time based on your current stock and forecast.
+                            </AlertDescription>
+                        </Alert>
+                    )}
+                </div>
                 <Button onClick={() => setRecommendations(null)} variant="outline">
                     <ArrowLeft className="mr-2" /> Recalculate
                 </Button>
@@ -159,26 +167,31 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
                  <div className="max-h-[50vh] overflow-y-auto pr-4 space-y-4 border-t pt-4">
                     <h3 className="text-lg font-medium">Enter Current Stock Levels</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                        {sortedInventory.map(item => (
-                            <FormField
-                                key={item.id}
-                                control={form.control}
-                                name={item.id}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>{capitalize(item.name)} (in {item.unit})</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="number"
-                                                placeholder={`Current stock of ${item.name}`}
-                                                {...field}
-                                                onChange={e => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
-                                            />
-                                        </FormControl>
-                                    </FormItem>
-                                )}
-                            />
-                        ))}
+                        {sortedInventory.map(item => {
+                            const unitLabel = (item.orderUnit && item.orderUnitConversion) ? item.orderUnit : item.unit;
+                            return (
+                                <FormField
+                                    key={item.id}
+                                    control={form.control}
+                                    name={item.id}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>{capitalize(item.name)} (in {unitLabel})</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    step="any"
+                                                    placeholder={`Current stock of ${item.name}`}
+                                                    {...field}
+                                                    onChange={e => field.onChange(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                                                    value={field.value ?? ''}
+                                                />
+                                            </FormControl>
+                                        </FormItem>
+                                    )}
+                                />
+                            );
+                        })}
                     </div>
                 </div>
                 <div className="flex justify-end pt-4 border-t">

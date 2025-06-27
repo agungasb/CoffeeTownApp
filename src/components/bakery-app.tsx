@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -68,6 +69,7 @@ export default function BakeryApp({
     actions
 }: BakeryAppProps) {
   const { toast } = useToast();
+  const router = useRouter();
   
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
@@ -87,41 +89,49 @@ export default function BakeryApp({
     const addRecipeHandler = async (recipe: Omit<Recipe, 'id'>) => {
         await actions.addRecipe(recipe);
         toast({ title: 'Success', description: 'Recipe added successfully.' });
+        router.refresh();
     };
 
     const updateRecipeHandler = async (recipe: Recipe) => {
         await actions.updateRecipe(recipe);
         toast({ title: 'Success', description: 'Recipe updated successfully.' });
+        router.refresh();
     };
 
     const deleteRecipeHandler = async (recipeId: string) => {
         await actions.deleteRecipe(recipeId);
         toast({ title: 'Success', description: 'Recipe deleted.' });
+        router.refresh();
     };
     
     const updateProductsHandler = async (newProducts: ProductIngredients) => {
         await actions.updateProducts(newProducts);
         toast({ title: 'Success', description: 'Product list updated.' });
+        router.refresh();
     };
     
     const addInventoryItemHandler = async (itemData: IngredientFormData) => {
         await actions.addInventoryItem(itemData);
         toast({ title: 'Success', description: 'Ingredient added.' });
+        router.refresh();
     };
 
     const updateInventoryItemHandler = async (item: InventoryItem) => {
         await actions.updateInventoryItem(item);
         toast({ title: 'Success', description: 'Ingredient updated.' });
+        router.refresh();
     };
 
     const deleteInventoryItemHandler = async (itemId: string) => {
         await actions.deleteInventoryItem(itemId);
         toast({ title: 'Success', description: 'Ingredient deleted.' });
+        router.refresh();
     };
     
     const addDailyUsageRecordHandler = async (record: Omit<DailyUsageRecord, 'id' | 'date'>) => {
         await actions.addDailyUsageRecord(record);
         toast({ title: 'Success', description: 'Daily usage saved.' });
+        router.refresh();
     };
 
   return (

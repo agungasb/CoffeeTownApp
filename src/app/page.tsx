@@ -125,7 +125,7 @@ export default function Home() {
               />
             </TabsContent>
             <TabsContent value="dashboard">
-              <DailyUsageDashboard inventory={inventory} dailyUsage={dailyUsage} isLoggedIn={isLoggedIn} />
+              <DailyUsageDashboard inventory={inventory} setInventory={setInventory} dailyUsage={dailyUsage} isLoggedIn={isLoggedIn} />
             </TabsContent>
           </Tabs>
         </main>

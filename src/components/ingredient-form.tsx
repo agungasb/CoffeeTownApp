@@ -1,0 +1,107 @@
+
+"use client";
+
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import type { InventoryItem } from '@/lib/inventoryData';
+
+const ingredientFormSchema = z.object({
+    id: z.string().optional(),
+    name: z.string().min(2, "Ingredient name must be at least 2 characters."),
+    currentStock: z.coerce.number().min(0, "Current stock must be a positive number."),
+    minimumStock: z.coerce.number().min(0, "Minimum stock must be a positive number."),
+    unit: z.string().min(1, "Unit is required (e.g., g, pcs, ml)."),
+});
+
+export type IngredientFormData = Omit<InventoryItem, 'id'> & { id?: string };
+
+interface IngredientFormProps {
+    ingredientToEdit?: InventoryItem | null;
+    onSubmit: (data: IngredientFormData) => void;
+    onCancel: () => void;
+}
+
+export function IngredientForm({ ingredientToEdit, onSubmit, onCancel }: IngredientFormProps) {
+    const form = useForm<IngredientFormData>({
+        resolver: zodResolver(ingredientFormSchema),
+        defaultValues: ingredientToEdit ?? {
+            name: '',
+            currentStock: 0,
+            minimumStock: 0,
+            unit: 'g',
+        },
+    });
+
+    const handleSubmit = (data: IngredientFormData) => {
+        onSubmit(data);
+    };
+
+    return (
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+                <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Ingredient Name</FormLabel>
+                            <FormControl>
+                                <Input placeholder="e.g. Tepung" {...field} disabled={!!ingredientToEdit} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                        control={form.control}
+                        name="currentStock"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Current Stock</FormLabel>
+                                <FormControl>
+                                    <Input type="number" step="0.01" placeholder="e.g. 10000" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="minimumStock"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Base Min. Stock</FormLabel>
+                                <FormControl>
+                                    <Input type="number" step="0.01" placeholder="e.g. 5000" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+                 <FormField
+                    control={form.control}
+                    name="unit"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Unit</FormLabel>
+                            <FormControl>
+                                <Input placeholder="e.g. g, pcs, ml" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <div className="flex justify-end gap-2 pt-4 border-t">
+                    <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
+                    <Button type="submit">Save Ingredient</Button>
+                </div>
+            </form>
+        </Form>
+    );
+}

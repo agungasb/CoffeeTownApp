@@ -31,31 +31,14 @@ export default function OrderCalculator({ inventory, dailyUsage }: OrderCalculat
     const [recommendation, setRecommendation] = useState<OrderRecommendation[] | null>(null);
 
     const combinedInventory = useMemo(() => {
-        const allIngredientNames = [
-            ...new Set([
-                ...inventory.map(i => i.name.toLowerCase()),
-                ...dailyUsage.map(u => u[0].toLowerCase())
-            ])
-        ];
-
-        return allIngredientNames.map(name => {
-            const inventoryItem = inventory.find(i => i.name.toLowerCase() === name);
-            const usageData = dailyUsage.find(u => u[0].toLowerCase() === name);
-
-            const id = inventoryItem?.id || name.replace(/\s+/g, '-');
-            const unit = inventoryItem?.unit || usageData?.[2] || 'g';
-            const currentStock = inventoryItem?.currentStock || 0;
-            const minimumStock = inventoryItem?.minimumStock || 0;
-            
+        return inventory.map(item => {
+            const id = item.id || item.name.replace(/\s+/g, '-');
             return {
+                ...item,
                 id,
-                name: name,
-                currentStock,
-                minimumStock,
-                unit
             };
         }).sort((a, b) => a.name.localeCompare(b.name));
-    }, [inventory, dailyUsage]);
+    }, [inventory]);
 
     const defaultValues = combinedInventory.reduce((acc, item) => {
         acc[item.id] = item.currentStock || '';
@@ -72,8 +55,10 @@ export default function OrderCalculator({ inventory, dailyUsage }: OrderCalculat
             const usageAmount = dailyUsage.find(u => u[0].toLowerCase() === item.name.toLowerCase())?.[1] || 0;
             const stockAfterUsage = currentStock - usageAmount;
 
-            if (stockAfterUsage < item.minimumStock) {
-                const amountToOrder = Math.ceil(item.minimumStock - stockAfterUsage);
+            const minimumStockForOrder = usageAmount > 0 ? usageAmount : item.minimumStock;
+
+            if (stockAfterUsage < minimumStockForOrder) {
+                const amountToOrder = Math.ceil(minimumStockForOrder - stockAfterUsage);
                 if (amountToOrder > 0) {
                     recommendations.push({
                         name: item.name,

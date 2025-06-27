@@ -9,10 +9,11 @@ import ProductionCalculator from "@/components/production-calculator";
 import RecipeScaler from "@/components/recipe-scaler";
 import RecipeManager from "@/components/recipe-manager";
 import ProductManager from '@/components/product-manager';
-import DailyUsageDashboard from '@/components/daily-usage-dashboard';
+import InventoryManager from '@/components/inventory-manager';
 import LoginForm from '@/components/login-form';
 import { recipes as initialRecipes, type Recipe } from '@/lib/recipes';
 import { productIngredientsData, type ProductIngredients } from '@/lib/productIngredients';
+import { inventoryData as initialInventory, type InventoryItem } from '@/lib/inventoryData';
 import { 
   LogIn, 
   LogOut, 
@@ -20,7 +21,7 @@ import {
   Scaling, 
   BookHeart, 
   Archive, 
-  LayoutDashboard
+  Warehouse
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
@@ -35,12 +36,13 @@ const TABS = [
   { id: 'recipe', label: 'Recipe Scaler', icon: <Scaling /> },
   { id: 'manager', label: 'Recipe Management', icon: <BookHeart /> },
   { id: 'product_management', label: 'Product Management', icon: <Archive /> },
-  { id: 'dashboard', label: 'Usage History', icon: <LayoutDashboard /> },
+  { id: 'inventory', label: 'Inventory Management', icon: <Warehouse /> },
 ];
 
 export default function Home() {
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
   const [products, setProducts] = useState<ProductIngredients>(productIngredientsData);
+  const [inventory, setInventory] = useState<InventoryItem[]>(initialInventory);
   const [dailyUsage, setDailyUsage] = useState<DailyUsageRecord[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
@@ -128,8 +130,13 @@ export default function Home() {
                 isLoggedIn={isLoggedIn} 
               />
             </TabsContent>
-            <TabsContent value="dashboard">
-              <DailyUsageDashboard dailyUsageRecords={dailyUsage} />
+             <TabsContent value="inventory">
+                <InventoryManager 
+                    inventory={inventory}
+                    setInventory={setInventory}
+                    dailyUsageRecords={dailyUsage}
+                    isLoggedIn={isLoggedIn}
+                />
             </TabsContent>
           </Tabs>
         </main>

@@ -16,7 +16,7 @@ interface DailyUsageDashboardProps {
 export default function DailyUsageDashboard({ dailyUsageRecords }: DailyUsageDashboardProps) {
 
     return (
-        <Card className="glassmorphic border-2 border-border/30 w-full max-w-4xl mx-auto">
+        <Card className="glassmorphic w-full max-w-4xl mx-auto">
             <CardHeader>
                 <CardTitle>Historical Usage Dashboard</CardTitle>
             </CardHeader>

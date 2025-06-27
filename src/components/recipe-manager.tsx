@@ -66,7 +66,7 @@ export default function RecipeManager({ recipes, setRecipes, isLoggedIn }: Recip
 
 
     return (
-        <Card className="glassmorphic border-2 border-border/30 w-full max-w-6xl mx-auto">
+        <Card className="glassmorphic w-full max-w-6xl mx-auto">
             <CardHeader className="flex flex-row items-center justify-between gap-4">
                 <CardTitle>Recipe Management</CardTitle>
                  <Button onClick={handleAddClick} disabled={!isLoggedIn}>

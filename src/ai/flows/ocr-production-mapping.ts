@@ -27,17 +27,12 @@ export async function ocrProductionMapping(input: OcrProductionMappingInput): Pr
   return ocrProductionMappingFlow(input);
 }
 
+// Define the prompt to ask the AI for a string output.
 const prompt = ai.definePrompt({
   name: 'ocrProductionMappingPrompt',
   model: 'googleai/gemini-1.5-flash-latest',
   input: {schema: OcrProductionMappingInputSchema},
-  output: {
-    schema: OcrProductionMappingOutputSchema,
-    format: 'json',
-  },
-  config: {
-    responseMimeType: 'application/json',
-  },
+  // We are not specifying an output schema here, so the prompt will return a raw string.
   prompt: `You are an expert bakery production manager. You will extract the production quantities for various bakery items from a photo and map them to the corresponding product names.  The photo is provided as a data URI.
 
   Here are the products:
@@ -58,12 +53,15 @@ const prompt = ai.definePrompt({
   - vanilla oreo
   - abon taiwan
 
-  Analyze the photo and extract the quantities for each product, mapping them to the correct product name.  If a product's quantity cannot be determined, set it to 0. Return a JSON object where the keys are the product names and the values are the corresponding quantities as numbers. Only include these products in the output, do not invent new products.
+  Analyze the photo and extract the quantities for each product, mapping them to the correct product name.  If a product's quantity cannot be determined, set it to 0. 
+
+  Your response must be ONLY a raw JSON object string. Do not wrap it in markdown backticks (\`\`\`json) or add any other explanatory text. The JSON object should have keys that are the product names and values that are the corresponding quantities as numbers. Only include these products in the output, do not invent new products.
 
   Photo: {{media url=photoDataUri}}
   `,
 });
 
+// Define the flow to handle the logic.
 const ocrProductionMappingFlow = ai.defineFlow(
   {
     name: 'ocrProductionMappingFlow',
@@ -71,7 +69,24 @@ const ocrProductionMappingFlow = ai.defineFlow(
     outputSchema: OcrProductionMappingOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    // Call the prompt. Since we didn't define an output schema, it returns a full GenerateResponse.
+    const response = await prompt(input);
+    
+    // Get the raw text from the response.
+    const textResponse = response.text;
+    
+    // Sometimes the model might still wrap the JSON in markdown, so we clean it.
+    const cleanedText = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
+
+    try {
+        // Parse the cleaned text string into a JSON object.
+        const parsedJson = JSON.parse(cleanedText);
+        // Validate the parsed object against our output schema to ensure it's correct.
+        return OcrProductionMappingOutputSchema.parse(parsedJson);
+    } catch (error) {
+        console.error("Failed to parse JSON from AI response:", cleanedText, error);
+        // This gives the user a helpful error if the AI messes up the format.
+        throw new Error("The AI returned an invalid data format. Please try again.");
+    }
   }
 );

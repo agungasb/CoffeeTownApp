@@ -16,15 +16,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 
 interface RecipeManagerProps {
     recipes: Recipe[];
-    setRecipes: (recipes: Recipe[]) => void;
+    addRecipe: (recipe: Omit<Recipe, 'id'>) => Promise<void>;
+    updateRecipe: (recipe: Recipe) => Promise<void>;
+    deleteRecipe: (recipeId: string) => Promise<void>;
     isLoggedIn: boolean;
 }
 
-export default function RecipeManager({ recipes, setRecipes, isLoggedIn }: RecipeManagerProps) {
+export default function RecipeManager({ recipes, addRecipe, updateRecipe, deleteRecipe, isLoggedIn }: RecipeManagerProps) {
     const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
     const [recipeToEdit, setRecipeToEdit] = useState<Recipe | null>(null);
-    const [recipeToConfirm, setRecipeToConfirm] = useState<Recipe | null>(null);
-    const [isConfirmingSave, setIsConfirmingSave] = useState(false);
     const { toast } = useToast();
 
     const handleAddClick = () => {
@@ -37,33 +37,26 @@ export default function RecipeManager({ recipes, setRecipes, isLoggedIn }: Recip
         setIsFormDialogOpen(true);
     };
 
-    const handleDelete = (recipeId: string) => {
-        setRecipes(recipes.filter(r => r.id !== recipeId));
+    const handleDelete = async (recipeId: string) => {
+        await deleteRecipe(recipeId);
         toast({ title: 'Success', description: 'Recipe deleted successfully.' });
     };
 
-    const handleFormSubmit = (data: Recipe) => {
+    const handleFormSubmit = async (data: Recipe) => {
         setIsFormDialogOpen(false);
-        setRecipeToConfirm(data);
-        setIsConfirmingSave(true);
-    };
-
-    const executeSave = () => {
-        if (!recipeToConfirm) return;
-
-        if (recipeToEdit && recipeToConfirm.id) {
-            setRecipes(recipes.map(r => (r.id === recipeToConfirm.id ? recipeToConfirm : r)));
-            toast({ title: 'Success', description: 'Recipe updated successfully.' });
-        } else {
-            setRecipes([...recipes, { ...recipeToConfirm, id: recipeToConfirm.name.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now() }]);
-            toast({ title: 'Success', description: 'Recipe added successfully.' });
+        try {
+            if (recipeToEdit && data.id) {
+                await updateRecipe(data);
+                toast({ title: 'Success', description: 'Recipe updated successfully.' });
+            } else {
+                await addRecipe(data);
+                toast({ title: 'Success', description: 'Recipe added successfully.' });
+            }
+        } catch (error) {
+             toast({ variant: 'destructive', title: 'Error', description: 'Failed to save recipe.' });
         }
-        
         setRecipeToEdit(null);
-        setRecipeToConfirm(null);
-        setIsConfirmingSave(false);
     };
-
 
     return (
         <Card className="w-full max-w-6xl mx-auto bg-card/90">
@@ -178,23 +171,6 @@ export default function RecipeManager({ recipes, setRecipes, isLoggedIn }: Recip
                         </div>
                     </DialogContent>
                 </Dialog>
-
-                <AlertDialog open={isConfirmingSave} onOpenChange={setIsConfirmingSave}>
-                    <AlertDialogContent className="glassmorphic">
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Confirm Save</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                Are you sure you want to save the changes for "{recipeToConfirm?.name}"?
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel onClick={() => setIsConfirmingSave(false)}>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={executeSave}>
-                                Save Changes
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
             </CardContent>
         </Card>
     );

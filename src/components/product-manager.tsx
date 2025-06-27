@@ -17,11 +17,11 @@ import { capitalize } from '@/lib/utils';
 
 interface ProductManagerProps {
     products: ProductIngredients;
-    setProducts: (products: ProductIngredients) => void;
+    updateProducts: (products: ProductIngredients) => Promise<void>;
     isLoggedIn: boolean;
 }
 
-export default function ProductManager({ products, setProducts, isLoggedIn }: ProductManagerProps) {
+export default function ProductManager({ products, updateProducts, isLoggedIn }: ProductManagerProps) {
     const { toast } = useToast();
     const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
     const [productToEdit, setProductToEdit] = useState<{ name: string; ingredients: { name: string; amount: number; unit: string }[] } | null>(null);
@@ -40,18 +40,18 @@ export default function ProductManager({ products, setProducts, isLoggedIn }: Pr
         setIsFormDialogOpen(true);
     };
 
-    const handleDelete = (productName: string) => {
+    const handleDelete = async (productName: string) => {
         const newProducts = { ...products };
         delete newProducts[productName];
-        setProducts(newProducts);
+        await updateProducts(newProducts);
         toast({ title: 'Success', description: `Product "${capitalize(productName)}" deleted.` });
     };
 
-    const handleFormSubmit = (data: { name: string; ingredients: { name: string; amount: number; unit: string }[] }) => {
+    const handleFormSubmit = async (data: { name: string; ingredients: { name: string; amount: number; unit: string }[] }) => {
         const newProducts = { ...products };
         const newIngredients: Record<string, IngredientData> = {};
         data.ingredients.forEach(ing => {
-            newIngredients[ing.name] = { amount: ing.amount, unit: ing.unit };
+            newIngredients[ing.name.toLowerCase()] = { amount: ing.amount, unit: ing.unit };
         });
 
         // If editing an old product with a new name, delete the old one
@@ -60,7 +60,8 @@ export default function ProductManager({ products, setProducts, isLoggedIn }: Pr
         }
         
         newProducts[data.name] = newIngredients;
-        setProducts(newProducts);
+        
+        await updateProducts(newProducts);
 
         toast({ title: 'Success', description: `Product "${capitalize(data.name)}" saved.` });
         setIsFormDialogOpen(false);

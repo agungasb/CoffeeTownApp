@@ -19,12 +19,14 @@ import { capitalize, calculateAverageDailyUsage } from '@/lib/utils';
 
 interface InventoryManagerProps {
     inventory: InventoryItem[];
-    setInventory: (inventory: InventoryItem[]) => void;
+    addInventoryItem: (itemData: IngredientFormData) => Promise<void>;
+    updateInventoryItem: (item: InventoryItem) => Promise<void>;
+    deleteInventoryItem: (itemId: string) => Promise<void>;
     dailyUsageRecords: DailyUsageRecord[];
     isLoggedIn: boolean;
 }
 
-export default function InventoryManager({ inventory, setInventory, dailyUsageRecords, isLoggedIn }: InventoryManagerProps) {
+export default function InventoryManager({ inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, dailyUsageRecords, isLoggedIn }: InventoryManagerProps) {
     const { toast } = useToast();
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isOrderOpen, setIsOrderOpen] = useState(false);
@@ -47,20 +49,24 @@ export default function InventoryManager({ inventory, setInventory, dailyUsageRe
         setIsFormOpen(true);
     };
 
-    const handleDelete = (itemId: string) => {
-        setInventory(inventory.filter(item => item.id !== itemId));
+    const handleDelete = async (itemId: string) => {
+        await deleteInventoryItem(itemId);
         toast({ title: 'Success', description: 'Ingredient deleted.' });
     };
 
-    const handleFormSubmit = (data: IngredientFormData) => {
-        if (itemToEdit) {
-            setInventory(inventory.map(item => item.id === itemToEdit.id ? { ...item, ...data } : item));
-            toast({ title: 'Success', description: `Ingredient "${capitalize(data.name)}" updated.` });
-        } else {
-            const newId = `ing-${Date.now()}`;
-            setInventory([...inventory, { ...data, id: newId }]);
-            toast({ title: 'Success', description: `Ingredient "${capitalize(data.name)}" added.` });
+    const handleFormSubmit = async (data: IngredientFormData) => {
+        try {
+            if (itemToEdit) {
+                await updateInventoryItem({ ...data, id: itemToEdit.id });
+                toast({ title: 'Success', description: `Ingredient "${capitalize(data.name)}" updated.` });
+            } else {
+                await addInventoryItem(data);
+                toast({ title: 'Success', description: `Ingredient "${capitalize(data.name)}" added.` });
+            }
+        } catch(e) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Failed to save ingredient.' });
         }
+        
         setIsFormOpen(false);
         setItemToEdit(null);
     };

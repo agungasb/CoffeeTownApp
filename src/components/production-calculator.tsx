@@ -27,10 +27,10 @@ type ProductionFormValues = {
 
 interface ProductionCalculatorProps {
     products: ProductIngredients;
-    setDailyUsage: (updater: (prevRecords: DailyUsageRecord[]) => DailyUsageRecord[]) => void;
+    addDailyUsageRecord: (record: Omit<DailyUsageRecord, 'id'>) => Promise<void>;
 }
 
-export default function ProductionCalculator({ products, setDailyUsage }: ProductionCalculatorProps) {
+export default function ProductionCalculator({ products, addDailyUsageRecord }: ProductionCalculatorProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -83,7 +83,7 @@ export default function ProductionCalculator({ products, setDailyUsage }: Produc
     event.target.value = "";
   };
 
-  const handleSaveUsage = () => {
+  const handleSaveUsage = async () => {
     if (!results.ingredientSummary || results.ingredientSummary.length === 0) {
         toast({
             variant: "destructive",
@@ -97,13 +97,12 @@ export default function ProductionCalculator({ products, setDailyUsage }: Produc
             [name, parseFloat(amountStr) || 0, unit] as [string, number, string]
     );
     
-    const newRecord: DailyUsageRecord = {
-        id: new Date().toISOString(),
+    const newRecord = {
         date: new Date(),
         usage: parsedUsage
     };
-
-    setDailyUsage(prevRecords => [newRecord, ...prevRecords]);
+    
+    await addDailyUsageRecord(newRecord);
 
     toast({
         title: "Success",

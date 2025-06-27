@@ -1,7 +1,9 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { db } from '@/lib/firebase';
+import { collection, doc, getDocs, getDoc, setDoc, addDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -12,8 +14,10 @@ import ProductManager from '@/components/product-manager';
 import InventoryManager from '@/components/inventory-manager';
 import LoginForm from '@/components/login-form';
 import { recipes as initialRecipes, type Recipe } from '@/lib/recipes';
-import { productIngredientsData, type ProductIngredients } from '@/lib/productIngredients';
+import { productIngredientsData as initialProductData, type ProductIngredients } from '@/lib/productIngredients';
 import { inventoryData as initialInventory, type InventoryItem } from '@/lib/inventoryData';
+import type { IngredientFormData } from '@/components/ingredient-form';
+import { useToast } from '@/hooks/use-toast';
 import { 
   LogIn, 
   LogOut, 
@@ -21,7 +25,8 @@ import {
   Scaling, 
   BookHeart, 
   Archive, 
-  Warehouse
+  Warehouse,
+  Loader2
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
@@ -40,13 +45,100 @@ const TABS = [
 ];
 
 export default function Home() {
-  const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
-  const [products, setProducts] = useState<ProductIngredients>(productIngredientsData);
-  const [inventory, setInventory] = useState<InventoryItem[]>(initialInventory);
+  const { toast } = useToast();
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [products, setProducts] = useState<ProductIngredients>({});
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [dailyUsage, setDailyUsage] = useState<DailyUsageRecord[]>([]);
+  
+  const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('calculator');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
+          toast({
+              variant: 'destructive',
+              title: 'Firebase Not Configured',
+              description: 'Please set up your Firebase credentials in the .env file.',
+              duration: 10000,
+          });
+          setLoading(false);
+          return;
+      }
+
+      setLoading(true);
+      try {
+        // --- Recipes ---
+        const recipesCol = collection(db, 'recipes');
+        const recipeSnapshot = await getDocs(recipesCol);
+        if (recipeSnapshot.empty) {
+          const batch = writeBatch(db);
+          initialRecipes.forEach(recipe => {
+            const docRef = doc(db, 'recipes', recipe.id);
+            batch.set(docRef, recipe);
+          });
+          await batch.commit();
+          setRecipes(initialRecipes);
+        } else {
+          const recipesList = recipeSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Recipe));
+          setRecipes(recipesList);
+        }
+
+        // --- Products ---
+        const productsDocRef = doc(db, 'products', 'allProducts');
+        const productsSnapshot = await getDoc(productsDocRef);
+        if (!productsSnapshot.exists()) {
+            await setDoc(productsDocRef, { data: initialProductData });
+            setProducts(initialProductData);
+        } else {
+            setProducts(productsSnapshot.data().data as ProductIngredients);
+        }
+
+        // --- Inventory ---
+        const inventoryCol = collection(db, 'inventory');
+        const inventorySnapshot = await getDocs(inventoryCol);
+        if (inventorySnapshot.empty) {
+            const batch = writeBatch(db);
+            initialInventory.forEach(item => {
+                const docRef = doc(db, 'inventory', item.id);
+                batch.set(docRef, item);
+            });
+            await batch.commit();
+            setInventory(initialInventory);
+        } else {
+            const inventoryList = inventorySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as InventoryItem));
+            setInventory(inventoryList);
+        }
+
+        // --- Daily Usage ---
+        const usageCol = collection(db, 'dailyUsage');
+        const usageSnapshot = await getDocs(usageCol);
+        const usageList = usageSnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                date: data.date.toDate(),
+                usage: data.usage
+            } as DailyUsageRecord;
+        });
+        setDailyUsage(usageList.sort((a,b) => b.date.getTime() - a.date.getTime()));
+
+      } catch (error) {
+        console.error("Error fetching data from Firestore:", error);
+        toast({
+            variant: 'destructive',
+            title: 'Error Loading Data',
+            description: 'Could not connect to the database. Check console for details.'
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [toast]);
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
@@ -55,6 +147,62 @@ export default function Home() {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
+  }
+
+  // --- CRUD Handlers ---
+
+  const addRecipe = async (recipe: Omit<Recipe, 'id'>) => {
+      const newId = recipe.name.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now();
+      const newRecipe = { ...recipe, id: newId };
+      await setDoc(doc(db, 'recipes', newId), recipe);
+      setRecipes(prev => [...prev, newRecipe]);
+  };
+
+  const updateRecipe = async (recipe: Recipe) => {
+      await setDoc(doc(db, 'recipes', recipe.id), recipe);
+      setRecipes(prev => prev.map(r => r.id === recipe.id ? recipe : r));
+  };
+
+  const deleteRecipe = async (recipeId: string) => {
+      await deleteDoc(doc(db, 'recipes', recipeId));
+      setRecipes(prev => prev.filter(r => r.id !== recipeId));
+  };
+  
+  const updateProducts = async (newProducts: ProductIngredients) => {
+      await setDoc(doc(db, 'products', 'allProducts'), { data: newProducts });
+      setProducts(newProducts);
+  };
+  
+  const addInventoryItem = async (itemData: IngredientFormData) => {
+      const docRef = await addDoc(collection(db, 'inventory'), itemData);
+      const newItem = { ...itemData, id: docRef.id } as InventoryItem;
+      setInventory(prev => [...prev, newItem]);
+  };
+
+  const updateInventoryItem = async (item: InventoryItem) => {
+      const docRef = doc(db, 'inventory', item.id);
+      await setDoc(docRef, item);
+      setInventory(prev => prev.map(i => i.id === item.id ? item : i));
+  };
+
+  const deleteInventoryItem = async (itemId: string) => {
+      await deleteDoc(doc(db, 'inventory', itemId));
+      setInventory(prev => prev.filter(i => i.id !== itemId));
+  };
+  
+  const addDailyUsageRecord = async (record: Omit<DailyUsageRecord, 'id'>) => {
+      const docRef = await addDoc(collection(db, 'dailyUsage'), record);
+      const newRecord = { ...record, id: docRef.id };
+      setDailyUsage(prev => [newRecord, ...prev]);
+  };
+
+  if (loading) {
+      return (
+          <div className="flex justify-center items-center min-h-screen flex-col gap-4 bg-background">
+              <Loader2 className="h-16 w-16 animate-spin text-primary" />
+              <p className="text-xl text-foreground">Loading Bakery Data...</p>
+          </div>
+      )
   }
 
   return (
@@ -115,25 +263,33 @@ export default function Home() {
         <main className="w-full max-w-7xl mt-[136px] md:mt-[160px] p-4 sm:p-6 md:p-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsContent value="calculator">
-              <ProductionCalculator products={products} setDailyUsage={setDailyUsage}/>
+              <ProductionCalculator products={products} addDailyUsageRecord={addDailyUsageRecord}/>
             </TabsContent>
             <TabsContent value="recipe">
               <RecipeScaler recipes={recipes} />
             </TabsContent>
             <TabsContent value="manager">
-              <RecipeManager recipes={recipes} setRecipes={setRecipes} isLoggedIn={isLoggedIn} />
+              <RecipeManager 
+                recipes={recipes} 
+                addRecipe={addRecipe}
+                updateRecipe={updateRecipe}
+                deleteRecipe={deleteRecipe}
+                isLoggedIn={isLoggedIn} 
+              />
             </TabsContent>
             <TabsContent value="product_management">
               <ProductManager 
                 products={products}
-                setProducts={setProducts}
+                updateProducts={updateProducts}
                 isLoggedIn={isLoggedIn} 
               />
             </TabsContent>
              <TabsContent value="inventory">
                 <InventoryManager 
                     inventory={inventory}
-                    setInventory={setInventory}
+                    addInventoryItem={addInventoryItem}
+                    updateInventoryItem={updateInventoryItem}
+                    deleteInventoryItem={deleteInventoryItem}
                     dailyUsageRecords={dailyUsage}
                     isLoggedIn={isLoggedIn}
                 />

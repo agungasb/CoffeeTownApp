@@ -35,6 +35,9 @@ const prompt = ai.definePrompt({
     schema: OcrProductionMappingOutputSchema,
     format: 'json',
   },
+  config: {
+    responseMimeType: 'application/json',
+  },
   prompt: `You are an expert bakery production manager. You will extract the production quantities for various bakery items from a photo and map them to the corresponding product names.  The photo is provided as a data URI.
 
   Here are the products:

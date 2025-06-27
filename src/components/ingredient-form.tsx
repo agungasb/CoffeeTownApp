@@ -60,7 +60,7 @@ export function IngredientForm({ ingredientToEdit, onSubmit, onCancel }: Ingredi
                         </FormItem>
                     )}
                 />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <FormField
                         control={form.control}
                         name="currentStock"
@@ -105,7 +105,7 @@ export function IngredientForm({ ingredientToEdit, onSubmit, onCancel }: Ingredi
                 <div className="pt-4 mt-4 border-t">
                     <h3 className="text-md font-medium mb-2">Order Unit Conversion (Optional)</h3>
                     <p className="text-sm text-muted-foreground mb-4">Define a larger unit for easier ordering (e.g., order "1 sak" instead of "25000 g").</p>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <FormField
                             control={form.control}
                             name="orderUnit"

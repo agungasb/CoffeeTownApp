@@ -155,7 +155,7 @@ export default function ProductionCalculator({ products, setDailyUsage }: Produc
                                 type="number" 
                                 {...field} 
                                 placeholder="0"
-                                className="flex-none w-24 text-center rounded-md py-1 px-2 h-auto"
+                                className="flex-none w-20 sm:w-24 text-center rounded-md py-1 px-2 h-auto"
                                 onChange={e => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
                                 value={field.value === 0 ? '' : field.value}
                               />

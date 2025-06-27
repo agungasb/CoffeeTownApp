@@ -61,7 +61,7 @@ export default function Home() {
     <>
       <div className="flex flex-col items-center min-h-screen pb-20">
         
-        <header className="fixed top-0 left-0 w-full p-4 z-20 glassmorphic flex justify-between items-center">
+        <header className="fixed top-0 left-0 w-full p-2 md:p-4 z-20 glassmorphic flex justify-between items-center">
             <div>
                  <h1 className="font-headline text-2xl md:text-3xl text-primary-foreground" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
                     Coffee Town Bakery
@@ -94,7 +94,7 @@ export default function Home() {
             </div>
         </header>
 
-        <nav className="fixed top-[88px] md:top-[96px] left-0 w-full z-10 py-2 glassmorphic flex items-center justify-center">
+        <nav className="fixed top-[74px] md:top-[96px] left-0 w-full z-10 py-2 glassmorphic flex items-center justify-center">
             <div className="overflow-x-auto hide-scrollbar">
                 <div className="flex justify-start md:justify-center items-center gap-5 px-4">
                   {TABS.map((tab) => (
@@ -104,7 +104,7 @@ export default function Home() {
                         onClick={() => setActiveTab(tab.id)}
                       >
                         {tab.icon}
-                        <span>{tab.label}</span>
+                        <span className="hidden sm:inline">{tab.label}</span>
                       </button>
                   ))}
                 </div>
@@ -112,7 +112,7 @@ export default function Home() {
         </nav>
 
 
-        <main className="w-full max-w-7xl mt-[160px] p-4 sm:p-6 md:p-8">
+        <main className="w-full max-w-7xl mt-[136px] md:mt-[160px] p-4 sm:p-6 md:p-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsContent value="calculator">
               <ProductionCalculator products={products} setDailyUsage={setDailyUsage}/>

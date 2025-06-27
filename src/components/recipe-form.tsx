@@ -184,7 +184,7 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
 
                 <div className="flex justify-end gap-2 pt-4 border-t">
                     <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
-                    <Button type="submit">Save Recipe</Button>
+                    <Button type="submit" variant="success">Save Recipe</Button>
                 </div>
             </form>
         </Form>

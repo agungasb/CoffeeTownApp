@@ -138,7 +138,7 @@ export function IngredientForm({ ingredientToEdit, onSubmit, onCancel }: Ingredi
 
                 <div className="flex justify-end gap-2 pt-4 border-t">
                     <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
-                    <Button type="submit">Save Ingredient</Button>
+                    <Button type="submit" variant="success">Save Ingredient</Button>
                 </div>
             </form>
         </Form>

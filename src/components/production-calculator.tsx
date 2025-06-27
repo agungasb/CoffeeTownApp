@@ -92,7 +92,7 @@ export default function ProductionCalculator({ products, addDailyUsageRecord }: 
         });
         return;
     }
-    const parsedUsage = results.ingredientSummary.map(
+    const parsedUsage: DailyUsageIngredient[] = results.ingredientSummary.map(
         ([name, amountStr, unit]) => ({
             name: name,
             amount: parseFloat(amountStr) || 0,
@@ -225,7 +225,7 @@ export default function ProductionCalculator({ products, addDailyUsageRecord }: 
                           </TableBody>
                       </Table>
                        <div className="flex justify-end mt-4">
-                          <Button onClick={handleSaveUsage}>
+                          <Button onClick={handleSaveUsage} variant="success">
                               <Save className="mr-2 h-4 w-4" />
                               Save as Daily Usage
                           </Button>

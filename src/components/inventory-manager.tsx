@@ -79,14 +79,14 @@ export default function InventoryManager({ inventory, setInventory, dailyUsageRe
     return (
         <>
             <Card className="glassmorphic border-2 border-border/30 w-full max-w-7xl mx-auto">
-                <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                     <CardTitle>Inventory Management</CardTitle>
                     <div className="flex gap-2">
                         <Button onClick={handleAddClick} disabled={!isLoggedIn} size="sm">
                             <PlusCircle className="mr-2" /> Add New Ingredient
                         </Button>
                         <Button onClick={() => setIsOrderOpen(true)} variant="secondary" size="sm">
-                            <Package className="mr-2" /> Order Recommendation
+                            <Package className="mr-2" /> Order
                         </Button>
                     </div>
                 </CardHeader>

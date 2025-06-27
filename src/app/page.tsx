@@ -84,7 +84,7 @@ export default function Home() {
         // --- Recipes ---
         const recipesCol = collection(db, 'recipes');
         const recipeSnapshot = await getDocs(recipesCol);
-        if (recipeSnapshot.empty) {
+        if (recipeSnapshot.docs.length === 0) {
           const batch = writeBatch(db);
           initialRecipes.forEach(recipe => {
             const docRef = doc(db, 'recipes', recipe.id);
@@ -110,7 +110,7 @@ export default function Home() {
         // --- Inventory ---
         const inventoryCol = collection(db, 'inventory');
         const inventorySnapshot = await getDocs(inventoryCol);
-        if (inventorySnapshot.empty) {
+        if (inventorySnapshot.docs.length === 0) {
             const batch = writeBatch(db);
             initialInventory.forEach(item => {
                 const docRef = doc(db, 'inventory', item.id);

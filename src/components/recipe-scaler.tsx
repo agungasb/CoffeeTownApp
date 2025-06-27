@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Label } from "@/components/ui/label";
 import { type Recipe } from "@/lib/recipes";
+import { BookOpen, ChefHat } from 'lucide-react';
 
 interface ScaledIngredient {
     name: string;
@@ -25,6 +26,7 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
     const [multiplier, setMultiplier] = useState<number>(1);
     const [scaledIngredients, setScaledIngredients] = useState<ScaledIngredient[]>([]);
     const [recipeTitle, setRecipeTitle] = useState('');
+    const [recipeSteps, setRecipeSteps] = useState<string[]>([]);
 
     const handleScaleRecipe = () => {
         if (!selectedRecipeId || multiplier <= 0) {
@@ -42,7 +44,16 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
         
         setScaledIngredients(scaled);
         setRecipeTitle(recipe.name);
+        setRecipeSteps(recipe.steps);
     };
+
+    const handleSelectRecipe = (id: string) => {
+        setSelectedRecipeId(id);
+        setMultiplier(1);
+        setScaledIngredients([]);
+        setRecipeTitle('');
+        setRecipeSteps([]);
+    }
 
     return (
         <Card className="glassmorphic border-2 border-border/30 w-full max-w-4xl mx-auto">
@@ -55,7 +66,7 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="recipes">Choose a recipe</Label>
-                            <Select onValueChange={setSelectedRecipeId} value={selectedRecipeId}>
+                            <Select onValueChange={handleSelectRecipe} value={selectedRecipeId}>
                                 <SelectTrigger id="recipes">
                                     <SelectValue placeholder="Select a recipe" />
                                 </SelectTrigger>
@@ -84,26 +95,40 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
 
                     <div className="md:col-span-2">
                         {scaledIngredients.length > 0 ? (
-                           <div className='pl-4'>
-                                <h3 className="font-headline text-xl md:text-2xl mb-4">Scaled: {recipeTitle}</h3>
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Ingredient</TableHead>
-                                            <TableHead className="text-right">Amount</TableHead>
-                                            <TableHead>Unit</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {scaledIngredients.map((ing) => (
-                                            <TableRow key={ing.name}>
-                                                <TableCell className="font-medium">{ing.name}</TableCell>
-                                                <TableCell className="text-right">{ing.amount}</TableCell>
-                                                <TableCell>{ing.unit}</TableCell>
+                           <div className='space-y-8'>
+                               <div>
+                                    <h3 className="font-semibold text-xl md:text-2xl mb-4 flex items-center gap-2">
+                                        <ChefHat /> Scaled Ingredients: {recipeTitle}
+                                    </h3>
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>Ingredient</TableHead>
+                                                <TableHead className="text-right">Amount</TableHead>
+                                                <TableHead>Unit</TableHead>
                                             </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {scaledIngredients.map((ing) => (
+                                                <TableRow key={ing.name}>
+                                                    <TableCell className="font-medium">{ing.name}</TableCell>
+                                                    <TableCell className="text-right">{ing.amount}</TableCell>
+                                                    <TableCell>{ing.unit}</TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                               </div>
+                               <div>
+                                    <h3 className="font-semibold text-xl md:text-2xl mb-4 flex items-center gap-2">
+                                        <BookOpen /> Instructions
+                                    </h3>
+                                    <ol className="list-decimal list-inside space-y-2 text-sm text-foreground/90 bg-muted/30 p-4 rounded-md">
+                                        {recipeSteps.map((step, index) => (
+                                            <li key={index} className="pl-2">{step}</li>
                                         ))}
-                                    </TableBody>
-                                </Table>
+                                    </ol>
+                               </div>
                            </div>
                         ) : (
                             <div className="flex items-center justify-center h-full min-h-[40vh] text-muted-foreground italic border-2 border-dashed rounded-lg">

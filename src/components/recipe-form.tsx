@@ -16,7 +16,7 @@ const recipeFormSchema = z.object({
     name: z.string().min(3, "Recipe name must be at least 3 characters."),
     ingredients: z.array(z.object({
         name: z.string().min(1, "Name is required."),
-        amount: z.coerce.number().positive("Amount must be positive."),
+        amount: z.coerce.number({ invalid_type_error: "Amount is required." }).positive("Amount must be positive."),
         unit: z.string().min(1, "Unit is required."),
     })).min(1, "A recipe must have at least one ingredient."),
     steps: z.array(z.string().min(3, "Step must be at least 3 characters long.")).min(1, "A recipe must have at least one step."),
@@ -35,7 +35,7 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
         resolver: zodResolver(recipeFormSchema),
         defaultValues: recipeToEdit ?? {
             name: '',
-            ingredients: [{ name: '', amount: 1, unit: '' }],
+            ingredients: [{ name: '', amount: undefined as any, unit: '' }],
             steps: [''],
         },
     });
@@ -85,7 +85,7 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
                                             <FormItem>
                                                 <FormLabel>Name</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="Flour" {...field} />
+                                                    <Input placeholder="e.g. Flour" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -98,7 +98,7 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
                                             <FormItem>
                                                 <FormLabel>Amount</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" step="0.01" {...field} className="md:w-24"/>
+                                                    <Input type="number" step="0.01" placeholder="e.g. 100" {...field} className="md:w-24"/>
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -133,7 +133,7 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
                         <Button
                             type="button"
                             variant="outline"
-                            onClick={() => appendIngredient({ name: '', amount: 1, unit: '' })}
+                            onClick={() => appendIngredient({ name: '', amount: undefined as any, unit: '' })}
                             className="mt-2"
                         >
                             <PlusCircle className="mr-2" /> Add Ingredient

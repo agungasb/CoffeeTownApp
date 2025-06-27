@@ -13,7 +13,7 @@ const productFormSchema = z.object({
     name: z.string().min(3, "Product name must be at least 3 characters."),
     ingredients: z.array(z.object({
         name: z.string().min(1, "Name is required."),
-        amount: z.coerce.number().positive("Amount must be positive."),
+        amount: z.coerce.number({ invalid_type_error: "Amount is required."}).positive("Amount must be positive."),
     })).min(1, "A product must have at least one ingredient."),
 });
 
@@ -33,7 +33,7 @@ export function ProductForm({ productToEdit, onSubmit, onCancel }: ProductFormPr
             name: productToEdit.name,
         } : {
             name: '',
-            ingredients: [{ name: '', amount: 1 }],
+            ingredients: [{ name: '', amount: undefined as any }],
         },
     });
 
@@ -89,7 +89,7 @@ export function ProductForm({ productToEdit, onSubmit, onCancel }: ProductFormPr
                                             <FormItem>
                                                 <FormLabel>Amount (g)</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" step="0.001" {...field} className="md:w-28"/>
+                                                    <Input type="number" step="0.001" placeholder="e.g. 50" {...field} className="md:w-28"/>
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -111,7 +111,7 @@ export function ProductForm({ productToEdit, onSubmit, onCancel }: ProductFormPr
                         <Button
                             type="button"
                             variant="outline"
-                            onClick={() => append({ name: '', amount: 1 })}
+                            onClick={() => append({ name: '', amount: undefined as any })}
                             className="mt-2"
                         >
                             <PlusCircle className="mr-2" /> Add Ingredient

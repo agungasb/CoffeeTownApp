@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { Calculator, PackagePlus, ArrowLeft, CalendarDays } from "lucide-react";
 import type { InventoryItem } from "@/lib/inventoryData";
 import type { DailyUsageRecord } from "@/app/page";

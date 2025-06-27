@@ -23,13 +23,14 @@ interface RecipeScalerProps {
 
 export default function RecipeScaler({ recipes }: RecipeScalerProps) {
     const [selectedRecipeId, setSelectedRecipeId] = useState<string>('');
-    const [multiplier, setMultiplier] = useState<number>(1);
+    const [multiplier, setMultiplier] = useState<string>('');
     const [scaledIngredients, setScaledIngredients] = useState<ScaledIngredient[]>([]);
     const [recipeTitle, setRecipeTitle] = useState('');
     const [recipeSteps, setRecipeSteps] = useState<string[]>([]);
 
     const handleScaleRecipe = () => {
-        if (!selectedRecipeId || multiplier <= 0) {
+        const scaleValue = parseFloat(multiplier);
+        if (!selectedRecipeId || !multiplier || isNaN(scaleValue) || scaleValue <= 0) {
             return;
         }
 
@@ -38,7 +39,7 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
         
         const scaled = recipe.ingredients.map((ing) => ({
             name: ing.name,
-            amount: (ing.amount * multiplier).toFixed(2),
+            amount: (ing.amount * scaleValue).toFixed(2),
             unit: ing.unit,
         }));
         
@@ -49,7 +50,7 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
 
     const handleSelectRecipe = (id: string) => {
         setSelectedRecipeId(id);
-        setMultiplier(1);
+        setMultiplier('1');
         setScaledIngredients([]);
         setRecipeTitle('');
         setRecipeSteps([]);
@@ -85,9 +86,10 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
                                 id="multiplier"
                                 type="number" 
                                 value={multiplier}
-                                onChange={(e) => setMultiplier(parseFloat(e.target.value) || 1)}
+                                onChange={(e) => setMultiplier(e.target.value)}
                                 min="0.1"
                                 step="0.1"
+                                placeholder="e.g. 1.5"
                              />
                         </div>
                         <Button onClick={handleScaleRecipe} className="w-full">Scale Recipe</Button>

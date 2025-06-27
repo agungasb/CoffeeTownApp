@@ -13,6 +13,7 @@ import Inventory from '@/components/inventory';
 import LoginForm from '@/components/login-form';
 import { recipes as initialRecipes, type Recipe } from '@/lib/recipes';
 import { productIngredientsData, type ProductIngredients } from '@/lib/productIngredients';
+import { inventoryData as initialInventory, type InventoryItem } from '@/lib/inventoryData';
 import { 
   LogIn, 
   LogOut, 
@@ -35,6 +36,7 @@ const TABS = [
 export default function Home() {
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
   const [products, setProducts] = useState<ProductIngredients>(productIngredientsData);
+  const [inventory, setInventory] = useState<InventoryItem[]>(initialInventory);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('calculator');
@@ -122,7 +124,7 @@ export default function Home() {
               />
             </TabsContent>
             <TabsContent value="inventory">
-              <Inventory products={products} />
+              <Inventory inventory={inventory} setInventory={setInventory} isLoggedIn={isLoggedIn} />
             </TabsContent>
           </Tabs>
         </main>

@@ -82,10 +82,10 @@ export default function InventoryManager({ inventory, setInventory, dailyUsageRe
                 <CardHeader className="flex flex-row items-center justify-between gap-4">
                     <CardTitle>Inventory Management</CardTitle>
                     <div className="flex gap-2">
-                        <Button onClick={handleAddClick} disabled={!isLoggedIn}>
+                        <Button onClick={handleAddClick} disabled={!isLoggedIn} size="sm">
                             <PlusCircle className="mr-2" /> Add New Ingredient
                         </Button>
-                        <Button onClick={() => setIsOrderOpen(true)} variant="secondary">
+                        <Button onClick={() => setIsOrderOpen(true)} variant="secondary" size="sm">
                             <Package className="mr-2" /> Order Recommendation
                         </Button>
                     </div>

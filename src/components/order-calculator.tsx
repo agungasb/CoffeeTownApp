@@ -91,22 +91,24 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
                 </Alert>
 
                 {recommendations.length > 0 ? (
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Ingredient</TableHead>
-                                <TableHead className="text-right">Recommended Order Amount</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {recommendations.map(rec => (
-                                <TableRow key={rec.name}>
-                                    <TableCell>{capitalize(rec.name)}</TableCell>
-                                    <TableCell className="text-right font-bold">{rec.amountToOrder.toLocaleString()} {rec.unit}</TableCell>
+                    <div className="max-h-[50vh] overflow-y-auto pr-4">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Ingredient</TableHead>
+                                    <TableHead className="text-right">Recommended Order Amount</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {recommendations.map(rec => (
+                                    <TableRow key={rec.name}>
+                                        <TableCell>{capitalize(rec.name)}</TableCell>
+                                        <TableCell className="text-right font-bold">{rec.amountToOrder.toLocaleString()} {rec.unit}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
                 ) : (
                     <Alert>
                         <PackagePlus className="h-4 w-4" />

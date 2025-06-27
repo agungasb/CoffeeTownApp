@@ -75,15 +75,35 @@ export async function addDailyUsageRecord(record: { usage: [string, number, stri
 
 // --- AI Actions ---
 export async function getQuantitiesFromImage(photoDataUri: string): Promise<{ data: OcrProductionMappingOutput | null; error: string | null; }> {
-    try {
-        if (!photoDataUri) {
-            throw new Error("Image data URI is missing.");
-        }
-        const result = await ocrProductionMapping({ photoDataUri });
-        return { data: result, error: null };
-    } catch (error) {
-        console.error("Error in OCR mapping:", error);
-        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
-        return { data: null, error: `Failed to process image with AI: ${errorMessage}` };
+    const MAX_RETRIES = 3;
+    let lastError: Error | null = null;
+
+    if (!photoDataUri) {
+        return { data: null, error: "Image data URI is missing." };
     }
+
+    for (let i = 0; i < MAX_RETRIES; i++) {
+        try {
+            const result = await ocrProductionMapping({ photoDataUri });
+            return { data: result, error: null }; // Success
+        } catch (error) {
+            lastError = error instanceof Error ? error : new Error("An unknown error occurred.");
+            console.error(`Attempt ${i + 1} failed for OCR mapping:`, lastError.message);
+
+            // Check for overload error to retry
+            if (lastError.message.includes("overloaded") && i < MAX_RETRIES - 1) {
+                // Wait for a short, increasing amount of time before retrying
+                await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+                console.log(`Retrying... (Attempt ${i + 2})`);
+                continue; // Go to the next iteration to retry
+            }
+            
+            // For other errors, or if it's the last retry, break the loop and return the error
+            break;
+        }
+    }
+    
+    // If the loop finishes, it's because all retries failed or a non-retriable error occurred.
+    const finalErrorMessage = lastError ? lastError.message : "An unknown error occurred.";
+    return { data: null, error: `Failed to process image with AI: ${finalErrorMessage}` };
 }

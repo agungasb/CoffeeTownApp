@@ -2,8 +2,6 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { db } from '@/lib/firebase';
-import { collection, doc, getDocs, getDoc, setDoc, addDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -25,8 +23,7 @@ import {
   Scaling, 
   BookHeart, 
   Archive, 
-  Warehouse,
-  Loader2
+  Warehouse
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
@@ -51,136 +48,15 @@ export default function Home() {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [dailyUsage, setDailyUsage] = useState<DailyUsageRecord[]>([]);
   
-  const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('calculator');
 
   useEffect(() => {
-    const fetchData = async () => {
-      const requiredEnvVars = [
-        'NEXT_PUBLIC_FIREBASE_API_KEY',
-        'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
-        'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
-        'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET',
-        'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
-        'NEXT_PUBLIC_FIREBASE_APP_ID',
-      ];
-      const missingVars = requiredEnvVars.filter(key => !process.env[key]);
-
-      if (missingVars.length > 0) {
-        toast({
-            variant: 'destructive',
-            title: 'Firebase Not Configured',
-            description: `The following environment variables are missing: ${missingVars.join(', ')}. Please add them to your .env file from your Firebase project settings.`,
-            duration: 15000,
-        });
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      toast({ title: 'Connecting to Firestore...', description: 'Attempting to fetch data.' });
-      console.log("Connecting to Firestore...");
-
-      try {
-        // --- Recipes ---
-        console.log("Checking for recipes...");
-        const recipesCol = collection(db, 'recipes');
-        const recipeSnapshot = await getDocs(recipesCol);
-        console.log(`Found ${recipeSnapshot.docs.length} recipes in Firestore.`);
-        
-        if (recipeSnapshot.docs.length === 0) {
-          console.log('No recipes found. Seeding initial recipes...');
-          toast({ title: 'Seeding Data', description: 'Adding initial recipes...' });
-          const batch = writeBatch(db);
-          initialRecipes.forEach(recipe => {
-            const docRef = doc(db, 'recipes', recipe.id);
-            batch.set(docRef, recipe);
-          });
-          await batch.commit();
-          setRecipes(initialRecipes);
-          console.log('Successfully seeded recipes.');
-          toast({ title: 'Success', description: 'Initial recipes have been saved.' });
-        } else {
-          const recipesList = recipeSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Recipe));
-          setRecipes(recipesList);
-          console.log('Recipes loaded from Firestore.');
-        }
-
-        // --- Products ---
-        console.log("Checking for products...");
-        const productsDocRef = doc(db, 'products', 'allProducts');
-        const productsSnapshot = await getDoc(productsDocRef);
-        console.log(`Products document exists: ${productsSnapshot.exists()}`);
-
-        if (!productsSnapshot.exists()) {
-            console.log('No products found. Seeding initial products...');
-            toast({ title: 'Seeding Data', description: 'Adding initial products...' });
-            await setDoc(productsDocRef, { data: initialProductData });
-            setProducts(initialProductData);
-            console.log('Successfully seeded products.');
-            toast({ title: 'Success', description: 'Initial products have been saved.' });
-        } else {
-            setProducts(productsSnapshot.data().data as ProductIngredients);
-            console.log('Products loaded from Firestore.');
-        }
-
-        // --- Inventory ---
-        console.log("Checking for inventory...");
-        const inventoryCol = collection(db, 'inventory');
-        const inventorySnapshot = await getDocs(inventoryCol);
-        console.log(`Found ${inventorySnapshot.docs.length} inventory items in Firestore.`);
-
-        if (inventorySnapshot.docs.length === 0) {
-            console.log('No inventory found. Seeding initial inventory...');
-            toast({ title: 'Seeding Data', description: 'Adding initial inventory...' });
-            const batch = writeBatch(db);
-            initialInventory.forEach(item => {
-                const docRef = doc(db, 'inventory', item.id);
-                batch.set(docRef, item);
-            });
-            await batch.commit();
-            setInventory(initialInventory);
-            console.log('Successfully seeded inventory.');
-            toast({ title: 'Success', description: 'Initial inventory has been saved.' });
-        } else {
-            const inventoryList = inventorySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as InventoryItem));
-            setInventory(inventoryList);
-            console.log('Inventory loaded from Firestore.');
-        }
-
-        // --- Daily Usage ---
-        console.log("Fetching daily usage records...");
-        const usageCol = collection(db, 'dailyUsage');
-        const usageSnapshot = await getDocs(usageCol);
-        const usageList = usageSnapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-                id: doc.id,
-                date: data.date.toDate(),
-                usage: data.usage
-            } as DailyUsageRecord;
-        });
-        setDailyUsage(usageList.sort((a,b) => b.date.getTime() - a.date.getTime()));
-        console.log(`Found ${usageList.length} daily usage records.`);
-        toast({ title: 'All Done!', description: 'Data loaded successfully.' });
-
-      } catch (error) {
-        console.error("CRITICAL ERROR during Firestore operation:", error);
-        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
-        toast({
-            variant: 'destructive',
-            title: 'CRITICAL Firestore Error',
-            description: `Operation failed: ${errorMessage}. Check the console (F12) for details.`,
-            duration: 20000,
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [toast]);
+    setRecipes(initialRecipes);
+    setProducts(initialProductData);
+    setInventory(initialInventory);
+  }, []);
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
@@ -191,61 +67,45 @@ export default function Home() {
     setIsLoggedIn(false);
   }
 
-  // --- CRUD Handlers ---
+  // --- CRUD Handlers (Local State) ---
 
   const addRecipe = async (recipe: Omit<Recipe, 'id'>) => {
       const newId = recipe.name.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now();
       const newRecipe = { ...recipe, id: newId };
-      await setDoc(doc(db, 'recipes', newId), recipe);
       setRecipes(prev => [...prev, newRecipe]);
   };
 
   const updateRecipe = async (recipe: Recipe) => {
-      await setDoc(doc(db, 'recipes', recipe.id), recipe);
       setRecipes(prev => prev.map(r => r.id === recipe.id ? recipe : r));
   };
 
   const deleteRecipe = async (recipeId: string) => {
-      await deleteDoc(doc(db, 'recipes', recipeId));
       setRecipes(prev => prev.filter(r => r.id !== recipeId));
   };
   
   const updateProducts = async (newProducts: ProductIngredients) => {
-      await setDoc(doc(db, 'products', 'allProducts'), { data: newProducts });
       setProducts(newProducts);
   };
   
   const addInventoryItem = async (itemData: IngredientFormData) => {
-      const docRef = await addDoc(collection(db, 'inventory'), itemData);
-      const newItem = { ...itemData, id: docRef.id } as InventoryItem;
+      const newId = 'inv_' + Date.now();
+      const newItem = { ...itemData, id: newId } as InventoryItem;
       setInventory(prev => [...prev, newItem]);
   };
 
   const updateInventoryItem = async (item: InventoryItem) => {
-      const docRef = doc(db, 'inventory', item.id);
-      await setDoc(docRef, item);
       setInventory(prev => prev.map(i => i.id === item.id ? item : i));
   };
 
   const deleteInventoryItem = async (itemId: string) => {
-      await deleteDoc(doc(db, 'inventory', itemId));
       setInventory(prev => prev.filter(i => i.id !== itemId));
   };
   
   const addDailyUsageRecord = async (record: Omit<DailyUsageRecord, 'id'>) => {
-      const docRef = await addDoc(collection(db, 'dailyUsage'), record);
-      const newRecord = { ...record, id: docRef.id };
-      setDailyUsage(prev => [newRecord, ...prev]);
+      const newId = 'usage_' + Date.now();
+      const newRecord = { ...record, id: newId };
+      setDailyUsage(prev => [newRecord, ...prev].sort((a,b) => b.date.getTime() - a.date.getTime()));
   };
-
-  if (loading) {
-      return (
-          <div className="flex justify-center items-center min-h-screen flex-col gap-4 bg-background">
-              <Loader2 className="h-16 w-16 animate-spin text-primary" />
-              <p className="text-xl text-foreground">Loading Bakery Data...</p>
-          </div>
-      )
-  }
 
   return (
     <>

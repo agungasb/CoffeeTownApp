@@ -104,6 +104,13 @@ export default async function Page() {
     try {
         const { recipes, products, inventory, dailyUsage } = await fetchData();
 
+        // Deduplicate inventory data to prevent React key errors
+        const uniqueInventory = inventory.filter((item, index, self) =>
+            index === self.findIndex((t) => (
+                t.id === item.id
+            ))
+        );
+
         const serverActions = {
             addRecipe,
             updateRecipe,
@@ -120,7 +127,7 @@ export default async function Page() {
                 <BakeryApp
                     initialRecipes={recipes}
                     initialProducts={products}
-                    initialInventory={inventory}
+                    initialInventory={uniqueInventory}
                     initialDailyUsage={dailyUsage}
                     actions={serverActions}
                 />

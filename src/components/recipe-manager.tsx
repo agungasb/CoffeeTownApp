@@ -66,7 +66,7 @@ export default function RecipeManager({ recipes, setRecipes, isLoggedIn }: Recip
 
 
     return (
-        <Card className="glassmorphic w-full max-w-6xl mx-auto">
+        <Card className="w-full max-w-6xl mx-auto bg-card/90 backdrop-blur-sm">
             <CardHeader className="flex flex-row items-center justify-between gap-4">
                 <CardTitle>Recipe Management</CardTitle>
                  <Button onClick={handleAddClick} disabled={!isLoggedIn}>
@@ -89,7 +89,7 @@ export default function RecipeManager({ recipes, setRecipes, isLoggedIn }: Recip
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {recipes.map((recipe) => (
-                        <Card key={recipe.id} className="flex flex-col glassmorphic">
+                        <Card key={recipe.id} className="flex flex-col bg-background/70 backdrop-blur-sm">
                             <CardHeader>
                                 <CardTitle className="text-lg">{recipe.name}</CardTitle>
                                 <CardDescription>{recipe.ingredients.length} ingredients, {recipe.steps.length} steps</CardDescription>

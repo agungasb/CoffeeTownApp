@@ -78,7 +78,7 @@ export default function InventoryManager({ inventory, setInventory, dailyUsageRe
 
     return (
         <>
-            <Card className="glassmorphic w-full max-w-7xl mx-auto">
+            <Card className="w-full max-w-7xl mx-auto bg-card/90 backdrop-blur-sm">
                 <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                     <CardTitle>Inventory Management</CardTitle>
                     <div className="flex gap-2">

@@ -57,7 +57,7 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
     }
 
     return (
-        <Card className="glassmorphic w-full max-w-4xl mx-auto">
+        <Card className="w-full max-w-4xl mx-auto bg-card/90 backdrop-blur-sm">
             <CardHeader>
                 <CardTitle>Recipe Scaler</CardTitle>
                 <CardDescription>Choose a recipe and enter a multiplier to scale the ingredients.</CardDescription>

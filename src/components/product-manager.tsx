@@ -68,7 +68,7 @@ export default function ProductManager({ products, setProducts, isLoggedIn }: Pr
     };
 
     return (
-        <Card className="w-full max-w-6xl mx-auto bg-card/90 backdrop-blur-sm">
+        <Card className="w-full max-w-6xl mx-auto bg-card/90">
             <CardHeader className="flex flex-row items-center justify-between gap-4">
                 <CardTitle>Product Management</CardTitle>
                 <Button onClick={handleAddClick} disabled={!isLoggedIn}>
@@ -91,7 +91,7 @@ export default function ProductManager({ products, setProducts, isLoggedIn }: Pr
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {Object.entries(products).sort(([a], [b]) => a.localeCompare(b)).map(([productName, ingredients]) => (
-                        <Card key={productName} className="flex flex-col bg-background/70 backdrop-blur-sm">
+                        <Card key={productName} className="flex flex-col bg-background/70">
                             <CardHeader>
                                 <CardTitle className="text-lg">{capitalize(productName)}</CardTitle>
                                 <CardDescription>{Object.keys(ingredients).length} ingredients</CardDescription>

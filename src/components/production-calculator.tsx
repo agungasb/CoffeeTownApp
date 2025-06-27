@@ -112,7 +112,7 @@ export default function ProductionCalculator({ products, setDailyUsage }: Produc
   };
 
   return (
-    <Card className="w-full max-w-[600px] mx-auto bg-card/90 backdrop-blur-sm">
+    <Card className="w-full max-w-[600px] mx-auto bg-card/90">
       <CardContent className="pt-6">
         <div className="flex flex-col gap-6">
           
@@ -175,7 +175,7 @@ export default function ProductionCalculator({ products, setDailyUsage }: Produc
 
           {hasCalculated ? (
             <Accordion type="multiple" defaultValue={['results', 'summary']} className="w-full space-y-4">
-                <AccordionItem value="results" className="bg-background/70 backdrop-blur-sm border-none rounded-lg">
+                <AccordionItem value="results" className="bg-background/70 border-none rounded-lg">
                     <AccordionTrigger className="p-4 hover:no-underline text-foreground font-semibold text-lg">
                         <h3 className="flex items-center gap-2"><Calculator /> Calculation Results</h3>
                     </AccordionTrigger>
@@ -199,7 +199,7 @@ export default function ProductionCalculator({ products, setDailyUsage }: Produc
                     </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="summary" className="bg-background/70 backdrop-blur-sm border-none rounded-lg">
+                <AccordionItem value="summary" className="bg-background/70 border-none rounded-lg">
                     <AccordionTrigger className="p-4 hover:no-underline text-foreground font-semibold text-lg">
                          <h3 className="flex items-center gap-2"><ShoppingBasket /> Ingredient Summary</h3>
                     </AccordionTrigger>

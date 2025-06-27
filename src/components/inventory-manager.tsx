@@ -156,8 +156,8 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
                                         </Button>
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
-                                                <Button variant="ghost" size="icon" disabled={!isLoggedIn}>
-                                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                                <Button variant="destructive" size="icon" disabled={!isLoggedIn}>
+                                                    <Trash2 className="h-4 w-4" />
                                                 </Button>
                                             </AlertDialogTrigger>
                                             <AlertDialogContent className="glassmorphic">

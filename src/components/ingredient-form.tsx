@@ -15,6 +15,8 @@ const ingredientFormSchema = z.object({
     currentStock: z.coerce.number().min(0, "Current stock must be a positive number."),
     minimumStock: z.coerce.number().min(0, "Minimum stock must be a positive number."),
     unit: z.string().min(1, "Unit is required (e.g., g, pcs, ml)."),
+    orderUnit: z.string().optional(),
+    orderUnitConversion: z.coerce.number().positive("Conversion must be a positive number").optional().or(z.literal('')),
 });
 
 export type IngredientFormData = Omit<InventoryItem, 'id'> & { id?: string };
@@ -26,18 +28,20 @@ interface IngredientFormProps {
 }
 
 export function IngredientForm({ ingredientToEdit, onSubmit, onCancel }: IngredientFormProps) {
-    const form = useForm<IngredientFormData>({
+    const form = useForm<z.infer<typeof ingredientFormSchema>>({
         resolver: zodResolver(ingredientFormSchema),
         defaultValues: ingredientToEdit ?? {
             name: '',
             currentStock: 0,
             minimumStock: 0,
             unit: 'g',
+            orderUnit: '',
+            orderUnitConversion: '',
         },
     });
 
-    const handleSubmit = (data: IngredientFormData) => {
-        onSubmit(data);
+    const handleSubmit = (data: z.infer<typeof ingredientFormSchema>) => {
+        onSubmit(data as IngredientFormData);
     };
 
     return (
@@ -89,7 +93,7 @@ export function IngredientForm({ ingredientToEdit, onSubmit, onCancel }: Ingredi
                     name="unit"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Unit</FormLabel>
+                            <FormLabel>Base Unit</FormLabel>
                             <FormControl>
                                 <Input placeholder="e.g. g, pcs, ml" {...field} />
                             </FormControl>
@@ -97,6 +101,41 @@ export function IngredientForm({ ingredientToEdit, onSubmit, onCancel }: Ingredi
                         </FormItem>
                     )}
                 />
+
+                <div className="pt-4 mt-4 border-t">
+                    <h3 className="text-md font-medium mb-2">Order Unit Conversion (Optional)</h3>
+                    <p className="text-sm text-muted-foreground mb-4">Define a larger unit for easier ordering (e.g., order "1 sak" instead of "25000 g").</p>
+                    <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                            control={form.control}
+                            name="orderUnit"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Order Unit Name</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="e.g. sak, pack, dus" {...field} value={field.value ?? ''} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="orderUnitConversion"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Base Units per Order Unit</FormLabel>
+                                    <FormControl>
+                                        <Input type="number" placeholder="e.g. 25000" {...field} value={field.value ?? ''} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                </div>
+
+
                 <div className="flex justify-end gap-2 pt-4 border-t">
                     <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
                     <Button type="submit">Save Ingredient</Button>

@@ -60,7 +60,7 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
     const handleCalculate = (data: FormValues) => {
         const newRecommendations: OrderRecommendation[] = [];
 
-        sortedInventory.forEach(item => {
+        inventory.forEach(item => {
             const currentStock = Number(data[item.id]) || 0;
             const usageAmount = averageUsage.find(u => u[0].toLowerCase() === item.name.toLowerCase())?.[1] || 0;
             const stockAfterUsage = currentStock - usageAmount;
@@ -68,11 +68,20 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
             if (stockAfterUsage < item.minimumStock) {
                 const amountToOrder = Math.ceil((item.minimumStock + usageAmount) - currentStock);
                 if (amountToOrder > 0) {
-                    newRecommendations.push({
-                        name: item.name,
-                        amountToOrder,
-                        unit: item.unit
-                    });
+                     if (item.orderUnit && item.orderUnitConversion && item.orderUnitConversion > 0) {
+                        const convertedAmount = amountToOrder / item.orderUnitConversion;
+                        newRecommendations.push({
+                            name: item.name,
+                            amountToOrder: convertedAmount,
+                            unit: item.orderUnit
+                        });
+                    } else {
+                        newRecommendations.push({
+                            name: item.name,
+                            amountToOrder,
+                            unit: item.unit
+                        });
+                    }
                 }
             }
         });
@@ -103,7 +112,9 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
                                 {recommendations.map(rec => (
                                     <TableRow key={rec.name}>
                                         <TableCell>{capitalize(rec.name)}</TableCell>
-                                        <TableCell className="text-right font-bold">{rec.amountToOrder.toLocaleString()} {rec.unit}</TableCell>
+                                        <TableCell className="text-right font-bold">
+                                            {Number.isInteger(rec.amountToOrder) ? rec.amountToOrder.toLocaleString() : rec.amountToOrder.toFixed(2)} {rec.unit}
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>

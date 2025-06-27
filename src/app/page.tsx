@@ -9,7 +9,7 @@ import ProductionCalculator from "@/components/production-calculator";
 import RecipeScaler from "@/components/recipe-scaler";
 import RecipeManager from "@/components/recipe-manager";
 import ProductManager from '@/components/product-manager';
-import Inventory from '@/components/inventory';
+import DailyUsageDashboard from '@/components/daily-usage-dashboard';
 import LoginForm from '@/components/login-form';
 import { recipes as initialRecipes, type Recipe } from '@/lib/recipes';
 import { productIngredientsData, type ProductIngredients } from '@/lib/productIngredients';
@@ -21,7 +21,7 @@ import {
   Scaling, 
   BookHeart, 
   Archive, 
-  Warehouse 
+  LayoutDashboard
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
@@ -30,13 +30,14 @@ const TABS = [
   { id: 'recipe', label: 'Recipe Scaler', icon: <Scaling /> },
   { id: 'manager', label: 'Recipe Management', icon: <BookHeart /> },
   { id: 'product_management', label: 'Product Management', icon: <Archive /> },
-  { id: 'inventory', label: 'Inventory', icon: <Warehouse /> },
+  { id: 'dashboard', label: 'Daily Usage Dashboard', icon: <LayoutDashboard /> },
 ];
 
 export default function Home() {
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
   const [products, setProducts] = useState<ProductIngredients>(productIngredientsData);
   const [inventory, setInventory] = useState<InventoryItem[]>(initialInventory);
+  const [dailyUsage, setDailyUsage] = useState<[string, number, string][]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('calculator');
@@ -108,7 +109,7 @@ export default function Home() {
         <main className="w-full max-w-7xl mt-[160px] p-4 sm:p-6 md:p-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsContent value="calculator">
-              <ProductionCalculator products={products}/>
+              <ProductionCalculator products={products} setDailyUsage={setDailyUsage}/>
             </TabsContent>
             <TabsContent value="recipe">
               <RecipeScaler recipes={recipes} />
@@ -123,8 +124,8 @@ export default function Home() {
                 isLoggedIn={isLoggedIn} 
               />
             </TabsContent>
-            <TabsContent value="inventory">
-              <Inventory inventory={inventory} setInventory={setInventory} isLoggedIn={isLoggedIn} />
+            <TabsContent value="dashboard">
+              <DailyUsageDashboard inventory={inventory} dailyUsage={dailyUsage} isLoggedIn={isLoggedIn} />
             </TabsContent>
           </Tabs>
         </main>

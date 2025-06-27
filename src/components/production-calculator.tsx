@@ -4,7 +4,7 @@
 import { useState, useTransition, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UploadCloud, Loader2, Calculator, ShoppingBasket } from "lucide-react";
+import { UploadCloud, Loader2, Calculator, ShoppingBasket, Save } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,9 +26,10 @@ type ProductionFormValues = {
 
 interface ProductionCalculatorProps {
     products: ProductIngredients;
+    setDailyUsage: (usage: [string, number, string][]) => void;
 }
 
-export default function ProductionCalculator({ products }: ProductionCalculatorProps) {
+export default function ProductionCalculator({ products, setDailyUsage }: ProductionCalculatorProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -79,6 +80,26 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
     };
     reader.readAsDataURL(file);
     event.target.value = "";
+  };
+
+  const handleSaveUsage = () => {
+    if (!results.ingredientSummary || results.ingredientSummary.length === 0) {
+        toast({
+            variant: "destructive",
+            title: "No Data",
+            description: "Calculate a production first to save the usage summary.",
+        });
+        return;
+    }
+    const parsedUsage = results.ingredientSummary.map(
+        ([name, amountStr, unit]) =>
+            [name, parseFloat(amountStr) || 0, unit] as [string, number, string]
+    );
+    setDailyUsage(parsedUsage);
+    toast({
+        title: "Success",
+        description: "Ingredient summary has been saved as daily usage.",
+    });
   };
 
   return (
@@ -198,6 +219,12 @@ export default function ProductionCalculator({ products }: ProductionCalculatorP
                           )}
                           </TableBody>
                       </Table>
+                       <div className="flex justify-end mt-4">
+                          <Button onClick={handleSaveUsage}>
+                              <Save className="mr-2 h-4 w-4" />
+                              Save as Daily Usage
+                          </Button>
+                      </div>
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>

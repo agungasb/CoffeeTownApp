@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
@@ -30,7 +30,34 @@ type FormValues = {
 export default function OrderCalculator({ inventory, dailyUsage }: OrderCalculatorProps) {
     const [recommendation, setRecommendation] = useState<OrderRecommendation[] | null>(null);
 
-    const defaultValues = inventory.reduce((acc, item) => {
+    const combinedInventory = useMemo(() => {
+        const allIngredientNames = [
+            ...new Set([
+                ...inventory.map(i => i.name.toLowerCase()),
+                ...dailyUsage.map(u => u[0].toLowerCase())
+            ])
+        ];
+
+        return allIngredientNames.map(name => {
+            const inventoryItem = inventory.find(i => i.name.toLowerCase() === name);
+            const usageData = dailyUsage.find(u => u[0].toLowerCase() === name);
+
+            const id = inventoryItem?.id || name.replace(/\s+/g, '-');
+            const unit = inventoryItem?.unit || usageData?.[2] || 'g';
+            const currentStock = inventoryItem?.currentStock || 0;
+            const minimumStock = inventoryItem?.minimumStock || 0;
+            
+            return {
+                id,
+                name: name,
+                currentStock,
+                minimumStock,
+                unit
+            };
+        }).sort((a, b) => a.name.localeCompare(b.name));
+    }, [inventory, dailyUsage]);
+
+    const defaultValues = combinedInventory.reduce((acc, item) => {
         acc[item.id] = item.currentStock || '';
         return acc;
     }, {} as FormValues);
@@ -40,7 +67,7 @@ export default function OrderCalculator({ inventory, dailyUsage }: OrderCalculat
     const handleCalculate = (data: FormValues) => {
         const recommendations: OrderRecommendation[] = [];
 
-        inventory.forEach(item => {
+        combinedInventory.forEach(item => {
             const currentStock = Number(data[item.id]) || 0;
             const usageAmount = dailyUsage.find(u => u[0].toLowerCase() === item.name.toLowerCase())?.[1] || 0;
             const stockAfterUsage = currentStock - usageAmount;
@@ -101,7 +128,7 @@ export default function OrderCalculator({ inventory, dailyUsage }: OrderCalculat
             <form onSubmit={form.handleSubmit(handleCalculate)} className="space-y-6">
                  <div className="max-h-[50vh] overflow-y-auto pr-4 space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                        {inventory.sort((a,b) => a.name.localeCompare(b.name)).map(item => (
+                        {combinedInventory.map(item => (
                             <FormField
                                 key={item.id}
                                 control={form.control}

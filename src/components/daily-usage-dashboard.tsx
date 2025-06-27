@@ -21,7 +21,7 @@ interface DailyUsageDashboardProps {
 
 const getStatus = (stockAfterUsage: number, minimumStock: number): { text: string; variant: "destructive" | "secondary" | "outline" } => {
     if (stockAfterUsage <= 0) return { text: 'Critical', variant: 'destructive' };
-    if (stockAfterUsage <= minimumStock) return { text: 'Low', variant: 'secondary' };
+    if (stockAfterUsage < minimumStock) return { text: 'Low', variant: 'secondary' };
     return { text: 'OK', variant: 'outline' };
 };
 
@@ -29,12 +29,32 @@ export default function DailyUsageDashboard({ inventory, dailyUsage, isLoggedIn 
     const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
 
     const dashboardData = useMemo(() => {
-        return inventory.map(item => {
-            const usage = dailyUsage.find(u => u[0].toLowerCase() === item.name.toLowerCase())?.[1] || 0;
-            const stockAfterUsage = item.currentStock - usage;
-            const status = getStatus(stockAfterUsage, item.minimumStock);
+        const allIngredientNames = [
+            ...new Set([
+                ...inventory.map(i => i.name.toLowerCase()),
+                ...dailyUsage.map(u => u[0].toLowerCase())
+            ])
+        ];
+
+        return allIngredientNames.map(name => {
+            const inventoryItem = inventory.find(i => i.name.toLowerCase() === name);
+            const usageData = dailyUsage.find(u => u[0].toLowerCase() === name);
+
+            const usage = usageData ? usageData[1] : 0;
+            const unit = inventoryItem?.unit || usageData?.[2] || 'g';
+            const currentStock = inventoryItem?.currentStock || 0;
+            const minimumStock = inventoryItem?.minimumStock || 0;
+            const id = inventoryItem?.id || name;
+
+            const stockAfterUsage = currentStock - usage;
+            const status = getStatus(stockAfterUsage, minimumStock);
+
             return {
-                ...item,
+                id,
+                name,
+                currentStock,
+                minimumStock,
+                unit,
                 dailyUsage: usage,
                 stockAfterUsage,
                 status,
@@ -54,7 +74,7 @@ export default function DailyUsageDashboard({ inventory, dailyUsage, isLoggedIn 
                 <CardContent>
                     <div className="flex items-center gap-2 mb-4 text-foreground">
                         <LayoutDashboard className="h-6 w-6 text-muted-foreground" />
-                        <h3 className="text-xl font-semibold">Ingredient Status</h3>
+                        <h3 className="text-xl font-semibold">Ingredient Status ({dashboardData.length})</h3>
                     </div>
 
                     {!isLoggedIn && (
@@ -96,7 +116,7 @@ export default function DailyUsageDashboard({ inventory, dailyUsage, isLoggedIn 
                                 ) : (
                                     <TableRow>
                                         <TableCell colSpan={6} className="text-center h-24 text-muted-foreground italic">
-                                            No inventory data available.
+                                            No inventory data available. Calculate and save a production summary first.
                                         </TableCell>
                                     </TableRow>
                                 )}

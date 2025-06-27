@@ -16,7 +16,7 @@ interface DailyUsageDashboardProps {
 export default function DailyUsageDashboard({ dailyUsageRecords }: DailyUsageDashboardProps) {
 
     return (
-        <Card className="w-full max-w-4xl mx-auto bg-card/90">
+        <Card className="w-full max-w-4xl mx-auto glassmorphic">
             <CardHeader>
                 <CardTitle>Historical Usage Dashboard</CardTitle>
             </CardHeader>
@@ -29,7 +29,7 @@ export default function DailyUsageDashboard({ dailyUsageRecords }: DailyUsageDas
                 {dailyUsageRecords.length > 0 ? (
                     <Accordion type="single" collapsible className="w-full space-y-4">
                         {dailyUsageRecords.map(record => (
-                            <AccordionItem key={record.id} value={record.id} className="bg-background/70 border-none rounded-lg">
+                            <AccordionItem key={record.id} value={record.id} className="bg-muted/50 border-none rounded-lg">
                                 <AccordionTrigger className="p-4 hover:no-underline text-foreground font-semibold">
                                     <span>
                                         Usage saved on: {new Intl.DateTimeFormat('en-US', { dateStyle: 'full', timeStyle: 'short' }).format(record.date)}

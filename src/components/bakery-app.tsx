@@ -11,6 +11,7 @@ import RecipeScaler from "@/components/recipe-scaler";
 import RecipeManager from "@/components/recipe-manager";
 import ProductManager from '@/components/product-manager';
 import InventoryManager from '@/components/inventory-manager';
+import DailyUsageDashboard from '@/components/daily-usage-dashboard';
 import LoginForm from '@/components/login-form';
 import { type Recipe } from '@/lib/recipes';
 import { type ProductIngredients } from '@/lib/productIngredients';
@@ -25,7 +26,8 @@ import {
   BookHeart, 
   Archive, 
   Warehouse,
-  Settings
+  Settings,
+  History
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
@@ -50,6 +52,7 @@ const TABS = [
   { id: 'manager', label: 'Recipe Management', icon: <BookHeart /> },
   { id: 'product_management', label: 'Product Management', icon: <Archive /> },
   { id: 'inventory', label: 'Inventory Management', icon: <Warehouse /> },
+  { id: 'daily_usage', label: 'Usage History', icon: <History /> },
 ];
 
 
@@ -301,6 +304,9 @@ export default function BakeryApp({
                     resetDailyUsage={resetDailyUsageHandler}
                     isLoggedIn={isLoggedIn}
                 />
+            </TabsContent>
+            <TabsContent value="daily_usage">
+              <DailyUsageDashboard dailyUsageRecords={initialDailyUsage} />
             </TabsContent>
           </Tabs>
         </main>

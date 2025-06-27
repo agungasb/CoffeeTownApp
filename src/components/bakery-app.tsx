@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
@@ -24,9 +24,13 @@ import {
   Scaling, 
   BookHeart, 
   Archive, 
-  Warehouse
+  Warehouse,
+  Settings
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Label } from './ui/label';
+import { Slider } from './ui/slider';
 
 export type DailyUsageIngredient = {
   name: string;
@@ -86,6 +90,14 @@ export default function BakeryApp({
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('calculator');
+  
+  const [blur, setBlur] = useState(16);
+  const [opacity, setOpacity] = useState(40);
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--glass-blur', `${blur}px`);
+    document.documentElement.style.setProperty('--glass-opacity', `${opacity / 100}`);
+  }, [blur, opacity]);
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
@@ -173,6 +185,47 @@ export default function BakeryApp({
                 </p>
             </div>
              <div className="flex items-center gap-2">
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button variant="ghost" size="icon" className="text-foreground hover:text-foreground/80 hover:bg-foreground/10" title="Adjust visual settings">
+                            <Settings className="h-5 w-5 md:h-6 md:w-6" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80 glassmorphic">
+                        <div className="grid gap-4">
+                            <div className="space-y-2">
+                                <h4 className="font-medium leading-none">Visual Settings</h4>
+                                <p className="text-sm text-muted-foreground">
+                                    Adjust the glass effect for all panels.
+                                </p>
+                            </div>
+                            <div className="grid gap-4">
+                                <div className="grid grid-cols-3 items-center gap-4">
+                                    <Label htmlFor="blur" className="text-sm">Blur</Label>
+                                    <Slider
+                                        id="blur"
+                                        value={[blur]}
+                                        max={100}
+                                        step={1}
+                                        onValueChange={(value) => setBlur(value[0])}
+                                        className="col-span-2"
+                                    />
+                                </div>
+                                <div className="grid grid-cols-3 items-center gap-4">
+                                    <Label htmlFor="opacity" className="text-sm">Opacity</Label>
+                                    <Slider
+                                        id="opacity"
+                                        value={[opacity]}
+                                        max={100}
+                                        step={1}
+                                        onValueChange={(value) => setOpacity(value[0])}
+                                        className="col-span-2"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </PopoverContent>
+                </Popover>
                 <ThemeToggle />
                 {isLoggedIn ? (
                     <Button

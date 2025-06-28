@@ -218,7 +218,7 @@ export default function ProductionCalculator({ products, addDailyUsageRecord, is
                               ))
                           ) : (
                               <TableRow>
-                                  <TableCell colSpan={2} className="text-center h-24 text-muted-foreground italic">
+                                  <TableCell colSpan={2} className="text-center h-24 text-foreground italic">
                                       No ingredients for the entered quantities.
                                   </TableCell>
                               </TableRow>

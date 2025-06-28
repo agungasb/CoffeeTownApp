@@ -143,7 +143,7 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
                                </div>
                            </div>
                         ) : (
-                            <div className="flex items-center justify-center h-full min-h-[40vh] text-muted-foreground italic border-2 border-dashed rounded-lg">
+                            <div className="flex items-center justify-center h-full min-h-[40vh] text-foreground italic border-2 border-dashed rounded-lg">
                                 Select a recipe and click 'Scale' to see results.
                             </div>
                         )}

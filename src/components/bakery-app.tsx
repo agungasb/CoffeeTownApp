@@ -95,6 +95,7 @@ export default function BakeryApp({
   
   const [blur, setBlur] = useState(16);
   const [opacity, setOpacity] = useState(40);
+  const [activeTab, setActiveTab] = useState(TABS[0].id);
 
   useEffect(() => {
     document.documentElement.style.setProperty('--glass-blur', `${blur}px`);

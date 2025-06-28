@@ -25,15 +25,16 @@ async function seedDatabase() {
     if (!db) return; // Guard against null db
 
     try {
-        const seedFlagRef = doc(db, 'appData', 'seedStatus');
-        const seedFlagDoc = await getDoc(seedFlagRef);
+        // More robust check: If the recipes collection has any documents, we assume it's seeded.
+        const recipesQuery = query(collection(db, 'recipes'), limit(1));
+        const recipesSnapshot = await getDocs(recipesQuery);
 
-        // If the flag exists, it means we've already seeded. Do nothing.
-        if (seedFlagDoc.exists()) {
+        // If the snapshot is not empty, it means data exists. Do nothing.
+        if (!recipesSnapshot.empty) {
             return;
         }
 
-        console.log("Database not seeded, seeding all initial data...");
+        console.log("Database appears empty, seeding all initial data...");
         const batch = writeBatch(db);
 
         // 1. Seed Recipes
@@ -52,8 +53,7 @@ async function seedDatabase() {
             batch.set(docRef, item);
         });
         
-        // 4. Set the seed flag so this doesn't run again
-        batch.set(seedFlagRef, { seeded: true, timestamp: Timestamp.now() });
+        // No longer using a separate flag. The presence of data is the flag.
 
         console.log("Committing seed data to database...");
         await batch.commit();

@@ -20,6 +20,7 @@ import type { DailyUsageRecord } from '@/components/bakery-app';
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
 
 async function fetchDataAndSeed() {
     if (!db) {

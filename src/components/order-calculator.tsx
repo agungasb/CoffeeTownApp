@@ -106,7 +106,7 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
                 <Alert>
                     <CalendarDays className="h-4 w-4" />
                     <AlertTitle>Order Recommendation for {daysOfWeek[selectedDay]}</AlertTitle>
-                    <AlertDescription>
+                    <AlertDescription className="text-yellow-400">
                         Based on an average usage of {averageUsage.length > 0 ? 'the last four relevant days.' : '0'} saved records for this day.
                     </AlertDescription>
                 </Alert>

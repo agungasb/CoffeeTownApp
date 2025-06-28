@@ -4,7 +4,6 @@
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -28,9 +27,6 @@ interface ProductFormProps {
 }
 
 export function ProductForm({ productToEdit, onSubmit, onCancel }: ProductFormProps) {
-    const t = useTranslations('ProductForm');
-    const tCommon = useTranslations('Common');
-
     const form = useForm<ProductFormData>({
         resolver: zodResolver(productFormSchema),
         defaultValues: productToEdit ? {
@@ -60,7 +56,7 @@ export function ProductForm({ productToEdit, onSubmit, onCancel }: ProductFormPr
                         name="name"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>{t('nameLabel')}</FormLabel>
+                                <FormLabel>Product Name</FormLabel>
                                 <FormControl>
                                     <Input placeholder="e.g. Abon Sosis" {...field} />
                                 </FormControl>
@@ -70,7 +66,7 @@ export function ProductForm({ productToEdit, onSubmit, onCancel }: ProductFormPr
                     />
 
                     <div>
-                        <h3 className="text-lg font-medium mb-2">{t('ingredientsTitle')}</h3>
+                        <h3 className="text-lg font-medium mb-2">Ingredients</h3>
                         <div className="space-y-4">
                             {fields.map((field, index) => (
                                 <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto_auto] gap-4 md:gap-2 p-2 border rounded-md md:items-end">
@@ -79,7 +75,7 @@ export function ProductForm({ productToEdit, onSubmit, onCancel }: ProductFormPr
                                         name={`ingredients.${index}.name`}
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>{tCommon('name')}</FormLabel>
+                                                <FormLabel>Name</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="Tepung" {...field} />
                                                 </FormControl>
@@ -92,7 +88,7 @@ export function ProductForm({ productToEdit, onSubmit, onCancel }: ProductFormPr
                                         name={`ingredients.${index}.amount`}
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>{tCommon('amount')}</FormLabel>
+                                                <FormLabel>Amount</FormLabel>
                                                 <FormControl>
                                                     <Input type="number" step="0.001" placeholder="e.g. 50" {...field} className="md:w-28"/>
                                                 </FormControl>
@@ -105,7 +101,7 @@ export function ProductForm({ productToEdit, onSubmit, onCancel }: ProductFormPr
                                         name={`ingredients.${index}.unit`}
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>{tCommon('unit')}</FormLabel>
+                                                <FormLabel>Unit</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="g" {...field} className="md:w-20" />
                                                 </FormControl>
@@ -132,13 +128,13 @@ export function ProductForm({ productToEdit, onSubmit, onCancel }: ProductFormPr
                             onClick={() => append({ name: '', amount: undefined as any, unit: 'g' })}
                             className="mt-2"
                         >
-                            <PlusCircle className="mr-2" /> {t('addIngredientButton')}
+                            <PlusCircle className="mr-2" /> Add Ingredient
                         </Button>
                     </div>
                 </div>
                 <div className="flex justify-end gap-2 pt-4 border-t">
-                    <Button type="button" variant="ghost" onClick={onCancel}>{t('cancelButton')}</Button>
-                    <Button type="submit" variant="success">{t('saveButton')}</Button>
+                    <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
+                    <Button type="submit" variant="success">Save Product</Button>
                 </div>
             </form>
         </Form>

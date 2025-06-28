@@ -3,7 +3,6 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -32,12 +31,11 @@ type FormValues = {
 };
 
 export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculatorProps) {
-    const t = useTranslations('OrderCalculator');
     const [recommendations, setRecommendations] = useState<OrderRecommendation[] | null>(null);
     const [selectedDay, setSelectedDay] = useState<number>(new Date().getDay());
     const [averageUsage, setAverageUsage] = useState<DailyUsageIngredient[]>([]);
 
-    const daysOfWeek = [t('days.sun'), t('days.mon'), t('days.tue'), t('days.wed'), t('days.thu'), t('days.fri'), t('days.sat')];
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     
     useEffect(() => {
         const usage = calculateAverageDailyUsage(dailyUsageRecords, selectedDay);
@@ -107,9 +105,9 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
             <div className="space-y-4">
                 <Alert>
                     <CalendarDays className="h-4 w-4" />
-                    <AlertTitle>{t('recommendationTitle', {day: daysOfWeek[selectedDay]})}</AlertTitle>
+                    <AlertTitle>Order Recommendation for {daysOfWeek[selectedDay]}</AlertTitle>
                     <AlertDescription>
-                        {t('recommendationDescription', {count: averageUsage.length > 0 ? 'the last four relevant days.' : '0'})}
+                        Based on an average usage of {averageUsage.length > 0 ? 'the last four relevant days.' : '0'} saved records for this day.
                     </AlertDescription>
                 </Alert>
 
@@ -118,8 +116,8 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>{t('ingredientHeader')}</TableHead>
-                                        <TableHead className="text-right">{t('recommendedAmountHeader')}</TableHead>
+                                        <TableHead>Ingredient</TableHead>
+                                        <TableHead className="text-right">Recommended Order Amount</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -136,13 +134,13 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
                     ) : (
                         <Alert>
                             <PackagePlus className="h-4 w-4" />
-                            <AlertTitle>{t('allStockSufficient')}</AlertTitle>
-                            <AlertDescription>{t('noRecommendation')}</AlertDescription>
+                            <AlertTitle>All stock is sufficient!</AlertTitle>
+                            <AlertDescription>No order recommendations at this time based on your current stock and forecast.</AlertDescription>
                         </Alert>
                     )}
                 </div>
                 <Button onClick={() => setRecommendations(null)} variant="outline">
-                    <ArrowLeft className="mr-2" /> {t('recalculateButton')}
+                    <ArrowLeft className="mr-2" /> Recalculate
                 </Button>
             </div>
         );
@@ -152,10 +150,10 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
         <Form {...form}>
             <form onSubmit={form.handleSubmit(handleCalculate)} className="space-y-6">
                 <div className="space-y-2">
-                    <Label>{t('forecastDayLabel')}</Label>
+                    <Label>Select Day for Forecast</Label>
                     <Select onValueChange={(val) => setSelectedDay(Number(val))} defaultValue={String(selectedDay)}>
                         <SelectTrigger>
-                            <SelectValue placeholder={t('forecastDayPlaceholder')} />
+                            <SelectValue placeholder="Select a day" />
                         </SelectTrigger>
                         <SelectContent>
                             {daysOfWeek.map((day, index) => (
@@ -163,11 +161,11 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
                             ))}
                         </SelectContent>
                     </Select>
-                    <p className="text-sm text-muted-foreground">{t('forecastDayDescription')}</p>
+                    <p className="text-sm text-muted-foreground">The calculation will use the average of the last 4 saved usages for the selected day.</p>
                 </div>
 
                  <div className="max-h-[50vh] overflow-y-auto pr-4 space-y-4 border-t pt-4">
-                    <h3 className="text-lg font-medium">{t('stockLevelsTitle')}</h3>
+                    <h3 className="text-lg font-medium">Enter Current Stock Levels (Optional)</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                         {sortedInventory.map(item => {
                             const unitLabel = (item.orderUnit && item.orderUnitConversion) ? item.orderUnit : item.unit;
@@ -206,7 +204,7 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
                 <div className="flex justify-end pt-4 border-t">
                     <Button type="submit">
                         <Calculator className="mr-2"/>
-                        {t('calculateButton')}
+                        Calculate Recommendation
                     </Button>
                 </div>
             </form>

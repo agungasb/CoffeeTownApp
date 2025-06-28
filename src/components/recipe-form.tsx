@@ -4,7 +4,6 @@
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useTranslations } from 'next-intl';
 import type { Recipe } from '@/lib/recipes';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -32,8 +31,6 @@ interface RecipeFormProps {
 }
 
 export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps) {
-    const t = useTranslations('RecipeForm');
-    const tCommon = useTranslations('Common');
     const form = useForm<RecipeFormData>({
         resolver: zodResolver(recipeFormSchema),
         defaultValues: recipeToEdit ?? {
@@ -67,7 +64,7 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
                         name="name"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>{t('nameLabel')}</FormLabel>
+                                <FormLabel>Recipe Name</FormLabel>
                                 <FormControl>
                                     <Input placeholder="e.g. Chocolate Chip Cookies" {...field} />
                                 </FormControl>
@@ -77,7 +74,7 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
                     />
 
                     <div>
-                        <h3 className="text-lg font-medium mb-2">{t('ingredientsTitle')}</h3>
+                        <h3 className="text-lg font-medium mb-2">Ingredients</h3>
                         <div className="space-y-4">
                             {ingredientFields.map((field, index) => (
                                 <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto_auto] gap-4 md:gap-2 p-2 border rounded-md md:items-end">
@@ -86,7 +83,7 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
                                         name={`ingredients.${index}.name`}
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>{tCommon('name')}</FormLabel>
+                                                <FormLabel>Name</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="e.g. Flour" {...field} />
                                                 </FormControl>
@@ -99,7 +96,7 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
                                         name={`ingredients.${index}.amount`}
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>{tCommon('amount')}</FormLabel>
+                                                <FormLabel>Amount</FormLabel>
                                                 <FormControl>
                                                     <Input type="number" step="0.01" placeholder="e.g. 100" {...field} className="md:w-24"/>
                                                 </FormControl>
@@ -112,7 +109,7 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
                                         name={`ingredients.${index}.unit`}
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>{tCommon('unit')}</FormLabel>
+                                                <FormLabel>Unit</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="grams" {...field} className="md:w-24" />
                                                 </FormControl>
@@ -139,12 +136,12 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
                             onClick={() => appendIngredient({ name: '', amount: undefined as any, unit: '' })}
                             className="mt-2"
                         >
-                            <PlusCircle className="mr-2" /> {t('addIngredientButton')}
+                            <PlusCircle className="mr-2" /> Add Ingredient
                         </Button>
                     </div>
 
                      <div>
-                        <h3 className="text-lg font-medium mb-2">{t('instructionsTitle')}</h3>
+                        <h3 className="text-lg font-medium mb-2">Instructions</h3>
                         <div className="space-y-4">
                             {stepFields.map((field, index) => (
                                  <div key={field.id} className="flex items-start gap-2">
@@ -180,14 +177,14 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
                             onClick={() => appendStep('')}
                             className="mt-2"
                         >
-                            <PlusCircle className="mr-2" /> {t('addStepButton')}
+                            <PlusCircle className="mr-2" /> Add Step
                         </Button>
                     </div>
                 </div>
 
                 <div className="flex justify-end gap-2 pt-4 border-t">
-                    <Button type="button" variant="ghost" onClick={onCancel}>{t('cancelButton')}</Button>
-                    <Button type="submit" variant="success">{t('saveButton')}</Button>
+                    <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
+                    <Button type="submit" variant="success">Save Recipe</Button>
                 </div>
             </form>
         </Form>

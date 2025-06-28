@@ -4,7 +4,6 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -29,7 +28,6 @@ interface IngredientFormProps {
 }
 
 export function IngredientForm({ ingredientToEdit, onSubmit, onCancel }: IngredientFormProps) {
-    const t = useTranslations('IngredientForm');
     const form = useForm<z.infer<typeof ingredientFormSchema>>({
         resolver: zodResolver(ingredientFormSchema),
         defaultValues: ingredientToEdit ?? {
@@ -54,7 +52,7 @@ export function IngredientForm({ ingredientToEdit, onSubmit, onCancel }: Ingredi
                     name="name"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>{t('nameLabel')}</FormLabel>
+                            <FormLabel>Ingredient Name</FormLabel>
                             <FormControl>
                                 <Input placeholder="e.g. Tepung" {...field} disabled={!!ingredientToEdit} />
                             </FormControl>
@@ -68,7 +66,7 @@ export function IngredientForm({ ingredientToEdit, onSubmit, onCancel }: Ingredi
                         name="currentStock"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>{t('currentStockLabel')}</FormLabel>
+                                <FormLabel>Current Stock</FormLabel>
                                 <FormControl>
                                     <Input type="number" step="0.01" placeholder="e.g. 10000" {...field} />
                                 </FormControl>
@@ -81,7 +79,7 @@ export function IngredientForm({ ingredientToEdit, onSubmit, onCancel }: Ingredi
                         name="minimumStock"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>{t('minStockLabel')}</FormLabel>
+                                <FormLabel>Base Min. Stock</FormLabel>
                                 <FormControl>
                                     <Input type="number" step="0.01" placeholder="e.g. 5000" {...field} />
                                 </FormControl>
@@ -95,7 +93,7 @@ export function IngredientForm({ ingredientToEdit, onSubmit, onCancel }: Ingredi
                     name="unit"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>{t('unitLabel')}</FormLabel>
+                            <FormLabel>Base Unit</FormLabel>
                             <FormControl>
                                 <Input placeholder="e.g. g, pcs, ml" {...field} />
                             </FormControl>
@@ -105,15 +103,15 @@ export function IngredientForm({ ingredientToEdit, onSubmit, onCancel }: Ingredi
                 />
 
                 <div className="pt-4 mt-4 border-t">
-                    <h3 className="text-md font-medium mb-2">{t('orderUnitTitle')}</h3>
-                    <p className="text-sm text-muted-foreground mb-4">{t('orderUnitDescription')}</p>
+                    <h3 className="text-md font-medium mb-2">Order Unit Conversion (Optional)</h3>
+                    <p className="text-sm text-muted-foreground mb-4">Define a larger unit for easier ordering (e.g., order "1 sak" instead of "25000 g").</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <FormField
                             control={form.control}
                             name="orderUnit"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t('orderUnitNameLabel')}</FormLabel>
+                                    <FormLabel>Order Unit Name</FormLabel>
                                     <FormControl>
                                         <Input placeholder="e.g. sak, pack, dus" {...field} value={field.value ?? ''} />
                                     </FormControl>
@@ -126,7 +124,7 @@ export function IngredientForm({ ingredientToEdit, onSubmit, onCancel }: Ingredi
                             name="orderUnitConversion"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{t('orderUnitConversionLabel')}</FormLabel>
+                                    <FormLabel>Base Units per Order Unit</FormLabel>
                                     <FormControl>
                                         <Input type="number" placeholder="e.g. 25000" {...field} value={field.value ?? ''} />
                                     </FormControl>
@@ -139,8 +137,8 @@ export function IngredientForm({ ingredientToEdit, onSubmit, onCancel }: Ingredi
 
 
                 <div className="flex justify-end gap-2 pt-4 border-t">
-                    <Button type="button" variant="ghost" onClick={onCancel}>{t('cancelButton')}</Button>
-                    <Button type="submit" variant="success">{t('saveButton')}</Button>
+                    <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
+                    <Button type="submit" variant="success">Save Ingredient</Button>
                 </div>
             </form>
         </Form>

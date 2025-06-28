@@ -3,7 +3,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import {useTranslations} from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -31,7 +30,6 @@ import {
   History
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { LanguageToggle } from './language-toggle';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Label } from './ui/label';
 import { Slider } from './ui/slider';
@@ -74,26 +72,23 @@ export default function BakeryApp({
     initialDailyUsage,
     actions
 }: BakeryAppProps) {
-  const t = useTranslations('BakeryApp');
   const { toast } = useToast();
   const router = useRouter();
 
   const TABS = [
-    { id: 'calculator', label: t('tabCalculator'), icon: <Calculator /> },
-    { id: 'recipe', label: t('tabScaler'), icon: <Scaling /> },
-    { id: 'manager', label: t('tabRecipeManager'), icon: <BookHeart /> },
-    { id: 'product_management', label: t('tabProductManager'), icon: <Archive /> },
-    { id: 'inventory', label: t('tabInventoryManager'), icon: <Warehouse /> },
-    { id: 'daily_usage', label: t('tabUsageHistory'), icon: <History /> },
+    { id: 'calculator', label: 'Production Calculator', icon: <Calculator /> },
+    { id: 'recipe', label: 'Recipe Scaler', icon: <Scaling /> },
+    { id: 'manager', label: 'Recipe Management', icon: <BookHeart /> },
+    { id: 'product_management', label: 'Product Management', icon: <Archive /> },
+    { id: 'inventory', label: 'Inventory Management', icon: <Warehouse /> },
+    { id: 'daily_usage', label: 'Usage History', icon: <History /> },
   ];
 
   const [recipes, setRecipes] = useState(initialRecipes);
   const [products, setProducts] = useState(initialProducts);
   const [inventory, setInventory] = useState(initialInventory);
-  
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
-  
   const [blur, setBlur] = useState(16);
   const [opacity, setOpacity] = useState(40);
   const [activeTab, setActiveTab] = useState(TABS[0].id);
@@ -104,11 +99,13 @@ export default function BakeryApp({
   }, [blur, opacity]);
 
   useEffect(() => {
+    // This effect runs only on the client, after hydration
     const userIsLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     if (userIsLoggedIn) {
       setIsLoggedIn(true);
     }
   }, []);
+
 
   const handleLoginSuccess = () => {
     localStorage.setItem('isLoggedIn', 'true');
@@ -124,61 +121,61 @@ export default function BakeryApp({
     const addRecipeHandler = async (recipe: Omit<Recipe, 'id'>) => {
         setRecipes(prev => [...prev, { ...recipe, id: 'temp-id' }]); // Optimistic add
         await actions.addRecipe(recipe);
-        toast({ title: 'Success', description: t('addRecipeSuccess') });
+        toast({ title: 'Success', description: 'Recipe added successfully.' });
         router.refresh(); 
     };
 
     const updateRecipeHandler = async (recipe: Recipe) => {
         setRecipes(prev => prev.map(r => r.id === recipe.id ? recipe : r));
         await actions.updateRecipe(recipe);
-        toast({ title: 'Success', description: t('updateRecipeSuccess') });
+        toast({ title: 'Success', description: 'Recipe updated successfully.' });
         router.refresh(); 
     };
 
     const deleteRecipeHandler = async (recipeId: string) => {
         setRecipes(prev => prev.filter(r => r.id !== recipeId));
         await actions.deleteRecipe(recipeId);
-        toast({ title: 'Success', description: t('deleteRecipeSuccess') });
+        toast({ title: 'Success', description: 'Recipe deleted.' });
         router.refresh(); 
     };
     
     const updateProductsHandler = async (newProducts: ProductIngredients) => {
         setProducts(newProducts);
         await actions.updateProducts(newProducts);
-        toast({ title: 'Success', description: t('updateProductsSuccess') });
+        toast({ title: 'Success', description: 'Product list updated.' });
         router.refresh(); 
     };
     
     const addInventoryItemHandler = async (itemData: IngredientFormData) => {
         setInventory(prev => [...prev, { ...itemData, id: 'temp-id' } as InventoryItem]); // Optimistic add
         await actions.addInventoryItem(itemData);
-        toast({ title: 'Success', description: t('addIngredientSuccess') });
+        toast({ title: 'Success', description: 'Ingredient added.' });
         router.refresh(); 
     };
 
     const updateInventoryItemHandler = async (item: InventoryItem) => {
         setInventory(prev => prev.map(i => i.id === item.id ? item : i));
         await actions.updateInventoryItem(item);
-        toast({ title: 'Success', description: t('updateIngredientSuccess') });
+        toast({ title: 'Success', description: 'Ingredient updated.' });
         router.refresh();
     };
 
     const deleteInventoryItemHandler = async (itemId: string) => {
         setInventory(prev => prev.filter(i => i.id !== itemId));
         await actions.deleteInventoryItem(itemId);
-        toast({ title: 'Success', description: t('deleteIngredientSuccess') });
+        toast({ title: 'Success', description: 'Ingredient deleted.' });
         router.refresh();
     };
     
     const addDailyUsageRecordHandler = async (record: Omit<DailyUsageRecord, 'id' | 'date'>) => {
         await actions.addDailyUsageRecord(record);
-        toast({ title: 'Success', description: t('saveUsageSuccess') });
+        toast({ title: 'Success', description: 'Daily usage saved.' });
         router.refresh(); 
     };
 
     const resetDailyUsageHandler = async () => {
         await actions.resetDailyUsage();
-        toast({ title: 'Success', description: t('resetUsageSuccess') });
+        toast({ title: 'Success', description: 'All historical usage data has been deleted.' });
         router.refresh();
     };
 
@@ -189,30 +186,30 @@ export default function BakeryApp({
         <header className="fixed top-0 left-0 w-full p-2 md:p-4 z-20 glassmorphic flex justify-between items-center">
             <div>
                  <h1 className="font-headline text-2xl md:text-3xl text-primary-foreground" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
-                    {t('title')}
+                    Coffee Town Bakery
                 </h1>
                 <p className="hidden md:block text-sm text-foreground/90 italic" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
-                    {t('subtitle')}
+                    Not What You Want, But Surely What You Need
                 </p>
             </div>
              <div className="flex items-center gap-2">
                 <Popover>
                     <PopoverTrigger asChild>
-                        <Button variant="ghost" size="icon" className="text-foreground hover:text-foreground/80 hover:bg-foreground/10" title={t('settingsAdjust')}>
+                        <Button variant="ghost" size="icon" className="text-foreground hover:text-foreground/80 hover:bg-foreground/10" title="Adjust visual settings">
                             <Settings className="h-5 w-5 md:h-6 md:w-6" />
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-80 glassmorphic">
                         <div className="grid gap-4">
                             <div className="space-y-2">
-                                <h4 className="font-medium leading-none">{t('settingsTitle')}</h4>
+                                <h4 className="font-medium leading-none">Visual Settings</h4>
                                 <p className="text-sm text-muted-foreground">
-                                    {t('settingsDescription')}
+                                    Adjust the glass effect for all panels.
                                 </p>
                             </div>
                             <div className="grid gap-4">
                                 <div className="grid grid-cols-3 items-center gap-4">
-                                    <Label htmlFor="blur" className="text-sm">{t('blurLabel')}</Label>
+                                    <Label htmlFor="blur" className="text-sm">Blur</Label>
                                     <Slider
                                         id="blur"
                                         value={[blur]}
@@ -223,7 +220,7 @@ export default function BakeryApp({
                                     />
                                 </div>
                                 <div className="grid grid-cols-3 items-center gap-4">
-                                    <Label htmlFor="opacity" className="text-sm">{t('opacityLabel')}</Label>
+                                    <Label htmlFor="opacity" className="text-sm">Opacity</Label>
                                     <Slider
                                         id="opacity"
                                         value={[opacity]}
@@ -237,14 +234,13 @@ export default function BakeryApp({
                         </div>
                     </PopoverContent>
                 </Popover>
-                <LanguageToggle />
                 <ThemeToggle />
                 {isLoggedIn ? (
                     <Button
                         variant="ghost"
                         className="text-foreground hover:text-foreground/80 hover:bg-foreground/10"
                         onClick={handleLogout}
-                        title={t('logoutButton')}
+                        title="Logout"
                     >
                         <LogOut className="h-5 w-5 md:h-6 md:w-6" />
                     </Button>
@@ -253,7 +249,7 @@ export default function BakeryApp({
                         variant="ghost"
                         className="text-foreground hover:text-foreground/80 hover:bg-foreground/10"
                         onClick={() => setIsLoginDialogOpen(true)}
-                        title={t('loginButton')}
+                        title="Login"
                     >
                         <LogIn className="h-5 w-5 md:h-6 md:w-6" />
                     </Button>
@@ -331,7 +327,7 @@ export default function BakeryApp({
       <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
         <DialogContent className="sm:max-w-md glassmorphic">
           <DialogHeader>
-            <DialogTitle>{t('loginDialogTitle')}</DialogTitle>
+            <DialogTitle>Login</DialogTitle>
           </DialogHeader>
           <LoginForm
             onLoginSuccess={handleLoginSuccess}

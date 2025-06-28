@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
 import { type Recipe } from '@/lib/recipes';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,8 +23,6 @@ interface RecipeManagerProps {
 }
 
 export default function RecipeManager({ recipes, addRecipe, updateRecipe, deleteRecipe, isLoggedIn }: RecipeManagerProps) {
-    const t = useTranslations('RecipeManager');
-    const tCommon = useTranslations('Common');
     const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
     const [recipeToEdit, setRecipeToEdit] = useState<Recipe | null>(null);
 
@@ -56,21 +53,21 @@ export default function RecipeManager({ recipes, addRecipe, updateRecipe, delete
     return (
         <Card className="w-full max-w-6xl mx-auto glassmorphic">
             <CardHeader className="flex flex-row items-center justify-between gap-4">
-                <CardTitle>{t('title')}</CardTitle>
+                <CardTitle>Recipe Management</CardTitle>
                  <Button onClick={handleAddClick} disabled={!isLoggedIn} variant="success">
-                    <PlusCircle className="mr-2" /> {t('addNewButton')}
+                    <PlusCircle className="mr-2" /> Add New Recipe
                 </Button>
             </CardHeader>
             <CardContent>
                 <div className="flex items-center gap-2 mb-4 text-foreground">
                     <BookHeart className="h-6 w-6 text-muted-foreground" />
-                    <h3 className="text-xl font-semibold">{t('existingRecipesTitle', {count: recipes.length})}</h3>
+                    <h3 className="text-xl font-semibold">Existing Recipes ({recipes.length})</h3>
                 </div>
                 {!isLoggedIn && (
                      <Alert variant="destructive" className="mb-4 bg-destructive/20 border-destructive/50">
                         <ShieldAlert className="h-4 w-4" />
-                        <AlertTitle>{t('loginRequiredTitle')}</AlertTitle>
-                        <AlertDescription>{t('loginRequiredDescription')}</AlertDescription>
+                        <AlertTitle>Login Required</AlertTitle>
+                        <AlertDescription>Please log in to add, edit, or delete recipes.</AlertDescription>
                     </Alert>
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -83,17 +80,17 @@ export default function RecipeManager({ recipes, addRecipe, updateRecipe, delete
                              <CardContent className="flex-grow pb-0">
                                 <Accordion type="single" collapsible className="w-full">
                                     <AccordionItem value={recipe.id} className="border-b-0">
-                                        <AccordionTrigger className="py-2 hover:no-underline">{t('viewDetails')}</AccordionTrigger>
+                                        <AccordionTrigger className="py-2 hover:no-underline">View Details</AccordionTrigger>
                                         <AccordionContent>
                                             <div className="space-y-4">
                                                 <div>
-                                                    <h4 className="font-semibold mb-2">{t('ingredientsHeader')}</h4>
+                                                    <h4 className="font-semibold mb-2">Ingredients</h4>
                                                     <Table>
                                                         <TableHeader>
                                                             <TableRow>
-                                                            <TableHead className="p-2 h-auto">{tCommon('name')}</TableHead>
-                                                            <TableHead className="p-2 h-auto text-right">{tCommon('amount')}</TableHead>
-                                                            <TableHead className="p-2 h-auto">{tCommon('unit')}</TableHead>
+                                                            <TableHead className="p-2 h-auto">Name</TableHead>
+                                                            <TableHead className="p-2 h-auto text-right">Amount</TableHead>
+                                                            <TableHead className="p-2 h-auto">Unit</TableHead>
                                                             </TableRow>
                                                         </TableHeader>
                                                         <TableBody>
@@ -108,7 +105,7 @@ export default function RecipeManager({ recipes, addRecipe, updateRecipe, delete
                                                     </Table>
                                                 </div>
                                                 <div>
-                                                    <h4 className="font-semibold mb-2">{t('stepsHeader')}</h4>
+                                                    <h4 className="font-semibold mb-2">Steps</h4>
                                                     <ol className="list-decimal list-inside space-y-2 text-sm">
                                                         {recipe.steps.map((step, index) => (
                                                             <li key={index}>{step}</li>
@@ -122,25 +119,25 @@ export default function RecipeManager({ recipes, addRecipe, updateRecipe, delete
                             </CardContent>
                             <CardFooter className="mt-auto flex justify-end gap-2 pt-4">
                                 <Button variant="info" size="sm" onClick={() => handleEditClick(recipe)} disabled={!isLoggedIn}>
-                                    <Edit className="mr-2 h-4 w-4" /> {t('editButton')}
+                                    <Edit className="mr-2 h-4 w-4" /> Edit
                                 </Button>
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild disabled={!isLoggedIn}>
                                          <Button variant="destructive" size="sm" disabled={!isLoggedIn}>
-                                            <Trash2 className="mr-2 h-4 w-4" /> {t('deleteButton')}
+                                            <Trash2 className="mr-2 h-4 w-4" /> Delete
                                         </Button>
                                     </AlertDialogTrigger>
                                     <AlertDialogContent className="glassmorphic">
                                         <AlertDialogHeader>
-                                            <AlertDialogTitle>{t('deleteDialogTitle')}</AlertDialogTitle>
+                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                                             <AlertDialogDescription>
-                                                {t('deleteDialogDescription', {recipeName: capitalize(recipe.name)})}
+                                                This action cannot be undone. This will permanently delete the recipe "{capitalize(recipe.name)}".
                                             </AlertDialogDescription>
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
-                                            <AlertDialogCancel>{tCommon('cancel')}</AlertDialogCancel>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
                                             <AlertDialogAction onClick={() => handleDelete(recipe.id)} className="bg-destructive hover:bg-destructive/90">
-                                                {tCommon('delete')}
+                                                Delete
                                             </AlertDialogAction>
                                         </AlertDialogFooter>
                                     </AlertDialogContent>
@@ -153,7 +150,7 @@ export default function RecipeManager({ recipes, addRecipe, updateRecipe, delete
                 <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
                     <DialogContent className="md:max-w-[700px] max-h-[90vh] flex flex-col p-0 glassmorphic">
                         <DialogHeader className="p-6 pb-0">
-                            <DialogTitle>{recipeToEdit ? t('formDialogTitleEdit') : t('formDialogTitleAdd')}</DialogTitle>
+                            <DialogTitle>{recipeToEdit ? "Edit Recipe" : "Add New Recipe"}</DialogTitle>
                         </DialogHeader>
                         <div className="flex-grow overflow-y-auto px-6">
                            <RecipeForm

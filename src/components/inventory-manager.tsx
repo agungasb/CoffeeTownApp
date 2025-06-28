@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import type { DailyUsageRecord } from '@/components/bakery-app';
 import type { InventoryItem } from '@/lib/inventoryData';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,7 @@ interface InventoryManagerProps {
 }
 
 export default function InventoryManager({ inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, dailyUsageRecords, resetDailyUsage, isLoggedIn }: InventoryManagerProps) {
+    const t = useTranslations('InventoryManager');
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isOrderOpen, setIsOrderOpen] = useState(false);
     const [itemToEdit, setItemToEdit] = useState<InventoryItem | null>(null);
@@ -66,12 +68,12 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
     const getStatus = (item: InventoryItem): { text: string, variant: "default" | "secondary" | "destructive" } => {
         const usage = averageUsageToday.find(u => u.name.toLowerCase() === item.name.toLowerCase())?.amount || 0;
         if (item.currentStock < item.minimumStock) {
-            return { text: "Critical", variant: "destructive" };
+            return { text: t('statusCritical'), variant: "destructive" };
         }
         if (item.currentStock < item.minimumStock + usage) {
-            return { text: "Low", variant: "secondary" };
+            return { text: t('statusLow'), variant: "secondary" };
         }
-        return { text: "In Stock", variant: "default" };
+        return { text: t('statusInStock'), variant: "default" };
     }
 
     const handleResetUsage = async () => {
@@ -82,32 +84,29 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
         <>
             <Card className="w-full max-w-7xl mx-auto glassmorphic">
                 <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                    <CardTitle>Inventory Management</CardTitle>
+                    <CardTitle>{t('title')}</CardTitle>
                     <div className="flex flex-wrap gap-2">
                         <Button onClick={handleAddClick} disabled={!isLoggedIn} size="sm" variant="success">
-                            <PlusCircle className="mr-2" /> Add New Ingredient
+                            <PlusCircle className="mr-2" /> {t('addNewButton')}
                         </Button>
                         <Button onClick={() => setIsOrderOpen(true)} variant="secondary" size="sm">
-                            <Package className="mr-2" /> Order
+                            <Package className="mr-2" /> {t('orderButton')}
                         </Button>
                          <AlertDialog>
                             <AlertDialogTrigger asChild>
                                 <Button variant="destructive" size="sm" disabled={!isLoggedIn}>
-                                    <Trash2 className="mr-2" /> Reset Usage Data
+                                    <Trash2 className="mr-2" /> {t('resetUsageButton')}
                                 </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent className="glassmorphic">
                                 <AlertDialogHeader>
-                                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        This action cannot be undone. This will permanently delete all
-                                        historical daily usage records. This data is used for the Order Recommendation Calculator.
-                                    </AlertDialogDescription>
+                                    <AlertDialogTitle>{t('resetDialogTitle')}</AlertDialogTitle>
+                                    <AlertDialogDescription>{t('resetDialogDescription')}</AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                                     <AlertDialogAction onClick={handleResetUsage} className="bg-destructive hover:bg-destructive/90">
-                                        Yes, delete all usage data
+                                        {t('resetDialogConfirm')}
                                     </AlertDialogAction>
                                 </AlertDialogFooter>
                             </AlertDialogContent>
@@ -117,26 +116,24 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
                 <CardContent>
                     <div className="flex items-center gap-2 mb-4 text-foreground">
                         <Warehouse className="h-6 w-6 text-muted-foreground" />
-                        <h3 className="text-xl font-semibold">Ingredient Stock ({inventory.length})</h3>
+                        <h3 className="text-xl font-semibold">{t('stockTitle', {count: inventory.length})}</h3>
                     </div>
                     {!isLoggedIn && (
                         <Alert variant="destructive" className="mb-4 bg-destructive/20 border-destructive/50">
                             <ShieldAlert className="h-4 w-4" />
-                            <AlertTitle>Login Required</AlertTitle>
-                            <AlertDescription>
-                                Please log in to manage inventory.
-                            </AlertDescription>
+                            <AlertTitle>{t('loginRequiredTitle')}</AlertTitle>
+                            <AlertDescription>{t('loginRequiredDescription')}</AlertDescription>
                         </Alert>
                     )}
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Ingredient</TableHead>
-                                <TableHead>Current Stock</TableHead>
-                                <TableHead>Min. Stock</TableHead>
-                                <TableHead>Avg. Daily Usage</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
+                                <TableHead>{t('ingredientHeader')}</TableHead>
+                                <TableHead>{t('currentStockHeader')}</TableHead>
+                                <TableHead>{t('minStockHeader')}</TableHead>
+                                <TableHead>{t('avgUsageHeader')}</TableHead>
+                                <TableHead>{t('statusHeader')}</TableHead>
+                                <TableHead className="text-right">{t('actionsHeader')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -151,26 +148,26 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
                                     <TableCell>{usage ? `${usage.amount.toFixed(2)} ${usage.unit}` : 'N/A'}</TableCell>
                                     <TableCell><Badge variant={status.variant}>{status.text}</Badge></TableCell>
                                     <TableCell className="text-right">
-                                        <Button variant="info" size="icon" onClick={() => handleEditClick(item)} disabled={!isLoggedIn}>
+                                        <Button variant="info" size="icon" onClick={() => handleEditClick(item)} disabled={!isLoggedIn} title={t('editButton')}>
                                             <Edit className="h-4 w-4" />
                                         </Button>
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
-                                                <Button variant="destructive" size="icon" disabled={!isLoggedIn}>
+                                                <Button variant="destructive" size="icon" disabled={!isLoggedIn} title={t('deleteButton')}>
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>
                                             </AlertDialogTrigger>
                                             <AlertDialogContent className="glassmorphic">
                                                 <AlertDialogHeader>
-                                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                    <AlertDialogTitle>{t('deleteDialogTitle')}</AlertDialogTitle>
                                                     <AlertDialogDescription>
-                                                        This will permanently delete the ingredient "{capitalize(item.name)}".
+                                                        {t('deleteDialogDescription', {name: capitalize(item.name)})}
                                                     </AlertDialogDescription>
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
                                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                                                     <AlertDialogAction onClick={() => handleDelete(item.id)} className="bg-destructive hover:bg-destructive/90">
-                                                        Delete
+                                                        {t('deleteButton')}
                                                     </AlertDialogAction>
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
@@ -186,7 +183,7 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
             <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
                 <DialogContent className="sm:max-w-md glassmorphic">
                     <DialogHeader>
-                        <DialogTitle>{itemToEdit ? 'Edit Ingredient' : 'Add New Ingredient'}</DialogTitle>
+                        <DialogTitle>{itemToEdit ? t('formDialogTitleEdit') : t('formDialogTitleAdd')}</DialogTitle>
                     </DialogHeader>
                     <IngredientForm 
                         ingredientToEdit={itemToEdit}
@@ -199,7 +196,7 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
             <Dialog open={isOrderOpen} onOpenChange={setIsOrderOpen}>
                 <DialogContent className="max-w-3xl glassmorphic">
                     <DialogHeader>
-                        <DialogTitle>Order Recommendation Calculator</DialogTitle>
+                        <DialogTitle>{t('orderDialogTitle')}</DialogTitle>
                     </DialogHeader>
                     {dailyUsageRecords.length > 0 ? (
                         <OrderCalculator 
@@ -209,10 +206,8 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
                     ) : (
                         <Alert className="mt-4 bg-muted/30 border-border/50">
                             <Info className="h-4 w-4" />
-                            <AlertTitle>No Usage Data Found</AlertTitle>
-                            <AlertDescription>
-                                To use the order calculator, go to the <strong>Production Calculator</strong> tab, enter production quantities, calculate the results, and then "Save as Daily Usage". You need at least one saved record to generate recommendations.
-                            </AlertDescription>
+                            <AlertTitle>{t('orderDialogNoDataTitle')}</AlertTitle>
+                            <AlertDescription dangerouslySetInnerHTML={{__html: t('orderDialogNoDataDescription')}} />
                         </Alert>
                     )}
                 </DialogContent>

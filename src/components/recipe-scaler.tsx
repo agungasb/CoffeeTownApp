@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Label } from "@/components/ui/label";
 import { type Recipe } from "@/lib/recipes";
 import { BookOpen, ChefHat } from 'lucide-react';
+import { capitalize } from '@/lib/utils';
 
 interface ScaledIngredient {
     name: string;
@@ -22,6 +24,7 @@ interface RecipeScalerProps {
 }
 
 export default function RecipeScaler({ recipes }: RecipeScalerProps) {
+    const t = useTranslations('RecipeScaler');
     const [selectedRecipeId, setSelectedRecipeId] = useState<string>('');
     const [multiplier, setMultiplier] = useState<string>('');
     const [scaledIngredients, setScaledIngredients] = useState<ScaledIngredient[]>([]);
@@ -59,29 +62,29 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
     return (
         <Card className="w-full max-w-4xl mx-auto glassmorphic">
             <CardHeader>
-                <CardTitle>Recipe Scaler</CardTitle>
-                <CardDescription>Choose a recipe and enter a multiplier to scale the ingredients.</CardDescription>
+                <CardTitle>{t('title')}</CardTitle>
+                <CardDescription>{t('description')}</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="grid md:grid-cols-3 gap-6 items-start">
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="recipes">Choose a recipe</Label>
+                            <Label htmlFor="recipes">{t('chooseRecipeLabel')}</Label>
                             <Select onValueChange={handleSelectRecipe} value={selectedRecipeId}>
                                 <SelectTrigger id="recipes">
-                                    <SelectValue placeholder="Select a recipe" />
+                                    <SelectValue placeholder={t('chooseRecipePlaceholder')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {recipes.map(recipe => (
                                         <SelectItem key={recipe.id} value={recipe.id}>
-                                            {recipe.name}
+                                            {capitalize(recipe.name)}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
                         </div>
                         <div className="space-y-2">
-                             <Label htmlFor="multiplier">Enter multiplier</Label>
+                             <Label htmlFor="multiplier">{t('enterMultiplierLabel')}</Label>
                              <Input 
                                 id="multiplier"
                                 type="number" 
@@ -92,7 +95,7 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
                                 placeholder="e.g. 1.5"
                              />
                         </div>
-                        <Button onClick={handleScaleRecipe} className="w-full">Scale Recipe</Button>
+                        <Button onClick={handleScaleRecipe} className="w-full">{t('scaleButton')}</Button>
                     </div>
 
                     <div className="md:col-span-2">
@@ -100,7 +103,7 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
                            <div className='space-y-8'>
                                <div>
                                     <h3 className="font-semibold text-xl md:text-2xl mb-4 flex items-center gap-2">
-                                        <ChefHat /> Scaled Ingredients: {recipeTitle}
+                                        <ChefHat /> {t('resultsTitle', {recipeName: capitalize(recipeTitle)})}
                                     </h3>
                                     <Table>
                                         <TableHeader>
@@ -113,7 +116,7 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
                                         <TableBody>
                                             {scaledIngredients.map((ing) => (
                                                 <TableRow key={ing.name}>
-                                                    <TableCell className="font-medium">{ing.name}</TableCell>
+                                                    <TableCell className="font-medium">{capitalize(ing.name)}</TableCell>
                                                     <TableCell className="text-right">{ing.amount}</TableCell>
                                                     <TableCell>{ing.unit}</TableCell>
                                                 </TableRow>
@@ -123,7 +126,7 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
                                </div>
                                <div>
                                     <h3 className="font-semibold text-xl md:text-2xl mb-4 flex items-center gap-2">
-                                        <BookOpen /> Instructions
+                                        <BookOpen /> {t('instructionsTitle')}
                                     </h3>
                                     <ol className="list-decimal list-inside space-y-2 text-sm text-foreground/90 bg-muted/30 p-4 rounded-md">
                                         {recipeSteps.map((step, index) => (
@@ -134,7 +137,7 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
                            </div>
                         ) : (
                             <div className="flex items-center justify-center h-full min-h-[40vh] text-muted-foreground italic border-2 border-dashed rounded-lg">
-                                Select a recipe and click 'Scale' to see results.
+                                {t('prompt')}
                             </div>
                         )}
                     </div>

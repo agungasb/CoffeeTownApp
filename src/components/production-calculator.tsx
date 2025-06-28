@@ -4,6 +4,7 @@
 import { useState, useTransition, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { UploadCloud, Loader2, Calculator, ShoppingBasket, Save } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,7 @@ interface ProductionCalculatorProps {
 export default function ProductionCalculator({ products, addDailyUsageRecord, isLoggedIn }: ProductionCalculatorProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+  const t = useTranslations('ProductionCalculator');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [results, setResults] = useState(initialMetrics);
   const [hasCalculated, setHasCalculated] = useState(false);
@@ -49,7 +51,7 @@ export default function ProductionCalculator({ products, addDailyUsageRecord, is
     const newResults = calculateProductionMetrics(data as ProductionInputs, products);
     setResults(newResults);
     setHasCalculated(true);
-    toast({ title: "Success", description: "Calculations complete." });
+    toast({ title: "Success", description: t('calculationSuccess') });
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,10 +63,10 @@ export default function ProductionCalculator({ products, addDailyUsageRecord, is
       const photoDataUri = e.target?.result as string;
       if (photoDataUri) {
         startTransition(async () => {
-          toast({ title: "Processing...", description: "AI is analyzing your image." });
+          toast({ title: "Processing...", description: t('ocrProcessing') });
           const { data, error } = await getQuantitiesFromImage(photoDataUri);
           if (error) {
-            toast({ variant: "destructive", title: "OCR Failed", description: error });
+            toast({ variant: "destructive", title: t('ocrFailed'), description: error });
           } else if (data) {
             let filledCount = 0;
             form.reset();
@@ -75,7 +77,7 @@ export default function ProductionCalculator({ products, addDailyUsageRecord, is
               }
             }
             setHasCalculated(false); 
-            toast({ title: "Success", description: `Auto-filled ${filledCount} items. Press Calculate to see results.` });
+            toast({ title: "Success", description: t('ocrSuccess', {count: filledCount}) });
           }
         });
       }
@@ -89,7 +91,7 @@ export default function ProductionCalculator({ products, addDailyUsageRecord, is
         toast({
             variant: "destructive",
             title: "No Data",
-            description: "Calculate a production first to save the usage summary.",
+            description: t('noDataToSave'),
         });
         return;
     }
@@ -114,7 +116,7 @@ export default function ProductionCalculator({ products, addDailyUsageRecord, is
         <div className="flex flex-col gap-6">
           
           <div className="p-4 bg-muted/50 rounded-lg">
-            <label className="block mb-2 text-center text-foreground font-medium">Upload Screenshot for Auto-Fill</label>
+            <label className="block mb-2 text-center text-foreground font-medium">{t('uploadLabel')}</label>
              <input
                 type="file"
                 accept="image/*"
@@ -129,7 +131,7 @@ export default function ProductionCalculator({ products, addDailyUsageRecord, is
               className="w-full hover:scale-105 transition-all text-base font-medium"
             >
               {isPending ? <Loader2 className="animate-spin" /> : <UploadCloud />}
-              {isPending ? 'Analyzing...' : 'Upload & Map Quantities'}
+              {isPending ? t('analyzingButton') : t('uploadButton')}
             </Button>
           </div>
 
@@ -164,7 +166,7 @@ export default function ProductionCalculator({ products, addDailyUsageRecord, is
                 </div>
                 <Button type="submit" className="w-full mt-4 hover:scale-105 transition-all text-base font-medium p-6">
                     <Calculator className="mr-2"/>
-                    CALCULATE
+                    {t('calculateButton')}
                 </Button>
               </form>
             </Form>
@@ -174,14 +176,14 @@ export default function ProductionCalculator({ products, addDailyUsageRecord, is
             <Accordion type="multiple" defaultValue={['results', 'summary']} className="w-full space-y-4">
                 <AccordionItem value="results" className="bg-background/70 border-none rounded-lg">
                     <AccordionTrigger className="p-4 hover:no-underline text-foreground font-semibold text-lg">
-                        <h3 className="flex items-center gap-2"><Calculator /> Calculation Results</h3>
+                        <h3 className="flex items-center gap-2"><Calculator /> {t('resultsTitle')}</h3>
                     </AccordionTrigger>
                     <AccordionContent className="p-4 pt-0">
                       <Table>
                         <TableHeader>
                           <TableRow className="border-border">
-                            <TableHead className="font-semibold text-foreground">Metric</TableHead>
-                            <TableHead className="text-right font-semibold text-foreground">Result</TableHead>
+                            <TableHead className="font-semibold text-foreground">{t('metricHeader')}</TableHead>
+                            <TableHead className="text-right font-semibold text-foreground">{t('resultHeader')}</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -198,14 +200,14 @@ export default function ProductionCalculator({ products, addDailyUsageRecord, is
 
                 <AccordionItem value="summary" className="bg-background/70 border-none rounded-lg">
                     <AccordionTrigger className="p-4 hover:no-underline text-foreground font-semibold text-lg">
-                         <h3 className="flex items-center gap-2"><ShoppingBasket /> Ingredient Summary</h3>
+                         <h3 className="flex items-center gap-2"><ShoppingBasket /> {t('summaryTitle')}</h3>
                     </AccordionTrigger>
                     <AccordionContent className="p-4 pt-0">
                       <Table>
                           <TableHeader>
                           <TableRow className="border-border">
-                              <TableHead className="font-semibold text-foreground">Ingredient</TableHead>
-                              <TableHead className="text-right font-semibold text-foreground">Total Amount</TableHead>
+                              <TableHead className="font-semibold text-foreground">{t('ingredientHeader')}</TableHead>
+                              <TableHead className="text-right font-semibold text-foreground">{t('amountHeader')}</TableHead>
                           </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -219,7 +221,7 @@ export default function ProductionCalculator({ products, addDailyUsageRecord, is
                           ) : (
                               <TableRow>
                                   <TableCell colSpan={2} className="text-center h-24 text-muted-foreground italic">
-                                      No ingredients for the entered quantities.
+                                      {t('noIngredients')}
                                   </TableCell>
                               </TableRow>
                           )}
@@ -228,7 +230,7 @@ export default function ProductionCalculator({ products, addDailyUsageRecord, is
                        <div className="flex justify-end mt-4">
                           <Button onClick={handleSaveUsage} variant="success" disabled={!isLoggedIn}>
                               <Save className="mr-2 h-4 w-4" />
-                              Save as Daily Usage
+                              {t('saveUsageButton')}
                           </Button>
                       </div>
                     </AccordionContent>
@@ -236,7 +238,7 @@ export default function ProductionCalculator({ products, addDailyUsageRecord, is
             </Accordion>
           ) : (
             <div className="text-center text-muted-foreground italic py-8 border-2 border-dashed border-border rounded-lg">
-              <p>Click "Calculate" to see the results.</p>
+              <p>{t('prompt')}</p>
             </div>
           )}
         </div>

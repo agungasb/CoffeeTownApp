@@ -3,6 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -21,6 +22,7 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ onLoginSuccess, onCancel }: LoginFormProps) {
+    const t = useTranslations('LoginForm');
     const { toast } = useToast();
     const form = useForm<LoginFormData>({
         resolver: zodResolver(loginFormSchema),
@@ -34,12 +36,12 @@ export default function LoginForm({ onLoginSuccess, onCancel }: LoginFormProps) 
         // Prototype login check
         if (data.username === 'agung' && data.password === 'freepalestine') {
             onLoginSuccess();
-            toast({ title: 'Success', description: 'Logged in successfully.' });
+            toast({ title: 'Success', description: t('loginSuccess') });
         } else {
             toast({
                 variant: 'destructive',
-                title: 'Login Failed',
-                description: 'Invalid username or password.',
+                title: t('loginFailed'),
+                description: t('loginFailedDescription'),
             });
         }
     };
@@ -52,7 +54,7 @@ export default function LoginForm({ onLoginSuccess, onCancel }: LoginFormProps) 
                     name="username"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Username</FormLabel>
+                            <FormLabel>{t('usernameLabel')}</FormLabel>
                             <FormControl>
                                 <Input placeholder="admin" {...field} />
                             </FormControl>
@@ -65,7 +67,7 @@ export default function LoginForm({ onLoginSuccess, onCancel }: LoginFormProps) 
                     name="password"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Password</FormLabel>
+                            <FormLabel>{t('passwordLabel')}</FormLabel>
                             <FormControl>
                                 <Input type="password" placeholder="password" {...field} />
                             </FormControl>
@@ -74,8 +76,8 @@ export default function LoginForm({ onLoginSuccess, onCancel }: LoginFormProps) 
                     )}
                 />
                 <div className="flex justify-end gap-2">
-                    <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
-                    <Button type="submit">Login</Button>
+                    <Button type="button" variant="ghost" onClick={onCancel}>{t('cancelButton')}</Button>
+                    <Button type="submit">{t('loginButton')}</Button>
                 </div>
             </form>
         </Form>

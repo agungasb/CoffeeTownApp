@@ -170,12 +170,6 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
                         {sortedInventory.map(item => {
                             const unitLabel = (item.orderUnit && item.orderUnitConversion) ? item.orderUnit : item.unit;
                             
-                            const stockInDisplayUnit = (item.orderUnit && item.orderUnitConversion)
-                                ? (item.currentStock / item.orderUnitConversion)
-                                : item.currentStock;
-                            
-                            const hintValue = Number(stockInDisplayUnit.toFixed(2));
-
                             return (
                                 <FormField
                                     key={item.id}
@@ -190,7 +184,7 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
                                                 <Input
                                                     type="number"
                                                     step="any"
-                                                    placeholder={`Hint: ${hintValue}`}
+                                                    placeholder="0"
                                                     className="w-32 text-right"
                                                     {...field}
                                                     onChange={e => field.onChange(e.target.value === '' ? '' : parseFloat(e.target.value))}

@@ -47,35 +47,37 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
     }, [inventory]);
 
     const defaultValues = useMemo(() => sortedInventory.reduce((acc, item) => {
-        if (item.orderUnit && item.orderUnitConversion) {
-            acc[item.id] = (item.currentStock / item.orderUnitConversion) || '';
-        } else {
-            acc[item.id] = item.currentStock || '';
-        }
+        acc[item.id] = ''; // Initialize all fields as empty
         return acc;
     }, {} as FormValues), [sortedInventory]);
 
     const form = useForm<FormValues>({ defaultValues });
 
-    // The useEffect that called form.reset() was removed.
-    // It was the source of the bug, causing the form to reset on every re-render
-    // and overwriting any user input. The form now correctly initializes
-    // with `defaultValues` when it mounts and maintains its own state after that.
-
     const handleCalculate = (data: FormValues) => {
         const newRecommendations: OrderRecommendation[] = [];
 
         inventory.forEach(item => {
-            const stockInput = Number(data[item.id]) || 0;
-            const currentStock = (item.orderUnit && item.orderUnitConversion) 
-                ? stockInput * item.orderUnitConversion
-                : stockInput;
-                
+            const stockInputValue = data[item.id];
+            const hasUserInput = stockInputValue !== '' && stockInputValue !== undefined;
+
+            // Use user input if provided, otherwise fall back to actual inventory stock.
+            // The value is in "display units" (e.g., 'sak' or 'g').
+            const stockInDisplayUnits = hasUserInput
+                ? Number(stockInputValue)
+                : (item.orderUnit && item.orderUnitConversion)
+                    ? item.currentStock / item.orderUnitConversion
+                    : item.currentStock;
+            
+            // Convert the stock to the base unit (e.g., 'g') for calculation.
+            const currentStockInBaseUnit = (item.orderUnit && item.orderUnitConversion)
+                ? stockInDisplayUnits * item.orderUnitConversion
+                : stockInDisplayUnits;
+
             const usageAmount = averageUsage.find(u => u.name.toLowerCase() === item.name.toLowerCase())?.amount || 0;
-            const stockAfterUsage = currentStock - usageAmount;
+            const stockAfterUsage = currentStockInBaseUnit - usageAmount;
 
             if (stockAfterUsage < item.minimumStock) {
-                const amountToOrder = Math.ceil((item.minimumStock + usageAmount) - currentStock);
+                const amountToOrder = Math.ceil((item.minimumStock + usageAmount) - currentStockInBaseUnit);
                 if (amountToOrder > 0) {
                      if (item.orderUnit && item.orderUnitConversion && item.orderUnitConversion > 0) {
                         const convertedAmount = amountToOrder / item.orderUnitConversion;
@@ -166,10 +168,17 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
                 </div>
 
                  <div className="max-h-[50vh] overflow-y-auto pr-4 space-y-4 border-t pt-4">
-                    <h3 className="text-lg font-medium">Enter Current Stock Levels</h3>
+                    <h3 className="text-lg font-medium">Enter Current Stock Levels (Optional)</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                         {sortedInventory.map(item => {
                             const unitLabel = (item.orderUnit && item.orderUnitConversion) ? item.orderUnit : item.unit;
+                            
+                            const stockInDisplayUnit = (item.orderUnit && item.orderUnitConversion)
+                                ? (item.currentStock / item.orderUnitConversion)
+                                : item.currentStock;
+                            
+                            const hintValue = Number(stockInDisplayUnit.toFixed(2));
+
                             return (
                                 <FormField
                                     key={item.id}
@@ -182,7 +191,7 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
                                                 <Input
                                                     type="number"
                                                     step="any"
-                                                    placeholder={`Current stock of ${item.name}`}
+                                                    placeholder={`Hint: ${hintValue}`}
                                                     {...field}
                                                     onChange={e => field.onChange(e.target.value === '' ? '' : parseFloat(e.target.value))}
                                                     value={field.value ?? ''}

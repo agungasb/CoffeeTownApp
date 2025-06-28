@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Languages } from "lucide-react"
 import { useLocale, useTranslations } from "next-intl"
-import { usePathname, useRouter } from "next-intl/navigation"
+import * as NextIntlNavigation from "next-intl/navigation"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -16,8 +16,8 @@ import {
 export function LanguageToggle() {
   const t = useTranslations('LanguageToggle');
   const locale = useLocale();
-  const router = useRouter();
-  const pathname = usePathname();
+  const router = NextIntlNavigation.useRouter();
+  const pathname = NextIntlNavigation.usePathname();
 
   const changeLocale = (nextLocale: string) => {
     router.replace(pathname, { locale: nextLocale });

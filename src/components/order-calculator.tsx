@@ -161,7 +161,7 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
                             ))}
                         </SelectContent>
                     </Select>
-                    <p className="text-sm text-muted-foreground">The calculation will use the average of the last 4 saved usages for the selected day.</p>
+                    <p className="text-sm text-yellow-400">The calculation will use the average of the last 4 saved usages for the selected day.</p>
                 </div>
 
                  <div className="max-h-[50vh] overflow-y-auto pr-4 space-y-4 border-t pt-4">

@@ -21,19 +21,17 @@ import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 
 
-async function seedDatabase() {
-    if (!db) return;
+async function fetchDataAndSeed() {
+    if (!db) {
+        throw new Error("Firebase config is incomplete. Please make sure all 6 NEXT_PUBLIC_FIREBASE_... variables are correctly set in your .env file.");
+    }
+    
+    // 1. Check if the database has been seeded before.
+    const dbStatusRef = doc(db, 'appData', 'dbStatus');
+    const dbStatusSnap = await getDoc(dbStatusRef);
 
-    try {
-        const dbStatusRef = doc(db, 'appData', 'dbStatus');
-        const dbStatusSnap = await getDoc(dbStatusRef);
-
-        if (dbStatusSnap.exists() && dbStatusSnap.data().seeded) {
-            // The database has been seeded before, so we skip.
-            return;
-        }
-
-        console.log("Database not seeded, seeding all initial data...");
+    if (!dbStatusSnap.exists() || !dbStatusSnap.data().seeded) {
+        console.log("Database status flag not found. Seeding initial data...");
         const batch = writeBatch(db);
         
         initialRecipesData.forEach(recipe => {
@@ -52,24 +50,16 @@ async function seedDatabase() {
         // Set the flag to indicate seeding is complete
         batch.set(dbStatusRef, { seeded: true, seededAt: Timestamp.now() });
         
-        console.log("Committing seed data to database...");
-        await batch.commit();
-        console.log("Seeding complete.");
-
-    } catch (error) {
-        console.error("Error seeding database:", error);
-        throw new Error("Failed to initialize database. Please check Firestore permissions and configuration.");
+        try {
+            await batch.commit();
+            console.log("Successfully committed seed data to database.");
+        } catch (error) {
+            console.error("CRITICAL: Failed to commit seed data batch.", error);
+            throw new Error(`Failed to initialize database. Could not write seed data. Please check Firestore permissions and security rules. Original error: ${(error as Error).message}`);
+        }
     }
-}
 
-
-async function fetchData() {
-    if (!db) {
-        throw new Error("Firebase config is incomplete. Please make sure all 6 NEXT_PUBLIC_FIREBASE_... variables are correctly set in your .env file.");
-    }
-    
-    await seedDatabase();
-
+    // 2. Fetch all data for the application.
     const recipesSnapshot = await getDocs(collection(db, 'recipes'));
     const recipes: Recipe[] = recipesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Recipe));
 
@@ -104,7 +94,7 @@ export default async function Page() {
     };
 
     try {
-        const { recipes, products, inventory, dailyUsage } = await fetchData();
+        const { recipes, products, inventory, dailyUsage } = await fetchDataAndSeed();
 
         const uniqueInventory = inventory.filter((item, index, self) =>
             index === self.findIndex((t) => (

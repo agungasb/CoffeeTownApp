@@ -282,7 +282,11 @@ export default function BakeryApp({
         <main className="w-full max-w-7xl mt-[136px] md:mt-[160px] p-4 sm:p-6 md:p-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsContent value="calculator">
-              <ProductionCalculator products={products} addDailyUsageRecord={addDailyUsageRecordHandler}/>
+              <ProductionCalculator 
+                products={products} 
+                addDailyUsageRecord={addDailyUsageRecordHandler} 
+                isLoggedIn={isLoggedIn}
+              />
             </TabsContent>
             <TabsContent value="recipe">
               <RecipeScaler recipes={recipes} />

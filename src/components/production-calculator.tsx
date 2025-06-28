@@ -28,9 +28,10 @@ type ProductionFormValues = {
 interface ProductionCalculatorProps {
     products: ProductIngredients;
     addDailyUsageRecord: (record: { usage: DailyUsageIngredient[] }) => Promise<void>;
+    isLoggedIn: boolean;
 }
 
-export default function ProductionCalculator({ products, addDailyUsageRecord }: ProductionCalculatorProps) {
+export default function ProductionCalculator({ products, addDailyUsageRecord, isLoggedIn }: ProductionCalculatorProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -225,7 +226,7 @@ export default function ProductionCalculator({ products, addDailyUsageRecord }: 
                           </TableBody>
                       </Table>
                        <div className="flex justify-end mt-4">
-                          <Button onClick={handleSaveUsage} variant="success">
+                          <Button onClick={handleSaveUsage} variant="success" disabled={!isLoggedIn}>
                               <Save className="mr-2 h-4 w-4" />
                               Save as Daily Usage
                           </Button>

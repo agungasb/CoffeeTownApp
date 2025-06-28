@@ -34,7 +34,7 @@ export function ProductForm({ productToEdit, onSubmit, onCancel }: ProductFormPr
             name: productToEdit.name,
         } : {
             name: '',
-            ingredients: [{ name: '', amount: undefined as any, unit: 'g' }],
+            ingredients: [{ name: '', amount: '' as any, unit: 'g' }],
         },
     });
 
@@ -125,7 +125,7 @@ export function ProductForm({ productToEdit, onSubmit, onCancel }: ProductFormPr
                         <Button
                             type="button"
                             variant="outline"
-                            onClick={() => append({ name: '', amount: undefined as any, unit: 'g' })}
+                            onClick={() => append({ name: '', amount: '' as any, unit: 'g' })}
                             className="mt-2"
                         >
                             <PlusCircle className="mr-2" /> Add Ingredient

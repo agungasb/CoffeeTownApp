@@ -35,7 +35,7 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
         resolver: zodResolver(recipeFormSchema),
         defaultValues: recipeToEdit ?? {
             name: '',
-            ingredients: [{ name: '', amount: undefined as any, unit: '' }],
+            ingredients: [{ name: '', amount: '' as any, unit: '' }],
             steps: [''],
         },
     });
@@ -133,7 +133,7 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
                         <Button
                             type="button"
                             variant="outline"
-                            onClick={() => appendIngredient({ name: '', amount: undefined as any, unit: '' })}
+                            onClick={() => appendIngredient({ name: '', amount: '' as any, unit: '' })}
                             className="mt-2"
                         >
                             <PlusCircle className="mr-2" /> Add Ingredient

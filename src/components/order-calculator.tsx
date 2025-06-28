@@ -166,7 +166,7 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
 
                  <div className="max-h-[50vh] overflow-y-auto pr-4 space-y-4 border-t pt-4">
                     <h3 className="text-lg font-medium">Enter Current Stock Levels (Optional)</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-4">
+                     <div className="space-y-2">
                         {sortedInventory.map(item => {
                             const unitLabel = (item.orderUnit && item.orderUnitConversion) ? item.orderUnit : item.unit;
                             
@@ -182,13 +182,16 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
                                     control={form.control}
                                     name={item.id}
                                     render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{capitalize(item.name)} (in {unitLabel})</FormLabel>
+                                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                                            <FormLabel className="flex-grow text-left text-sm font-medium">
+                                                {capitalize(item.name)} <span className="text-xs text-foreground/70"> (in {unitLabel})</span>
+                                            </FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="number"
                                                     step="any"
                                                     placeholder={`Hint: ${hintValue}`}
+                                                    className="w-32 text-right"
                                                     {...field}
                                                     onChange={e => field.onChange(e.target.value === '' ? '' : parseFloat(e.target.value))}
                                                     value={field.value ?? ''}

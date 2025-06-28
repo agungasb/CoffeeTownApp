@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Label } from "@/components/ui/label";
 import { type Recipe } from "@/lib/recipes";
-import { BookOpen, ChefHat } from 'lucide-react';
+import { BookOpen, Receipt, Notebook, X, Scale } from 'lucide-react';
 import { capitalize } from '@/lib/utils';
 
 interface ScaledIngredient {
@@ -67,7 +67,10 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
                 <div className="grid md:grid-cols-3 gap-6 items-start">
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="recipes">Choose a recipe</Label>
+                            <Label htmlFor="recipes" className="flex items-center gap-2">
+                                <Notebook className="h-4 w-4" />
+                                Choose Recipe:
+                            </Label>
                             <Select onValueChange={handleSelectRecipe} value={selectedRecipeId}>
                                 <SelectTrigger id="recipes">
                                     <SelectValue placeholder="Select a recipe" />
@@ -82,7 +85,10 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
                             </Select>
                         </div>
                         <div className="space-y-2">
-                             <Label htmlFor="multiplier">Enter multiplier</Label>
+                             <Label htmlFor="multiplier" className="flex items-center gap-2">
+                                <X className="h-4 w-4" />
+                                Scale Factor:
+                             </Label>
                              <Input 
                                 id="multiplier"
                                 type="number" 
@@ -93,7 +99,10 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
                                 placeholder="e.g. 1.5"
                              />
                         </div>
-                        <Button onClick={handleScaleRecipe} className="w-full">Scale Recipe</Button>
+                        <Button onClick={handleScaleRecipe} className="w-full">
+                            <Scale className="h-4 w-4" />
+                            Scale Recipe
+                        </Button>
                     </div>
 
                     <div className="md:col-span-2">
@@ -101,7 +110,7 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
                            <div className='space-y-8'>
                                <div>
                                     <h3 className="font-semibold text-xl md:text-2xl mb-4 flex items-center gap-2">
-                                        <ChefHat /> Scaled Ingredients: {capitalize(recipeTitle)}
+                                        <Receipt /> {capitalize(recipeTitle)} (x{multiplier})
                                     </h3>
                                     <Table>
                                         <TableHeader>

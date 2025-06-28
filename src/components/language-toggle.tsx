@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Languages } from "lucide-react"
 import { useLocale, useTranslations } from "next-intl"
-import { usePathname, useRouter } from "next-intl/navigation"
+import { Link, usePathname } from "next-intl/navigation"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -16,12 +16,7 @@ import {
 export function LanguageToggle() {
   const t = useTranslations('LanguageToggle');
   const locale = useLocale();
-  const router = useRouter();
   const pathname = usePathname();
-
-  const changeLocale = (nextLocale: string) => {
-    router.replace(pathname, { locale: nextLocale });
-  };
 
   return (
     <DropdownMenu>
@@ -32,11 +27,15 @@ export function LanguageToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="glassmorphic">
-        <DropdownMenuItem onClick={() => changeLocale("en")} disabled={locale === "en"}>
-          English
+        <DropdownMenuItem asChild disabled={locale === "en"}>
+          <Link href={pathname} locale="en">
+            English
+          </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => changeLocale("id")} disabled={locale === "id"}>
-          Bahasa Indonesia
+        <DropdownMenuItem asChild disabled={locale === "id"}>
+          <Link href={pathname} locale="id">
+            Bahasa Indonesia
+          </Link>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

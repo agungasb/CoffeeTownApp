@@ -92,7 +92,6 @@ export default function BakeryApp({
   
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('calculator');
   
   const [blur, setBlur] = useState(16);
   const [opacity, setOpacity] = useState(40);
@@ -102,12 +101,21 @@ export default function BakeryApp({
     document.documentElement.style.setProperty('--glass-opacity', `${opacity / 100}`);
   }, [blur, opacity]);
 
+  useEffect(() => {
+    const userIsLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    if (userIsLoggedIn) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
   const handleLoginSuccess = () => {
+    localStorage.setItem('isLoggedIn', 'true');
     setIsLoggedIn(true);
     setIsLoginDialogOpen(false);
   };
 
   const handleLogout = () => {
+    localStorage.removeItem('isLoggedIn');
     setIsLoggedIn(false);
   }
 

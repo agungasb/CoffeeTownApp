@@ -45,13 +45,13 @@
     --popover: 25 20% 10%;
     --popover-foreground: 30 60% 97%;
     --primary: 25 60% 35%;
-    --primary-foreground: 30 40% 95%;
+    --primary-foreground: 48 100% 82%;
     --secondary: 25 40% 50%;
-    --secondary-foreground: 30 60% 98%;
+    --secondary-foreground: 48 100% 82%;
     --muted: 25 20% 18%;
     --muted-foreground: 30 20% 65%;
     --accent: 25 60% 45%;
-    --accent-foreground: 30 40% 95%;
+    --accent-foreground: 48 100% 82%;
     --destructive: 0 63% 45%;
     --destructive-foreground: 30 40% 95%;
     --success: 142 71% 35%;

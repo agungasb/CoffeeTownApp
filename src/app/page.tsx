@@ -25,12 +25,15 @@ async function seedDatabase() {
     if (!db) return;
 
     try {
-        const recipesSnapshot = await getDocs(query(collection(db, 'recipes'), limit(1)));
-        if (!recipesSnapshot.empty) {
+        const dbStatusRef = doc(db, 'appData', 'dbStatus');
+        const dbStatusSnap = await getDoc(dbStatusRef);
+
+        if (dbStatusSnap.exists() && dbStatusSnap.data().seeded) {
+            // The database has been seeded before, so we skip.
             return;
         }
 
-        console.log("Database not seeded or empty, seeding all initial data...");
+        console.log("Database not seeded, seeding all initial data...");
         const batch = writeBatch(db);
         
         initialRecipesData.forEach(recipe => {
@@ -45,6 +48,9 @@ async function seedDatabase() {
             const docRef = doc(db, 'inventory', item.id);
             batch.set(docRef, item);
         });
+
+        // Set the flag to indicate seeding is complete
+        batch.set(dbStatusRef, { seeded: true, seededAt: Timestamp.now() });
         
         console.log("Committing seed data to database...");
         await batch.commit();

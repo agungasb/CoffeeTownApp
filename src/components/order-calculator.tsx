@@ -166,7 +166,7 @@ export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculato
 
                  <div className="max-h-[50vh] overflow-y-auto pr-4 space-y-4 border-t pt-4">
                     <h3 className="text-lg font-medium">Enter Current Stock Levels (Optional)</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-4">
                         {sortedInventory.map(item => {
                             const unitLabel = (item.orderUnit && item.orderUnitConversion) ? item.orderUnit : item.unit;
                             

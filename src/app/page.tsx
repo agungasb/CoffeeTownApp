@@ -1,3 +1,4 @@
+
 import BakeryApp from '@/components/bakery-app';
 import { collection, getDocs, writeBatch, doc, getDoc, Timestamp, query, orderBy, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -24,45 +25,40 @@ async function seedDatabase() {
     if (!db) return; // Guard against null db
 
     try {
+        const seedFlagRef = doc(db, 'appData', 'seedStatus');
+        const seedFlagDoc = await getDoc(seedFlagRef);
+
+        // If the flag exists, it means we've already seeded. Do nothing.
+        if (seedFlagDoc.exists()) {
+            return;
+        }
+
+        console.log("Database not seeded, seeding all initial data...");
         const batch = writeBatch(db);
-        let operations = 0;
 
         // 1. Seed Recipes
-        const recipesSnapshot = await getDocs(query(collection(db, 'recipes'), limit(1)));
-        if (recipesSnapshot.empty) {
-            console.log("Database empty, seeding recipes...");
-            initialRecipesData.forEach(recipe => {
-                const docRef = doc(db, 'recipes', recipe.id);
-                batch.set(docRef, recipe);
-            });
-            operations++;
-        }
+        initialRecipesData.forEach(recipe => {
+            const docRef = doc(db, 'recipes', recipe.id);
+            batch.set(docRef, recipe);
+        });
 
         // 2. Seed Products
         const productsDocRef = doc(db, 'appData', 'products');
-        const productsDoc = await getDoc(productsDocRef);
-        if (!productsDoc.exists()) {
-            console.log("Database empty, seeding products...");
-            batch.set(productsDocRef, { data: initialProductData });
-            operations++;
-        }
+        batch.set(productsDocRef, { data: initialProductData });
         
         // 3. Seed Inventory
-        const inventorySnapshot = await getDocs(query(collection(db, 'inventory'), limit(1)));
-        if (inventorySnapshot.empty) {
-             console.log("Database empty, seeding inventory...");
-            initialInventoryData.forEach(item => {
-                const docRef = doc(db, 'inventory', item.id);
-                batch.set(docRef, item);
-            });
-            operations++;
-        }
+        initialInventoryData.forEach(item => {
+            const docRef = doc(db, 'inventory', item.id);
+            batch.set(docRef, item);
+        });
+        
+        // 4. Set the seed flag so this doesn't run again
+        batch.set(seedFlagRef, { seeded: true, timestamp: Timestamp.now() });
 
-        if (operations > 0) {
-            console.log("Committing seed data to database...");
-            await batch.commit();
-            console.log("Seeding complete.");
-        }
+        console.log("Committing seed data to database...");
+        await batch.commit();
+        console.log("Seeding complete.");
+
     } catch (error) {
         console.error("Error seeding database:", error);
         // We can throw the error to be caught by the error boundary

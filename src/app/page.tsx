@@ -65,13 +65,13 @@ async function fetchDataAndSeed() {
 
     // 2. Fetch all data for the application directly from Firestore.
     const recipesSnapshot = await getDocs(collection(db, 'recipes'));
-    const recipes: Recipe[] = recipesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Recipe));
+    const recipes: Recipe[] = recipesSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Recipe));
 
     const productsDoc = await getDoc(doc(db, 'appData', 'products'));
     const products: ProductIngredients = productsDoc.exists() ? productsDoc.data().data : {};
 
     const inventorySnapshot = await getDocs(collection(db, 'inventory'));
-    const inventory: InventoryItem[] = inventorySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as InventoryItem));
+    const inventory: InventoryItem[] = inventorySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as InventoryItem));
 
     const dailyUsageSnapshot = await getDocs(query(collection(db, 'dailyUsage'), orderBy('date', 'desc')));
     const dailyUsage: DailyUsageRecord[] = dailyUsageSnapshot.docs.map(doc => {

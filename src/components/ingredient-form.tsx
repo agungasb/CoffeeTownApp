@@ -54,7 +54,7 @@ export function IngredientForm({ ingredientToEdit, onSubmit, onCancel }: Ingredi
                         <FormItem>
                             <FormLabel>Ingredient Name</FormLabel>
                             <FormControl>
-                                <Input placeholder="e.g. Tepung" {...field} disabled={!!ingredientToEdit} />
+                                <Input placeholder="e.g. Tepung" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>

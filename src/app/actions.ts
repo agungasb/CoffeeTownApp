@@ -1,11 +1,13 @@
+
 'use server';
 
 import { db } from '@/lib/firebase';
-import { collection, doc, addDoc, updateDoc, deleteDoc, setDoc, Timestamp, writeBatch, getDocs } from 'firebase/firestore';
+import { collection, doc, addDoc, updateDoc, deleteDoc, setDoc, Timestamp, writeBatch, getDocs, getDoc } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 import type { Recipe } from '@/lib/recipes';
-import type { ProductIngredients } from '@/lib/productIngredients';
+import type { ProductIngredients, IngredientData } from '@/lib/productIngredients';
 import type { InventoryItem } from '@/lib/inventoryData';
+import type { DailyUsageRecord, DailyUsageIngredient } from '@/components/bakery-app';
 import type { OcrProductionMappingOutput } from '@/ai/flows/ocr-production-mapping';
 import { ocrProductionMapping } from '@/ai/flows/ocr-production-mapping';
 
@@ -50,11 +52,111 @@ export async function addInventoryItem(item: Omit<InventoryItem, 'id'>) {
 }
 
 export async function updateInventoryItem(item: InventoryItem) {
-    checkDb();
-    const { id, ...itemData } = item;
-    await updateDoc(doc(db!, 'inventory', id), itemData);
+    if (!db) {
+        throw new Error("Database is not configured. Please check your Firebase credentials in .env.");
+    }
+
+    const { id, ...newItemData } = item;
+    const newName = newItemData.name;
+    const itemRef = doc(db, 'inventory', id);
+
+    const itemDoc = await getDoc(itemRef);
+    if (!itemDoc.exists()) {
+        throw new Error("Inventory item not found.");
+    }
+    const oldName = itemDoc.data().name;
+
+    // If the name hasn't changed (case-insensitively), just update the item.
+    if (oldName.toLowerCase() === newName.toLowerCase() && oldName !== newName) {
+        // Handle case-only changes without cascading, just update the master item.
+        await updateDoc(itemRef, { name: newName });
+        revalidatePath('/');
+        return;
+    } else if (oldName.toLowerCase() === newName.toLowerCase()) {
+        await updateDoc(itemRef, newItemData);
+        revalidatePath('/');
+        return;
+    }
+
+
+    // Name has changed, perform cascading updates using a batch write.
+    const batch = writeBatch(db);
+    const oldNameLower = oldName.toLowerCase();
+
+    // 1. Update the inventory item itself
+    batch.update(itemRef, newItemData);
+
+    // 2. Update recipes
+    const recipesSnapshot = await getDocs(collection(db, 'recipes'));
+    recipesSnapshot.forEach(recipeDoc => {
+        const recipe = recipeDoc.data() as Recipe;
+        let needsUpdate = false;
+        const updatedIngredients = recipe.ingredients.map(ing => {
+            if (ing.name.toLowerCase() === oldNameLower) {
+                needsUpdate = true;
+                return { ...ing, name: newName }; // Use the new name with its original casing
+            }
+            return ing;
+        });
+
+        if (needsUpdate) {
+            batch.update(recipeDoc.ref, { ingredients: updatedIngredients });
+        }
+    });
+
+    // 3. Update products
+    const productsDocRef = doc(db, 'appData', 'products');
+    const productsDoc = await getDoc(productsDocRef);
+    if (productsDoc.exists()) {
+        const productsData = productsDoc.data().data as ProductIngredients;
+        let needsUpdate = false;
+        const newProductsData: ProductIngredients = {};
+
+        for (const [productName, ingredients] of Object.entries(productsData)) {
+            const newIngredients: { [ingredientName: string]: IngredientData } = {};
+            let ingredientNameChangedInProduct = false;
+            for (const [ingredientName, ingredientData] of Object.entries(ingredients)) {
+                if (ingredientName.toLowerCase() === oldNameLower) {
+                    // Use the new name (lowercased) as the key
+                    newIngredients[newName.toLowerCase()] = ingredientData;
+                    ingredientNameChangedInProduct = true;
+                } else {
+                    newIngredients[ingredientName] = ingredientData;
+                }
+            }
+            newProductsData[productName] = newIngredients;
+            if (ingredientNameChangedInProduct) {
+                needsUpdate = true;
+            }
+        }
+
+        if (needsUpdate) {
+            batch.set(productsDocRef, { data: newProductsData });
+        }
+    }
+
+    // 4. Update daily usage records
+    const dailyUsageSnapshot = await getDocs(collection(db, 'dailyUsage'));
+    dailyUsageSnapshot.forEach(usageDoc => {
+        const usageRecord = usageDoc.data();
+        let needsUpdate = false;
+        const updatedUsage = usageRecord.usage.map((usageItem: DailyUsageIngredient) => {
+            if (usageItem.name.toLowerCase() === oldNameLower) {
+                needsUpdate = true;
+                return { ...usageItem, name: newName }; // Use new name with original casing
+            }
+            return usageItem;
+        });
+
+        if (needsUpdate) {
+            batch.update(usageDoc.ref, { usage: updatedUsage });
+        }
+    });
+
+    await batch.commit();
     revalidatePath('/');
 }
+
 
 export async function deleteInventoryItem(itemId: string) {
     checkDb();

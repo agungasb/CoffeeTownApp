@@ -63,7 +63,7 @@ async function fetchDataAndSeed() {
         }
     }
 
-    // 2. Fetch all data for the application.
+    // 2. Fetch all data for the application directly from Firestore.
     const recipesSnapshot = await getDocs(collection(db, 'recipes'));
     const recipes: Recipe[] = recipesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Recipe));
 
@@ -100,12 +100,6 @@ export default async function Page() {
     try {
         const { recipes, products, inventory, dailyUsage } = await fetchDataAndSeed();
 
-        const uniqueInventory = inventory.filter((item, index, self) =>
-            index === self.findIndex((t) => (
-                t.id === item.id
-            ))
-        );
-
         const serverActions = {
             addRecipe,
             updateRecipe,
@@ -123,7 +117,7 @@ export default async function Page() {
                 <BakeryApp
                     initialRecipes={recipes}
                     initialProducts={products}
-                    initialInventory={uniqueInventory}
+                    initialInventory={inventory}
                     initialDailyUsage={dailyUsage}
                     actions={serverActions}
                 />

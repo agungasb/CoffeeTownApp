@@ -27,29 +27,29 @@ async function fetchDataAndSeed() {
         throw new Error("Firebase config is incomplete. Please make sure all 6 NEXT_PUBLIC_FIREBASE_... variables are correctly set in your .env file.");
     }
     
-    // 1. Check if the database has been seeded before.
-    const dbStatusRef = doc(db, 'appData', 'dbStatus');
-    const dbStatusSnap = await getDoc(dbStatusRef);
+    // Check if seeding is needed by checking if a key collection is empty.
+    const recipesQuery = query(collection(db, 'recipes'), limit(1));
+    const recipesSnapshotCheck = await getDocs(recipesQuery);
 
-    if (!dbStatusSnap.exists() || !dbStatusSnap.data().seeded) {
-        console.log("Database status flag not found. Seeding initial data...");
+    if (recipesSnapshotCheck.empty) {
+        console.log("Database appears to be empty. Seeding initial data...");
         const batch = writeBatch(db);
         
+        // Seed Recipes
         initialRecipesData.forEach(recipe => {
             const docRef = doc(db, 'recipes', recipe.id);
             batch.set(docRef, recipe);
         });
 
+        // Seed Products
         const productsDocRef = doc(db, 'appData', 'products');
         batch.set(productsDocRef, { data: initialProductData });
         
+        // Seed Inventory
         initialInventoryData.forEach(item => {
             const docRef = doc(db, 'inventory', item.id);
             batch.set(docRef, item);
         });
-
-        // Set the flag to indicate seeding is complete
-        batch.set(dbStatusRef, { seeded: true, seededAt: Timestamp.now() });
         
         try {
             await batch.commit();

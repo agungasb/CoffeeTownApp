@@ -27,12 +27,12 @@ async function fetchDataAndSeed() {
         throw new Error("Firebase config is incomplete. Please make sure all 6 NEXT_PUBLIC_FIREBASE_... variables are correctly set in your .env file.");
     }
     
-    // Check if seeding is needed by checking if a key collection is empty.
-    const recipesQuery = query(collection(db, 'recipes'), limit(1));
-    const recipesSnapshotCheck = await getDocs(recipesQuery);
+    // Check if data has been seeded using a persistent flag.
+    const seedFlagRef = doc(db, 'appData', 'seedFlag');
+    const seedFlagDoc = await getDoc(seedFlagRef);
 
-    if (recipesSnapshotCheck.empty) {
-        console.log("Database appears to be empty. Seeding initial data...");
+    if (!seedFlagDoc.exists()) {
+        console.log("Seeding flag not found. Seeding initial data for the first time...");
         const batch = writeBatch(db);
         
         // Seed Recipes
@@ -50,6 +50,9 @@ async function fetchDataAndSeed() {
             const docRef = doc(db, 'inventory', item.id);
             batch.set(docRef, item);
         });
+
+        // Set the seeding flag so this process only ever runs once.
+        batch.set(seedFlagRef, { isSeeded: true, seededAt: Timestamp.now() });
         
         try {
             await batch.commit();

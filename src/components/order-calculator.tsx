@@ -32,11 +32,16 @@ type FormValues = {
 
 export function OrderCalculator({ inventory, dailyUsageRecords }: OrderCalculatorProps) {
     const [recommendations, setRecommendations] = useState<OrderRecommendation[] | null>(null);
-    const [selectedDay, setSelectedDay] = useState<number>(new Date().getDay());
+    const [selectedDay, setSelectedDay] = useState<number>(0); // Default to a static value
     const [averageUsage, setAverageUsage] = useState<DailyUsageIngredient[]>([]);
 
     const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     
+    useEffect(() => {
+        // This ensures new Date() is only called on the client after hydration
+        setSelectedDay(new Date().getDay());
+    }, []);
+
     useEffect(() => {
         const usage = calculateAverageDailyUsage(dailyUsageRecords, selectedDay);
         setAverageUsage(usage);

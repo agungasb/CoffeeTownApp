@@ -66,18 +66,12 @@ export async function updateInventoryItem(item: InventoryItem) {
     }
     const oldName = itemDoc.data().name;
 
-    // If the name hasn't changed (case-insensitively), just update the item.
-    if (oldName.toLowerCase() === newName.toLowerCase() && oldName !== newName) {
-        // Handle case-only changes without cascading, just update the master item.
-        await updateDoc(itemRef, { name: newName });
-        revalidatePath('/');
-        return;
-    } else if (oldName.toLowerCase() === newName.toLowerCase()) {
+    // If the name hasn't changed, just update the other fields without cascading.
+    if (oldName === newName) {
         await updateDoc(itemRef, newItemData);
         revalidatePath('/');
         return;
     }
-
 
     // Name has changed, perform cascading updates using a batch write.
     const batch = writeBatch(db);

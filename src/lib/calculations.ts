@@ -14,7 +14,7 @@ export function createProductionSchema(products: string[]) {
 
 export type ProductionInputs = Record<string, number>;
 
-// Helper to get a product's divisor, with a fallback.
+// Helper to get a product's divisor, with a fallback to prevent errors.
 const getDivisor = (productName: string, productIngredientsData: AllProductsData): number => {
     const divisor = productIngredientsData[productName]?.calculation?.divisor;
     // Fallback to 1 if divisor is not defined, 0, or negative to avoid division by zero errors.
@@ -22,6 +22,7 @@ const getDivisor = (productName: string, productIngredientsData: AllProductsData
 };
 
 export function calculateProductionMetrics(inputs: ProductionInputs, productIngredientsData: AllProductsData) {
+    // Sanitize inputs to ensure they are always numbers, defaulting to 0 to prevent NaN errors.
     const numInputs: { [key: string]: number } = {};
     for (const key of Object.keys(inputs)) {
         numInputs[key] = Number(inputs[key]) || 0;

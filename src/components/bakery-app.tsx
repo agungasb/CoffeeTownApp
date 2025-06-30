@@ -339,6 +339,7 @@ export default function BakeryApp({
             <TabsContent value="product_management">
               <ProductManager 
                 products={filteredProducts}
+                recipes={recipes}
                 updateProducts={updateProductsHandler}
                 isLoggedIn={isLoggedIn} 
               />

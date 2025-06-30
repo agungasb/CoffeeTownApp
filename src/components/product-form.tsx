@@ -5,30 +5,50 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { PlusCircle, Trash2 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { type Recipe } from '@/lib/recipes';
+import { type BaseRecipeData } from '@/lib/productIngredients';
+import { capitalize } from '@/lib/utils';
 
 const productFormSchema = z.object({
     name: z.string().min(3, "Product name must be at least 3 characters."),
+    baseRecipe: z.object({
+        recipeName: z.string().optional(),
+        weight: z.coerce.number().positive("Weight must be positive.").optional().or(z.literal('')),
+    }).optional(),
     ingredients: z.array(z.object({
         name: z.string().min(1, "Name is required."),
         amount: z.coerce.number({ invalid_type_error: "Amount is required."}).positive("Amount must be positive."),
         unit: z.string().min(1, "Unit is required."),
-    })).min(1, "A product must have at least one ingredient."),
+    })),
     calculation: z.object({
         divisor: z.coerce.number().positive("Divisor must be a positive number.").optional().or(z.literal('')),
         unit: z.string().optional(),
         multiplier: z.coerce.number().positive("Multiplier must be a positive number.").optional().or(z.literal('')),
     }).optional()
+}).refine(data => {
+    if (data.baseRecipe?.recipeName && (data.baseRecipe.weight === undefined || data.baseRecipe.weight === '')) {
+        return false;
+    }
+    if ((data.baseRecipe?.weight) && !data.baseRecipe.recipeName) {
+        return false;
+    }
+    return true;
+}, {
+    message: "Weight is required if a base recipe is selected.",
+    path: ["baseRecipe", "weight"],
 });
 
 type ProductFormData = z.infer<typeof productFormSchema>;
 
 interface ProductFormProps {
     productToEdit?: { 
-        name: string, 
+        name: string;
+        baseRecipe?: BaseRecipeData;
         ingredients: { name: string, amount: number, unit: string }[],
         calculation?: {
             divisor?: number,
@@ -36,19 +56,23 @@ interface ProductFormProps {
             multiplier?: number
         }
     } | null;
+    recipes: Recipe[];
     onSubmit: (data: ProductFormData) => void;
     onCancel: () => void;
 }
 
-export function ProductForm({ productToEdit, onSubmit, onCancel }: ProductFormProps) {
+export function ProductForm({ productToEdit, recipes, onSubmit, onCancel }: ProductFormProps) {
     const form = useForm<ProductFormData>({
         resolver: zodResolver(productFormSchema),
         defaultValues: productToEdit ? {
             ...productToEdit,
             name: productToEdit.name,
+            baseRecipe: productToEdit.baseRecipe ?? { recipeName: '', weight: ''},
             calculation: productToEdit.calculation ?? { divisor: '', unit: '', multiplier: '' },
+            ingredients: productToEdit.ingredients ?? [],
         } : {
             name: '',
+            baseRecipe: { recipeName: '', weight: ''},
             ingredients: [{ name: '', amount: '' as any, unit: 'g' }],
             calculation: { divisor: '', unit: '', multiplier: '' }
         },
@@ -62,6 +86,8 @@ export function ProductForm({ productToEdit, onSubmit, onCancel }: ProductFormPr
     const handleSubmit = (data: ProductFormData) => {
         onSubmit(data);
     };
+
+    const doughRecipes = recipes.filter(r => r.name.toLowerCase().includes('adonan'));
 
     return (
         <Form {...form}>
@@ -81,8 +107,53 @@ export function ProductForm({ productToEdit, onSubmit, onCancel }: ProductFormPr
                         )}
                     />
 
+                    <div className="p-4 border rounded-md space-y-4 bg-muted/50">
+                        <h3 className="text-md font-medium">Base Dough Recipe</h3>
+                        <FormDescription>Link this product to a base dough recipe for automated calculations.</FormDescription>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="baseRecipe.recipeName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Recipe</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select a base recipe" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="">None</SelectItem>
+                                                {doughRecipes.map(recipe => (
+                                                    <SelectItem key={recipe.id} value={recipe.name}>
+                                                        {capitalize(recipe.name)}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="baseRecipe.weight"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Dough Weight (g)</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" step="any" placeholder="e.g. 45" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                    </div>
+
                     <div>
-                        <h3 className="text-lg font-medium mb-2">Ingredients</h3>
+                        <h3 className="text-lg font-medium mb-2">Additional Ingredients</h3>
                         <div className="space-y-4">
                             {fields.map((field, index) => (
                                 <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto_auto] gap-4 md:gap-2 p-2 border rounded-md md:items-end">
@@ -93,7 +164,7 @@ export function ProductForm({ productToEdit, onSubmit, onCancel }: ProductFormPr
                                             <FormItem>
                                                 <FormLabel>Name</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="Tepung" {...field} />
+                                                    <Input placeholder="Ceres" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -106,7 +177,7 @@ export function ProductForm({ productToEdit, onSubmit, onCancel }: ProductFormPr
                                             <FormItem>
                                                 <FormLabel>Amount</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" step="0.001" placeholder="e.g. 50" {...field} className="md:w-28"/>
+                                                    <Input type="number" step="0.001" placeholder="e.g. 15" {...field} className="md:w-28"/>
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -130,7 +201,6 @@ export function ProductForm({ productToEdit, onSubmit, onCancel }: ProductFormPr
                                         variant="destructive"
                                         size="icon"
                                         onClick={() => remove(index)}
-                                        disabled={fields.length <= 1}
                                         className="justify-self-end md:justify-self-auto"
                                     >
                                         <Trash2 />

@@ -63,7 +63,6 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     // --- Hardcoded Total & Combined Calculations ---
     const safeGetDivisor = (productName: string): number => {
         const productData = findProductData(productName, productIngredientsData);
-        // Default to 1 to avoid division by zero if divisor is not set or is 0
         return (productData?.calculation?.divisor && productData.calculation.divisor > 0) ? productData.calculation.divisor : 1;
     };
     
@@ -92,83 +91,96 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         const totalSosisPack = totalSosisPcs / 28;
         productionCalculations.push(['Total Sosis', `${totalSosisPack.toFixed(2)} pack`]);
     }
+    
+    // --- Recipe Calculations ---
 
-    // --- Recipe Calculations (Your Formula: (Input * Dough Weight) / Recipe Base Weight) ---
-    const calculateRecipeNeeded = (productNames: string[], recipeIngredientName: string, recipeName: string): number => {
-        const recipeBaseWeight = getRecipeBaseWeight(recipeName, allRecipes);
-        if (recipeBaseWeight === 0) return 0;
+    // 1. Dough Recipes (using baseRecipe link)
+    const doughRecipeNames = [
+        'Adonan Donut Paha Ayam',
+        'Adonan Roti Manis Roll',
+        'Adonan Roti Manis Mesin',
+        'Adonan Donat Joko',
+        'Adonan Abon Taiwan'
+    ];
+    const recipeWeightTotals: { [recipeName: string]: number } = {};
 
-        return productNames.reduce((totalRecipes, productName) => {
-            const productInput = numInputs[productName.toLowerCase()] || 0;
-            if (productInput === 0) return totalRecipes;
-
+    for (const productName in numInputs) {
+        const quantity = numInputs[productName.toLowerCase()];
+        if (quantity > 0) {
             const productData = findProductData(productName, productIngredientsData);
-            const doughWeightPerPiece = productData?.ingredients[recipeIngredientName.toLowerCase()]?.amount || 0;
-            
-            if (doughWeightPerPiece > 0) {
-                const recipesForProduct = (productInput * doughWeightPerPiece) / recipeBaseWeight;
-                return totalRecipes + recipesForProduct;
+            if (productData?.baseRecipe && doughRecipeNames.includes(productData.baseRecipe.recipeName)) {
+                const { recipeName, weight } = productData.baseRecipe;
+                if (!recipeWeightTotals[recipeName]) {
+                    recipeWeightTotals[recipeName] = 0;
+                }
+                recipeWeightTotals[recipeName] += quantity * weight;
             }
-            return totalRecipes;
-        }, 0);
-    };
+        }
+    }
 
-    const adonanPahaAyamResep = calculateRecipeNeeded(['donut paha ayam'], 'adonan donut paha ayam', 'Adonan Donut Paha Ayam');
-    if (adonanPahaAyamResep > 0) productionCalculations.push(['Adonan Donut Paha Ayam', `${adonanPahaAyamResep.toFixed(2)} resep`]);
+    const recipeMultiplierMap: { [recipeName: string]: number } = {};
+
+    for (const recipeName in recipeWeightTotals) {
+        const totalDoughWeight = recipeWeightTotals[recipeName];
+        if (totalDoughWeight > 0) {
+            const recipeBaseWeight = getRecipeBaseWeight(recipeName, allRecipes);
+            if (recipeBaseWeight > 0) {
+                const recipesNeeded = totalDoughWeight / recipeBaseWeight;
+                recipeMultiplierMap[recipeName] = recipesNeeded;
+                if (recipeName === 'Adonan Abon Taiwan') {
+                    productionCalculations.push([recipeName, `${recipesNeeded.toFixed(2)} resep (*kali 2 telur)`]);
+                } else {
+                    productionCalculations.push([recipeName, `${recipesNeeded.toFixed(2)} resep`]);
+                }
+            }
+        }
+    }
     
-    const donutDeptProducts = ["Donut Almond", "Donut Coklat Ceres", "Donut Coklat Kacang", "Donut Gula Halus", "Donut Keju", "Donut Oreo", "7K BOMBOLONI CAPPUCINO", "7K BOMBOLONI DARK COKLAT", "7K BOMBOLONI GREENTEA", "7K BOMBOLONI TIRAMISU"];
-    const adonanDonutDeptResep = calculateRecipeNeeded(donutDeptProducts, 'adonan donat joko', 'Adonan Donat Joko');
-    if (adonanDonutDeptResep > 0) productionCalculations.push(['Adonan Donat', `${adonanDonutDeptResep.toFixed(2)} resep`]);
+    // 2. Other Filling/Topping Recipes (Hardcoded)
+    const eggCreamResep = ((numInputs['abon ayam pedas'] || 0) * 18 + (numInputs['abon sosis'] || 0) * 10 + (numInputs['abon piramid'] || 0) * 24 + (numInputs['abon roll pedas'] || 0) * 18) / (getRecipeBaseWeight('Egg Cream', allRecipes) || 1);
+    if (eggCreamResep > 0) {
+        productionCalculations.push(["Egg Cream", `${eggCreamResep.toFixed(2)} resep`]);
+        recipeMultiplierMap["Egg Cream"] = eggCreamResep;
+    }
 
-    const adonanRollTotalResep = calculateRecipeNeeded(totalRollProducts, 'adonan roti manis roll', 'Adonan Roti Manis Roll');
-    if (adonanRollTotalResep > 0) productionCalculations.push(['Adonan Roti Manis Roll', `${adonanRollTotalResep.toFixed(2)} resep`]);
+    const creamCheeseResep = ((numInputs['red velvet cream cheese'] || 0) * 48) / (getRecipeBaseWeight('Cream Cheese', allRecipes) || 1);
+    if (creamCheeseResep > 0) {
+        productionCalculations.push(["Cream Cheese", `${creamCheeseResep.toFixed(2)} resep`]);
+        recipeMultiplierMap["Cream Cheese"] = creamCheeseResep;
+    }
 
-    const mesinProducts = ["maxicana coklat", "abon ayam pedas", "red velvet cream cheese", "abon sosis", "cream choco cheese", "double coklat", "hot sosis", "kacang merah", "sosis label", "strawberry almond", "vanilla oreo"];
-    const adonanMesinTotalResep = calculateRecipeNeeded(mesinProducts, 'adonan roti manis mesin', 'Adonan Roti Manis Mesin');
-    if (adonanMesinTotalResep > 0) productionCalculations.push(['Adonan Roti Manis Mesin', `${adonanMesinTotalResep.toFixed(2)} resep`]);
-    
-    // --- Other Hardcoded Recipe Calculations ---
-    const eggCreamResep = ((numInputs['abon ayam pedas'] || 0) * 18 + (numInputs['abon sosis'] || 0) * 10 + (numInputs['abon piramid'] || 0) * 24 + (numInputs['abon roll pedas'] || 0) * 18) / (getRecipeBaseWeight('Egg Cream', allRecipes) || 22260);
-    if (eggCreamResep > 0) productionCalculations.push(["Egg Cream", `${eggCreamResep.toFixed(2)} resep`]);
+    const butterResep = ((numInputs['cream choco cheese'] || 0) * 17 + (numInputs['cheese roll'] || 0) * 13) / (getRecipeBaseWeight('Butter', allRecipes) || 1);
+    if (butterResep > 0) {
+        productionCalculations.push(["Butter", `${butterResep.toFixed(2)} resep`]);
+        recipeMultiplierMap["Butter"] = butterResep;
+    }
 
-    const creamCheeseResep = ((numInputs['red velvet cream cheese'] || 0) * 48) / (getRecipeBaseWeight('Cream Cheese', allRecipes) || 10000);
-    if (creamCheeseResep > 0) productionCalculations.push(["Cream Cheese", `${creamCheeseResep.toFixed(2)} resep`]);
+    const butterDonatResep = ((numInputs['donut paha ayam'] || 0) * 12) / (getRecipeBaseWeight('Butter Donat', allRecipes) || 1);
+    if (butterDonatResep > 0) {
+        productionCalculations.push(["Butter Donat", `${butterDonatResep.toFixed(2)} resep`]);
+        recipeMultiplierMap["Butter Donat"] = butterDonatResep;
+    }
 
-    const butterResep = ((numInputs['cream choco cheese'] || 0) * 17 + (numInputs['cheese roll'] || 0) * 13) / (getRecipeBaseWeight('Butter', allRecipes) || 9000);
-    if (butterResep > 0) productionCalculations.push(["Butter", `${butterResep.toFixed(2)} resep`]);
+    const coklatGanacheResep = ((numInputs['double coklat'] || 0) * 17) / (getRecipeBaseWeight('Coklat Ganache', allRecipes) || 1);
+    if (coklatGanacheResep > 0) {
+        productionCalculations.push(["Coklat Ganache", `${coklatGanacheResep.toFixed(2)} resep`]);
+        recipeMultiplierMap["Coklat Ganache"] = coklatGanacheResep;
+    }
 
-    const butterDonatResep = ((numInputs['donut paha ayam'] || 0) * 12) / (getRecipeBaseWeight('Butter Donat', allRecipes) || 10000);
-    if (butterDonatResep > 0) productionCalculations.push(["Butter Donat", `${butterDonatResep.toFixed(2)} resep`]);
+    const toppingMaxicanaResep = ((numInputs['maxicana coklat'] || 0) * 10) / (getRecipeBaseWeight('Topping Maxicana', allRecipes) || 1);
+    if (toppingMaxicanaResep > 0) {
+        productionCalculations.push(["Topping Maxicana", `${toppingMaxicanaResep.toFixed(2)} resep`]);
+        recipeMultiplierMap["Topping Maxicana"] = toppingMaxicanaResep;
+    }
 
-    const coklatGanacheResep = ((numInputs['double coklat'] || 0) * 17) / (getRecipeBaseWeight('Coklat Ganache', allRecipes) || 6000);
-    if (coklatGanacheResep > 0) productionCalculations.push(["Coklat Ganache", `${coklatGanacheResep.toFixed(2)} resep`]);
-
-    const toppingMaxicanaResep = ((numInputs['maxicana coklat'] || 0) * 10) / (getRecipeBaseWeight('Topping Maxicana', allRecipes) || 13100);
-    if (toppingMaxicanaResep > 0) productionCalculations.push(["Topping Maxicana", `${toppingMaxicanaResep.toFixed(2)} resep`]);
-
-    const flaAbonTaiwanResep = ((numInputs['abon taiwan'] || 0) * 30) / (getRecipeBaseWeight('Fla Abon Taiwan', allRecipes) || 328);
-    if (flaAbonTaiwanResep > 0) productionCalculations.push(["Fla Abon Taiwan", `${flaAbonTaiwanResep.toFixed(2)} resep`]);
-
-    const adonanAbonTaiwanResep = (numInputs['abon taiwan'] || 0) / 4;
-    if (adonanAbonTaiwanResep > 0) productionCalculations.push(["Adonan Abon Taiwan", `${adonanAbonTaiwanResep.toFixed(2)} resep (*kali 2 telur)`]);
+    const flaAbonTaiwanResep = ((numInputs['abon taiwan'] || 0) * 30) / (getRecipeBaseWeight('Fla Abon Taiwan', allRecipes) || 1);
+    if (flaAbonTaiwanResep > 0) {
+        productionCalculations.push(["Fla Abon Taiwan", `${flaAbonTaiwanResep.toFixed(2)} resep`]);
+        recipeMultiplierMap["Fla Abon Taiwan"] = flaAbonTaiwanResep;
+    }
 
     // --- Ingredient Summary Calculation ---
-    const allRecipeCalcs = {
-      "Adonan Donut Paha Ayam": adonanPahaAyamResep,
-      "Adonan Donat Joko": adonanDonutDeptResep,
-      "Adonan Roti Manis Roll": adonanRollTotalResep,
-      "Adonan Roti Manis Mesin": adonanMesinTotalResep,
-      "Egg Cream": eggCreamResep,
-      "Cream Cheese": creamCheeseResep,
-      "Butter": butterResep,
-      "Butter Donat": butterDonatResep,
-      "Coklat Ganache": coklatGanacheResep,
-      "Topping Maxicana": toppingMaxicanaResep,
-      "Fla Abon Taiwan": flaAbonTaiwanResep,
-      "Adonan Abon Taiwan": adonanAbonTaiwanResep,
-    };
-
-    for (const [recipeName, recipeMultiplier] of Object.entries(allRecipeCalcs)) {
+    for (const [recipeName, recipeMultiplier] of Object.entries(recipeMultiplierMap)) {
         if (recipeMultiplier > 0) {
             const recipe = findRecipe(recipeName, allRecipes);
             if (recipe) {
@@ -186,26 +198,22 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     
     // Add non-recipe ingredients from products
      for (const productName in numInputs) {
-        const quantity = numInputs[productName];
+        const quantity = numInputs[productName.toLowerCase()];
         if (quantity > 0) {
             const productData = findProductData(productName, productIngredientsData);
             if (productData) {
                 for (const ingName in productData.ingredients) {
-                    // Check if it's a raw material, not a base recipe
-                    if (!findRecipe(ingName, allRecipes)) {
-                        const ingData = productData.ingredients[ingName];
-                        const totalAmount = ingData.amount * quantity;
-                        const ingredientName = ingName.toLowerCase();
-                        if (!ingredientSummaryMap[ingredientName]) {
-                            ingredientSummaryMap[ingredientName] = { amount: 0, unit: ingData.unit };
-                        }
-                        ingredientSummaryMap[ingredientName].amount += totalAmount;
+                    const ingData = productData.ingredients[ingName];
+                    const totalAmount = ingData.amount * quantity;
+                    const ingredientName = ingName.toLowerCase();
+                    if (!ingredientSummaryMap[ingredientName]) {
+                        ingredientSummaryMap[ingredientName] = { amount: 0, unit: ingData.unit };
                     }
+                    ingredientSummaryMap[ingredientName].amount += totalAmount;
                 }
             }
         }
     }
-
 
     const ingredientSummary = Object.entries(ingredientSummaryMap)
         .map(([name, { amount, unit }]) => [capitalize(name), amount.toFixed(2), unit] as [string, string, string])

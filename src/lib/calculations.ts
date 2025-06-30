@@ -17,27 +17,14 @@ export type ProductionInputs = Record<string, number>;
 export function calculateProductionMetrics(inputs: ProductionInputs, productIngredientsData: AllProductsData) {
     // Sanitize inputs to ensure they are always numbers, defaulting to 0 to prevent NaN errors.
     const numInputs: { [key: string]: number } = {};
-    for (const key of Object.keys(inputs)) {
-        const val = inputs[key];
-        numInputs[key] = (typeof val === 'number' && !isNaN(val)) ? val : 0;
-    }
-
-    const productionCalculations: [string, string][] = [];
-
-    // --- Individual Product Calculations ---
-    // This loops through every product input and calculates its specific loyang value.
-    for (const productName in numInputs) {
-        const quantity = numInputs[productName];
-        if (quantity > 0) {
-            const productData = productIngredientsData[productName];
-            if (productData && productData.calculation && productData.calculation.divisor) {
-                const result = quantity / productData.calculation.divisor;
-                const unit = productData.calculation.unit || 'loyang'; // Default to 'loyang' if not specified
-                productionCalculations.push([capitalize(productName), `${result.toFixed(2)} ${unit}`]);
-            }
+    for (const key in inputs) {
+        if (Object.prototype.hasOwnProperty.call(inputs, key)) {
+            const val = inputs[key];
+            numInputs[key] = (typeof val === 'number' && !isNaN(val)) ? val : 0;
         }
     }
 
+    const productionCalculations: [string, string][] = [];
 
     // Helper to safely get a divisor, defaulting to 1 to prevent division by zero.
     const safeGetDivisor = (productName: string): number => {
@@ -47,6 +34,22 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         }
         return 1;
     };
+    
+    // --- Individual Product Calculations ---
+    // This loops through every product input and calculates its specific loyang value.
+    for (const productName in numInputs) {
+        const quantity = numInputs[productName];
+        if (quantity > 0) {
+            const productData = productIngredientsData[productName];
+            if (productData && productData.calculation) {
+                 const divisor = safeGetDivisor(productName);
+                 const result = quantity / divisor;
+                 const unit = productData.calculation.unit || 'loyang';
+                 productionCalculations.push([capitalize(productName), `${result.toFixed(2)} ${unit}`]);
+            }
+        }
+    }
+
 
     // --- Hardcoded Total & Recipe Calculations ---
     const totalRollProducts = ["abon piramid", "abon roll pedas", "cheese roll"];
@@ -54,7 +57,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         const quantity = numInputs[p] || 0;
         return sum + (quantity / safeGetDivisor(p));
     }, 0);
-    productionCalculations.push(["Total Roll", `${totalRoll.toFixed(2)} loyang`]);
+    if (totalRoll > 0) productionCalculations.push(["Total Roll", `${totalRoll.toFixed(2)} loyang`]);
 
     const nonRotiProducts = new Set([
         "abon piramid", "abon roll pedas", "cheese roll", "donut paha ayam",
@@ -63,13 +66,13 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     ]);
 
     const totalRoti = Object.keys(numInputs).reduce((sum, p) => {
-        if (nonRotiProducts.has(p)) {
+        if (nonRotiProducts.has(p) || (numInputs[p] || 0) === 0) {
             return sum;
         }
         const quantity = numInputs[p] || 0;
         return sum + (quantity / safeGetDivisor(p));
     }, 0);
-    productionCalculations.push(["Total Roti", `${totalRoti.toFixed(2)} loyang`]);
+    if (totalRoti > 0) productionCalculations.push(["Total Roti", `${totalRoti.toFixed(2)} loyang`]);
 
     const totalBoxTray = (
         (numInputs['donut paha ayam'] || 0) +
@@ -89,16 +92,64 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         (numInputs['cheese roll'] || 0) +
         (numInputs['abon taiwan'] || 0)
     );
-    productionCalculations.push(["Total Box Tray", `${totalBoxTray.toFixed(2)} pcs`]);
+    if (totalBoxTray > 0) productionCalculations.push(["Total Box Tray", `${totalBoxTray.toFixed(2)} pcs`]);
 
     const totalLoyang = Object.keys(numInputs).reduce((sum, p) => {
+         if ((numInputs[p] || 0) === 0) return sum;
         const quantity = numInputs[p] || 0;
         return sum + (quantity / safeGetDivisor(p));
     }, 0);
-    productionCalculations.push(["Total Loyang", `${totalLoyang.toFixed(2)} loyang`]);
+    if (totalLoyang > 0) productionCalculations.push(["Total Loyang", `${totalLoyang.toFixed(2)} loyang`]);
 
     const totalSlongsong = numInputs['donut paha ayam'] || 0;
-    productionCalculations.push(["Total Slongsong", `${totalSlongsong.toFixed(2)} pcs`]);
+    if (totalSlongsong > 0) productionCalculations.push(["Total Slongsong", `${totalSlongsong.toFixed(2)} pcs`]);
+    
+    // Total Sosis
+    const totalSosisPcs =
+        (numInputs['abon sosis'] || 0) * 0.5 +
+        (numInputs['hot sosis'] || 0) * 1 +
+        (numInputs['sosis label'] || 0) * 1;
+
+    // The conversion factor is 28 pcs per pack, based on inventoryData.
+    if (totalSosisPcs > 0) {
+        const totalSosisPack = totalSosisPcs / 28;
+        productionCalculations.push(['Total Sosis', `${totalSosisPack.toFixed(2)} pack`]);
+    }
+
+    // Recipe Totals
+    let adonanDonutTotal = 0;
+    let adonanRollTotal = 0;
+    let adonanMesinTotal = 0;
+
+    for (const productName in numInputs) {
+        if ((numInputs[productName] || 0) === 0) continue;
+
+        const productData = productIngredientsData[productName];
+        if (!productData || !productData.ingredients) continue;
+        
+        const productBaseAmount = (numInputs[productName] || 0) / safeGetDivisor(productName);
+
+        if (productData.ingredients['Adonan Donut Paha Ayam']) {
+            adonanDonutTotal += productBaseAmount * (productData.ingredients['Adonan Donut Paha Ayam'].amount || 1);
+        }
+        if (productData.ingredients['Adonan Roti Manis Roll']) {
+            adonanRollTotal += productBaseAmount * (productData.ingredients['Adonan Roti Manis Roll'].amount || 1);
+        }
+        if (productData.ingredients['Adonan Roti Manis Mesin']) {
+            adonanMesinTotal += productBaseAmount * (productData.ingredients['Adonan Roti Manis Mesin'].amount || 1);
+        }
+    }
+
+    if (adonanDonutTotal > 0) {
+        productionCalculations.push(['Adonan Donat', `${adonanDonutTotal.toFixed(2)} resep`]);
+    }
+    if (adonanRollTotal > 0) {
+        productionCalculations.push(['Adonan Roti Manis Roll', `${adonanRollTotal.toFixed(2)} resep`]);
+    }
+    if (adonanMesinTotal > 0) {
+        productionCalculations.push(['Adonan Roti Manis Mesin', `${adonanMesinTotal.toFixed(2)} resep`]);
+    }
+
 
     const eggCreamResep = ((
         (numInputs['abon ayam pedas'] || 0) * 18 +

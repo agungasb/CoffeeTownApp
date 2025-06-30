@@ -43,6 +43,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         "Adonan Donat": `${(((numInputs['donut paha ayam'] || 0) * 48) / 1800).toFixed(2)} resep`,
         "Adonan Roti Manis Roll": `${((((numInputs['abon piramid'] || 0) / 11) + ((numInputs['abon roll pedas'] || 0) / 12) + ((numInputs['cheese roll'] || 0) / 12)) * 800 / 2013).toFixed(2)} resep`,
         "Adonan Roti Manis Mesin": `${(((numInputs['abon ayam pedas'] || 0) + (numInputs['abon sosis'] || 0) + (numInputs['cream choco cheese'] || 0) + (numInputs['double coklat'] || 0) + (numInputs['hot sosis'] || 0) + (numInputs['kacang merah'] || 0) + (numInputs['maxicana coklat'] || 0) + (numInputs['sosis label'] || 0) + (numInputs['strawberry almond'] || 0) + (numInputs['vanilla oreo'] || 0)) * 49 / 1948).toFixed(2)} resep`,
+        "Total Roll": `${((((numInputs['abon piramid'] || 0) / 11) + ((numInputs['abon roll pedas'] || 0) / 12) + ((numInputs['cheese roll'] || 0) / 12)) / 12).toFixed(2)} loyang`,
     };
 
     const ingredientTotals: Record<string, { amount: number, unit: string }> = {};

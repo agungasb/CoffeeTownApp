@@ -108,12 +108,16 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         const quantity = numInputs[productName.toLowerCase()];
         if (quantity > 0) {
             const productData = findProductData(productName, productIngredientsData);
-            if (productData?.baseRecipe && doughRecipeNames.includes(productData.baseRecipe.recipeName)) {
-                const { recipeName, weight } = productData.baseRecipe;
-                if (!recipeWeightTotals[recipeName]) {
-                    recipeWeightTotals[recipeName] = 0;
+            if (productData?.baseRecipes) {
+                for (const baseRecipe of productData.baseRecipes) {
+                    if (doughRecipeNames.includes(baseRecipe.recipeName)) {
+                        const { recipeName, weight } = baseRecipe;
+                        if (!recipeWeightTotals[recipeName]) {
+                            recipeWeightTotals[recipeName] = 0;
+                        }
+                        recipeWeightTotals[recipeName] += quantity * weight;
+                    }
                 }
-                recipeWeightTotals[recipeName] += quantity * weight;
             }
         }
     }

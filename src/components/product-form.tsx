@@ -14,12 +14,14 @@ import { type Recipe } from '@/lib/recipes';
 import { type BaseRecipeData } from '@/lib/productIngredients';
 import { capitalize } from '@/lib/utils';
 
+const baseRecipeSchema = z.object({
+    recipeName: z.string().optional(),
+    weight: z.coerce.number().positive("Weight must be positive.").optional().or(z.literal('')),
+});
+
 const productFormSchema = z.object({
     name: z.string().min(3, "Product name must be at least 3 characters."),
-    baseRecipe: z.object({
-        recipeName: z.string().optional(),
-        weight: z.coerce.number().positive("Weight must be positive.").optional().or(z.literal('')),
-    }).optional(),
+    baseRecipes: z.array(baseRecipeSchema).optional(),
     ingredients: z.array(z.object({
         name: z.string().min(1, "Name is required."),
         amount: z.coerce.number({ invalid_type_error: "Amount is required."}).positive("Amount must be positive."),
@@ -30,22 +32,25 @@ const productFormSchema = z.object({
         unit: z.string().optional(),
         multiplier: z.coerce.number().positive("Multiplier must be a positive number.").optional().or(z.literal('')),
     }).optional()
-}).refine(data => {
-    const recipeName = data.baseRecipe?.recipeName;
-    const weight = data.baseRecipe?.weight;
-    
-    // A real recipe is selected, but weight is missing
-    if (recipeName && recipeName !== 'none' && (weight === undefined || weight === '')) {
-        return false;
+}).superRefine((data, ctx) => {
+    if (data.baseRecipes) {
+        data.baseRecipes.forEach((br, index) => {
+            if (br.recipeName && br.recipeName !== 'none' && (br.weight === undefined || br.weight === '')) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "Weight is required if a base recipe is selected.",
+                    path: ["baseRecipes", index, "weight"],
+                });
+            }
+             if ((br.weight || br.weight === 0) && (!br.recipeName || br.recipeName === 'none')) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "Recipe must be selected if weight is entered.",
+                    path: ["baseRecipes", index, "recipeName"],
+                });
+            }
+        });
     }
-    // Weight is entered, but no real recipe is selected
-    if ((weight || weight === 0) && (!recipeName || recipeName === 'none')) {
-        return false;
-    }
-    return true;
-}, {
-    message: "Weight is required if a base recipe is selected.",
-    path: ["baseRecipe", "weight"],
 });
 
 
@@ -54,7 +59,7 @@ type ProductFormData = z.infer<typeof productFormSchema>;
 interface ProductFormProps {
     productToEdit?: { 
         name: string;
-        baseRecipe?: BaseRecipeData;
+        baseRecipes?: BaseRecipeData[];
         ingredients: { name: string, amount: number, unit: string }[],
         calculation?: {
             divisor?: number,
@@ -73,20 +78,25 @@ export function ProductForm({ productToEdit, recipes, onSubmit, onCancel }: Prod
         defaultValues: productToEdit ? {
             ...productToEdit,
             name: productToEdit.name,
-            baseRecipe: productToEdit.baseRecipe ?? { recipeName: '', weight: ''},
+            baseRecipes: productToEdit.baseRecipes ?? [],
             calculation: productToEdit.calculation ?? { divisor: '', unit: '', multiplier: '' },
             ingredients: productToEdit.ingredients ?? [],
         } : {
             name: '',
-            baseRecipe: { recipeName: '', weight: ''},
+            baseRecipes: [],
             ingredients: [{ name: '', amount: '' as any, unit: 'g' }],
             calculation: { divisor: '', unit: '', multiplier: '' }
         },
     });
 
-    const { fields, append, remove } = useFieldArray({
+    const { fields: ingredientFields, append: appendIngredient, remove: removeIngredient } = useFieldArray({
         control: form.control,
         name: "ingredients",
+    });
+
+    const { fields: baseRecipeFields, append: appendBaseRecipe, remove: removeBaseRecipe } = useFieldArray({
+        control: form.control,
+        name: "baseRecipes"
     });
 
     const handleSubmit = (data: ProductFormData) => {
@@ -114,54 +124,73 @@ export function ProductForm({ productToEdit, recipes, onSubmit, onCancel }: Prod
                     />
 
                     <div className="p-4 border rounded-md space-y-4 bg-muted/50">
-                        <h3 className="text-md font-medium">Base Dough Recipe</h3>
-                        <FormDescription>Link this product to a base dough recipe for automated calculations.</FormDescription>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <FormField
-                                control={form.control}
-                                name="baseRecipe.recipeName"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Recipe</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <h3 className="text-md font-medium">Base Dough Recipes</h3>
+                        <FormDescription>Link this product to one or more base dough recipes for automated calculations.</FormDescription>
+                         {baseRecipeFields.map((field, index) => (
+                            <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-4 md:gap-2 p-2 border rounded-md md:items-end bg-background/50">
+                                <FormField
+                                    control={form.control}
+                                    name={`baseRecipes.${index}.recipeName`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Recipe</FormLabel>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a base recipe" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="none">None</SelectItem>
+                                                    {doughRecipes.map(recipe => (
+                                                        <SelectItem key={recipe.id} value={recipe.name}>
+                                                            {capitalize(recipe.name)}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name={`baseRecipes.${index}.weight`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Dough Weight (g)</FormLabel>
                                             <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select a base recipe" />
-                                                </SelectTrigger>
+                                                <Input type="number" step="any" placeholder="e.g. 45" {...field} className="md:w-28" />
                                             </FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="none">None</SelectItem>
-                                                {doughRecipes.map(recipe => (
-                                                    <SelectItem key={recipe.id} value={recipe.name}>
-                                                        {capitalize(recipe.name)}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="baseRecipe.weight"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Dough Weight (g)</FormLabel>
-                                        <FormControl>
-                                            <Input type="number" step="any" placeholder="e.g. 45" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                 <Button
+                                    type="button"
+                                    variant="destructive"
+                                    size="icon"
+                                    onClick={() => removeBaseRecipe(index)}
+                                    className="justify-self-end md:justify-self-auto"
+                                >
+                                    <Trash2 />
+                                </Button>
+                            </div>
+                        ))}
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => appendBaseRecipe({ recipeName: '', weight: '' })}
+                            className="mt-2"
+                        >
+                            <PlusCircle className="mr-2" /> Add Base Recipe
+                        </Button>
                     </div>
 
                     <div>
                         <h3 className="text-lg font-medium mb-2">Additional Ingredients</h3>
                         <div className="space-y-4">
-                            {fields.map((field, index) => (
+                            {ingredientFields.map((field, index) => (
                                 <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto_auto] gap-4 md:gap-2 p-2 border rounded-md md:items-end">
                                     <FormField
                                         control={form.control}
@@ -206,7 +235,7 @@ export function ProductForm({ productToEdit, recipes, onSubmit, onCancel }: Prod
                                         type="button"
                                         variant="destructive"
                                         size="icon"
-                                        onClick={() => remove(index)}
+                                        onClick={() => removeIngredient(index)}
                                         className="justify-self-end md:justify-self-auto"
                                     >
                                         <Trash2 />
@@ -217,7 +246,7 @@ export function ProductForm({ productToEdit, recipes, onSubmit, onCancel }: Prod
                         <Button
                             type="button"
                             variant="outline"
-                            onClick={() => append({ name: '', amount: '' as any, unit: 'g' })}
+                            onClick={() => appendIngredient({ name: '', amount: '' as any, unit: 'g' })}
                             className="mt-2"
                         >
                             <PlusCircle className="mr-2" /> Add Ingredient

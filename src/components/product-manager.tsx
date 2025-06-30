@@ -24,10 +24,10 @@ interface ProductManagerProps {
 
 type ProductFormData = { 
     name: string; 
-    baseRecipe?: {
+    baseRecipes?: {
         recipeName?: string;
         weight?: number | '';
-    };
+    }[];
     ingredients: { name: string; amount: number; unit: string }[];
     calculation?: { divisor?: number | '', unit?: string, multiplier?: number | '' } 
 };
@@ -36,7 +36,7 @@ export default function ProductManager({ products, recipes, updateProducts, isLo
     const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
     const [productToEdit, setProductToEdit] = useState<{ 
         name: string; 
-        baseRecipe?: BaseRecipeData;
+        baseRecipes?: BaseRecipeData[];
         ingredients: { name: string; amount: number; unit: string }[];
         calculation?: { divisor?: number; unit?: string; multiplier?: number; }
     } | null>(null);
@@ -50,7 +50,7 @@ export default function ProductManager({ products, recipes, updateProducts, isLo
     const handleEditClick = (productName: string, productData: ProductData) => {
         setProductToEdit({
             name: productName,
-            baseRecipe: productData.baseRecipe,
+            baseRecipes: productData.baseRecipes,
             ingredients: productData.ingredients ? Object.entries(productData.ingredients).map(([name, data]) => ({ name, amount: data.amount, unit: data.unit })) : [],
             calculation: productData.calculation
         });
@@ -79,10 +79,15 @@ export default function ProductManager({ products, recipes, updateProducts, isLo
             ingredients: newIngredients
         };
 
-        if (data.baseRecipe?.recipeName && data.baseRecipe.recipeName !== 'none' && data.baseRecipe.weight) {
-            newProductData.baseRecipe = {
-                recipeName: data.baseRecipe.recipeName,
-                weight: Number(data.baseRecipe.weight)
+        if (data.baseRecipes) {
+            newProductData.baseRecipes = data.baseRecipes
+                .filter(br => br.recipeName && br.recipeName !== 'none' && (br.weight || br.weight === 0))
+                .map(br => ({
+                    recipeName: br.recipeName!,
+                    weight: Number(br.weight)
+                }));
+            if (newProductData.baseRecipes.length === 0) {
+                delete newProductData.baseRecipes;
             }
         }
         
@@ -138,12 +143,12 @@ export default function ProductManager({ products, recipes, updateProducts, isLo
                             <CardHeader>
                                 <CardTitle className="text-lg">{capitalize(productName)}</CardTitle>
                                 <CardDescription>{productData.ingredients ? Object.keys(productData.ingredients).length : 0} additional ingredients</CardDescription>
-                                {productData.baseRecipe && (
-                                    <div className="flex items-center text-sm text-muted-foreground pt-1">
+                                {productData.baseRecipes && productData.baseRecipes.map((br, i) => (
+                                    <div key={i} className="flex items-center text-sm text-muted-foreground pt-1">
                                         <CookingPot className="h-4 w-4 mr-1"/>
-                                        Base: <strong>{capitalize(productData.baseRecipe.recipeName)} ({productData.baseRecipe.weight}g)</strong>
+                                        Base: <strong>{capitalize(br.recipeName)} ({br.weight}g)</strong>
                                     </div>
-                                )}
+                                ))}
                             </CardHeader>
                             <CardContent className="flex-grow pb-0">
                                  <Accordion type="single" collapsible className="w-full">

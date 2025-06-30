@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { PlusCircle, Edit, Trash2, ShieldAlert, BookHeart } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, ShieldAlert, BookHeart, Weight } from 'lucide-react';
 import { RecipeForm } from './recipe-form';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
@@ -25,6 +25,10 @@ interface RecipeManagerProps {
 export default function RecipeManager({ recipes, addRecipe, updateRecipe, deleteRecipe, isLoggedIn }: RecipeManagerProps) {
     const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
     const [recipeToEdit, setRecipeToEdit] = useState<Recipe | null>(null);
+
+    const calculateBaseWeight = (recipe: Recipe) => {
+        return recipe.ingredients.reduce((total, ingredient) => total + ingredient.amount, 0);
+    };
 
     const handleAddClick = () => {
         setRecipeToEdit(null);
@@ -71,11 +75,21 @@ export default function RecipeManager({ recipes, addRecipe, updateRecipe, delete
                     </Alert>
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {recipes.map((recipe) => (
+                    {recipes.map((recipe) => {
+                        const baseWeight = calculateBaseWeight(recipe);
+                        return (
                         <Card key={recipe.id} className="flex flex-col bg-background/70">
                             <CardHeader>
                                 <CardTitle className="text-lg">{capitalize(recipe.name)}</CardTitle>
-                                <CardDescription>{recipe.ingredients.length} ingredients, {recipe.steps.length} steps</CardDescription>
+                                <CardDescription className="flex flex-wrap items-center gap-x-2">
+                                    <span>{recipe.ingredients.length} ingredients</span>
+                                    <span>|</span>
+                                    <span>{recipe.steps.length} steps</span>
+                                </CardDescription>
+                                <div className="flex items-center text-sm text-muted-foreground pt-1">
+                                    <Weight className="h-4 w-4 mr-1"/>
+                                    Base Weight: <strong>{baseWeight.toLocaleString(undefined, {maximumFractionDigits: 0})}g</strong>
+                                </div>
                             </CardHeader>
                              <CardContent className="flex-grow pb-0">
                                 <Accordion type="single" collapsible className="w-full">
@@ -144,7 +158,7 @@ export default function RecipeManager({ recipes, addRecipe, updateRecipe, delete
                                 </AlertDialog>
                             </CardFooter>
                         </Card>
-                    ))}
+                    )})}
                 </div>
                 
                 <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>

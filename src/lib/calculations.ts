@@ -60,6 +60,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     // --- Hardcoded Total & Combined Calculations ---
     const safeGetDivisor = (productName: string): number => {
         const productData = findProductData(productName, productIngredientsData);
+        // Default to 1 to avoid division by zero if divisor is not set
         return productData?.calculation?.divisor || 1;
     };
     
@@ -99,7 +100,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
             if (productInput === 0) return totalRecipes;
 
             const productData = findProductData(productName, productIngredientsData);
-            const doughWeightPerPiece = productData?.ingredients[recipeIngredientName]?.amount || 0;
+            const doughWeightPerPiece = productData?.ingredients[recipeIngredientName.toLowerCase()]?.amount || 0;
             
             if (doughWeightPerPiece > 0) {
                 const recipesForProduct = (productInput * doughWeightPerPiece) / recipeBaseWeight;
@@ -109,18 +110,18 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         }, 0);
     };
 
-    const adonanPahaAyamResep = calculateRecipeNeeded(['donut paha ayam'], 'Adonan Donut Paha Ayam', 'Adonan Donut Paha Ayam');
+    const adonanPahaAyamResep = calculateRecipeNeeded(['donut paha ayam'], 'adonan donut paha ayam', 'Adonan Donut Paha Ayam');
     if (adonanPahaAyamResep > 0) productionCalculations.push(['Adonan Donut Paha Ayam', `${adonanPahaAyamResep.toFixed(2)} resep`]);
     
     const donutDeptProducts = ["Donut Almond", "Donut Coklat Ceres", "Donut Coklat Kacang", "Donut Gula Halus", "Donut Keju", "Donut Oreo", "7K BOMBOLONI CAPPUCINO", "7K BOMBOLONI DARK COKLAT", "7K BOMBOLONI GREENTEA", "7K BOMBOLONI TIRAMISU"];
-    const adonanDonutDeptResep = calculateRecipeNeeded(donutDeptProducts, 'Adonan Donat Joko', 'Adonan Donat Joko');
+    const adonanDonutDeptResep = calculateRecipeNeeded(donutDeptProducts, 'adonan donat joko', 'Adonan Donat Joko');
     if (adonanDonutDeptResep > 0) productionCalculations.push(['Adonan Donat', `${adonanDonutDeptResep.toFixed(2)} resep`]);
 
-    const adonanRollTotalResep = calculateRecipeNeeded(totalRollProducts, 'Adonan Roti Manis Roll', 'Adonan Roti Manis Roll');
+    const adonanRollTotalResep = calculateRecipeNeeded(totalRollProducts, 'adonan roti manis roll', 'Adonan Roti Manis Roll');
     if (adonanRollTotalResep > 0) productionCalculations.push(['Adonan Roti Manis Roll', `${adonanRollTotalResep.toFixed(2)} resep`]);
 
     const mesinProducts = ["maxicana coklat", "abon ayam pedas", "red velvet cream cheese", "abon sosis", "cream choco cheese", "double coklat", "hot sosis", "kacang merah", "sosis label", "strawberry almond", "vanilla oreo"];
-    const adonanMesinTotalResep = calculateRecipeNeeded(mesinProducts, 'Adonan Roti Manis Mesin', 'Adonan Roti Manis Mesin');
+    const adonanMesinTotalResep = calculateRecipeNeeded(mesinProducts, 'adonan roti manis mesin', 'Adonan Roti Manis Mesin');
     if (adonanMesinTotalResep > 0) productionCalculations.push(['Adonan Roti Manis Mesin', `${adonanMesinTotalResep.toFixed(2)} resep`]);
     
     // --- Other Hardcoded Recipe Calculations ---
@@ -170,10 +171,11 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
             if (recipe) {
                 recipe.ingredients.forEach(ing => {
                     const totalAmount = ing.amount * recipeMultiplier;
-                    if (!ingredientSummaryMap[ing.name]) {
-                        ingredientSummaryMap[ing.name] = { amount: 0, unit: ing.unit };
+                    const ingredientName = ing.name.toLowerCase();
+                    if (!ingredientSummaryMap[ingredientName]) {
+                        ingredientSummaryMap[ingredientName] = { amount: 0, unit: ing.unit };
                     }
-                    ingredientSummaryMap[ing.name].amount += totalAmount;
+                    ingredientSummaryMap[ingredientName].amount += totalAmount;
                 });
             }
         }
@@ -190,10 +192,11 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
                     if (!findRecipe(ingName, allRecipes)) {
                         const ingData = productData.ingredients[ingName];
                         const totalAmount = ingData.amount * quantity;
-                         if (!ingredientSummaryMap[ingName]) {
-                            ingredientSummaryMap[ingName] = { amount: 0, unit: ingData.unit };
+                        const ingredientName = ingName.toLowerCase();
+                        if (!ingredientSummaryMap[ingredientName]) {
+                            ingredientSummaryMap[ingredientName] = { amount: 0, unit: ingData.unit };
                         }
-                        ingredientSummaryMap[ingName].amount += totalAmount;
+                        ingredientSummaryMap[ingredientName].amount += totalAmount;
                     }
                 }
             }
@@ -206,7 +209,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         .sort((a, b) => a[0].localeCompare(b[0]));
         
     return {
-        productionCalculations,
+        productionCalculations: productionCalculations.sort((a, b) => a[0].localeCompare(b[0])),
         ingredientSummary,
     };
 }

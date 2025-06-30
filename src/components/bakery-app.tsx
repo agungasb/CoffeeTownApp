@@ -204,7 +204,7 @@ export default function BakeryApp({
 
   return (
     <>
-      <div className="flex flex-col items-center min-h-screen pb-20">
+      <div className="flex flex-col items-center min-h-screen pb-16">
         
         <header className="fixed top-0 left-0 w-full p-2 md:p-4 z-20 glassmorphic flex justify-between items-center">
             <div>
@@ -280,7 +280,7 @@ export default function BakeryApp({
             </div>
         </header>
 
-        <div className="fixed top-[74px] md:top-[96px] left-0 w-full z-10 py-2 glassmorphic flex flex-col items-center justify-center gap-4">
+        <div className="fixed top-[61px] md:top-[92px] left-0 w-full z-10 py-2 glassmorphic flex flex-col items-center justify-center gap-4">
             <div className="overflow-x-auto hide-scrollbar w-full">
                 <div className="flex justify-start md:justify-center items-center gap-5 px-4">
                   {TABS.map((tab) => (
@@ -311,7 +311,7 @@ export default function BakeryApp({
         </div>
 
 
-        <main className="w-full max-w-7xl mt-[190px] md:mt-[212px] p-4 sm:p-6 md:p-8">
+        <main className="w-full max-w-7xl mt-[177px] md:mt-[208px] p-4 sm:p-6 md:p-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsContent value="calculator">
               <ProductionCalculator 
@@ -360,7 +360,7 @@ export default function BakeryApp({
           </Tabs>
         </main>
         
-        <footer className="fixed bottom-0 left-0 w-full p-4 text-center glassmorphic border-t border-foreground/30 text-primary-foreground font-medium text-sm">
+        <footer className="fixed bottom-0 left-0 w-full p-3 text-center glassmorphic border-t border-foreground/30 text-primary-foreground font-medium text-xs">
             © 2024 Coffee Town Bakery. All Rights Reserved. | Follow me <a href="https://twitter.com/Agung_styb" target="_blank" rel="noopener noreferrer" className="font-bold underline text-accent-foreground/80 hover:text-accent-foreground">@Agung_styb</a>
         </footer>
       </div>

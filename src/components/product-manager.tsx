@@ -43,7 +43,7 @@ export default function ProductManager({ products, updateProducts, isLoggedIn }:
     const handleEditClick = (productName: string, productData: ProductData) => {
         setProductToEdit({
             name: productName,
-            ingredients: Object.entries(productData.ingredients).map(([name, data]) => ({ name, amount: data.amount, unit: data.unit })),
+            ingredients: productData.ingredients ? Object.entries(productData.ingredients).map(([name, data]) => ({ name, amount: data.amount, unit: data.unit })) : [],
             calculation: productData.calculation
         });
         setIsFormDialogOpen(true);
@@ -117,7 +117,7 @@ export default function ProductManager({ products, updateProducts, isLoggedIn }:
                         <Card key={productName} className="flex flex-col bg-background/70">
                             <CardHeader>
                                 <CardTitle className="text-lg">{capitalize(productName)}</CardTitle>
-                                <CardDescription>{Object.keys(productData.ingredients).length} ingredients</CardDescription>
+                                <CardDescription>{productData.ingredients ? Object.keys(productData.ingredients).length : 0} ingredients</CardDescription>
                             </CardHeader>
                             <CardContent className="flex-grow pb-0">
                                  <Accordion type="single" collapsible className="w-full">
@@ -133,7 +133,7 @@ export default function ProductManager({ products, updateProducts, isLoggedIn }:
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
-                                                    {Object.entries(productData.ingredients).map(([ingredientName, ingredientData]) => (
+                                                    {productData.ingredients && Object.entries(productData.ingredients).map(([ingredientName, ingredientData]) => (
                                                     <TableRow key={ingredientName}>
                                                         <TableCell className="p-2">{capitalize(ingredientName)}</TableCell>
                                                         <TableCell className="p-2 text-right">{typeof ingredientData.amount === 'number' ? ingredientData.amount.toFixed(3) : ingredientData.amount}</TableCell>

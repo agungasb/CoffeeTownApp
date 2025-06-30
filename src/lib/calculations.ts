@@ -1,7 +1,7 @@
 
 import { z } from "zod";
 import type { AllProductsData } from "./productIngredients";
-import { recipes as initialRecipesData } from './recipes';
+import { recipes as initialRecipesData, Recipe } from './recipes';
 
 // This function creates a Zod schema dynamically based on a list of product names.
 export function createProductionSchema(products: string[]) {
@@ -14,26 +14,39 @@ export function createProductionSchema(products: string[]) {
 
 export type ProductionInputs = Record<string, number>;
 
+// --- Helper Data ---
+const recipesByName: Record<string, Recipe> = initialRecipesData.reduce((acc, recipe) => {
+    acc[recipe.name.toLowerCase()] = recipe;
+    return acc;
+}, {} as Record<string, Recipe>);
+
+const recipeTotalWeights: Record<string, number> = initialRecipesData.reduce((acc, recipe) => {
+    // A bit of a hack for egg cream's oil which is in ml. Assume 1ml = 1g for this calculation.
+    acc[recipe.name.toLowerCase()] = recipe.ingredients.reduce((sum, ing) => sum + ing.amount, 0);
+    return acc;
+}, {} as Record<string, number>);
+
+
 export function calculateProductionMetrics(inputs: ProductionInputs, productIngredientsData: AllProductsData) {
     const numInputs: { [key: string]: number } = {};
     for (const key of Object.keys(inputs)) {
         numInputs[key] = Number(inputs[key]) || 0;
     }
 
-    const getDivisor = (productName: string, fallback: number = 1): number => {
+    const getDivisor = (productName: string): number => {
         const divisor = productIngredientsData[productName]?.calculation?.divisor;
-        // Ensure divisor is a positive number, otherwise default to the fallback (or 1)
-        return (divisor && divisor > 0) ? divisor : fallback;
+        return (divisor && divisor > 0) ? divisor : 1;
     };
-    
+
     const productionCalculations: [string, string][] = [];
+    const ingredientSummaryMap: Record<string, { amount: number; unit: string }> = {};
+    const recipeResepMap: Record<string, number> = {};
 
-    // --- Start with the fixed order of metrics ---
-
+    // --- SECTION 1: Fixed Calculations (Total Roll, Roti, etc.) ---
     const totalRollValue = (
-        ( (numInputs['abon piramid'] || 0) / getDivisor('abon piramid', 11) ) +
-        ( (numInputs['abon roll pedas'] || 0) / getDivisor('abon roll pedas', 12) ) +
-        ( (numInputs['cheese roll'] || 0) / getDivisor('cheese roll', 12) )
+        ( (numInputs['abon piramid'] || 0) / getDivisor('abon piramid') ) +
+        ( (numInputs['abon roll pedas'] || 0) / getDivisor('abon roll pedas') ) +
+        ( (numInputs['cheese roll'] || 0) / getDivisor('cheese roll') )
     ) / 12;
     productionCalculations.push(["Total Roll", `${totalRollValue.toFixed(2)} loyang`]);
     
@@ -79,34 +92,108 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     ) / 15;
     productionCalculations.push(["Total Slongsong", `${totalSlongsong.toFixed(2)} trolley (*include hot sosis)`]);
 
-    // --- Component Recipe Calculations (Hardcoded from original HTML) ---
-    const eggCreamResep = ((numInputs['abon ayam pedas'] * 18 + numInputs['abon sosis'] * 10 + numInputs['abon piramid'] * 24 + numInputs['abon roll pedas'] * 18) / 22260);
-    productionCalculations.push(["Egg Cream", `${eggCreamResep.toFixed(2)} resep`]);
-    
-    const creamCheeseResep = ((numInputs['red velvet cream cheese'] * 48) / 10000);
-    productionCalculations.push(["Cream Cheese", `${creamCheeseResep.toFixed(2)} resep`]);
+    // --- SECTION 2: Dynamic Resep and Ingredient Summary Calculations ---
 
-    const butterResep = ((numInputs['cream choco cheese'] * 17 + numInputs['cheese roll'] * 13) / 9000);
-    productionCalculations.push(["Butter", `${butterResep.toFixed(2)} resep`]);
+    // Calculate total grams needed for each component recipe based on production inputs
+    const recipeGramsNeeded: Record<string, number> = {};
+    for (const [productName, quantity] of Object.entries(numInputs)) {
+        if (quantity <= 0) continue;
+        const productData = productIngredientsData[productName];
+        if (!productData || !productData.ingredients) continue;
 
-    const butterDonatResep = ((numInputs['donut paha ayam'] * 12) / 10000);
-    productionCalculations.push(["Butter Donat", `${butterDonatResep.toFixed(2)} resep`]);
+        for (const [ingName, ingData] of Object.entries(productData.ingredients)) {
+            const key = ingName.toLowerCase();
+            if (recipesByName[key] && ingData.unit === 'g') { // It's a component recipe measured in grams
+                if (!recipeGramsNeeded[key]) recipeGramsNeeded[key] = 0;
+                recipeGramsNeeded[key] += ingData.amount * quantity;
+            }
+        }
+    }
     
-    const coklatGanacheResep = ((numInputs['double coklat'] * 17) / 6000);
-    productionCalculations.push(["Coklat Ganache", `${coklatGanacheResep.toFixed(2)} resep`]);
+    // Calculate resep counts and add them to the main results
+    const orderedRecipeNames = [
+        "egg cream", "cream cheese", "butter", "butter donat", "coklat ganache", 
+        "topping maxicana", "fla abon taiwan", "adonan abon taiwan"
+    ];
 
-    const toppingMaxicanaResep = ((numInputs['maxicana coklat'] * 10) / 13100);
-    productionCalculations.push(["Topping Maxicana", `${toppingMaxicanaResep.toFixed(2)} resep`]);
-    
-    const flaAbonTaiwanResep = ((numInputs['abon taiwan'] * 30) / 328);
-    productionCalculations.push(["Fla Abon Taiwan", `${flaAbonTaiwanResep.toFixed(2)} resep`]);
+    for (const recipeName of orderedRecipeNames) {
+        let resepCount = 0;
+        if(recipeName === "adonan abon taiwan") {
+            // This is a special case where the unit is 'resep' in product data
+             const productData = productIngredientsData["abon taiwan"];
+             if (productData) {
+                resepCount = (numInputs['abon taiwan'] || 0) * (productData.ingredients['Adonan Abon Taiwan']?.amount || 0);
+             }
+        } else {
+            const totalGrams = recipeGramsNeeded[recipeName] || 0;
+            const batchWeight = recipeTotalWeights[recipeName] || 1;
+            resepCount = totalGrams / batchWeight;
+        }
 
-    const adonanAbonTaiwanResep = (numInputs['abon taiwan'] / 4);
-    productionCalculations.push(["Adonan Abon Taiwan", `${adonanAbonTaiwanResep.toFixed(2)} resep (*kali 2 telur)`]);
-    
+        recipeResepMap[recipeName] = resepCount;
+
+        let resepString = `${resepCount.toFixed(2)} resep`;
+        if (recipeName === "adonan abon taiwan") {
+            resepString += " (*kali 2 telur)";
+        }
+        productionCalculations.push([recipeName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '), resepString]);
+    }
+
+    // Now, calculate the ingredient summary
+    // A. Add ingredients from component recipes
+    for (const [recipeName, resepCount] of Object.entries(recipeResepMap)) {
+        if (resepCount <= 0) continue;
+        const recipeData = recipesByName[recipeName];
+        if (recipeData) {
+            for (const ingredient of recipeData.ingredients) {
+                const key = ingredient.name.toLowerCase();
+                if (!ingredientSummaryMap[key]) {
+                    ingredientSummaryMap[key] = { amount: 0, unit: ingredient.unit };
+                }
+                ingredientSummaryMap[key].amount += ingredient.amount * resepCount;
+            }
+        }
+    }
+
+    // B. Add raw ingredients that are NOT component recipes
+    for (const [productName, quantity] of Object.entries(numInputs)) {
+        if (quantity <= 0) continue;
+        const productData = productIngredientsData[productName];
+        if (!productData || !productData.ingredients) continue;
+
+        for (const [ingName, ingData] of Object.entries(productData.ingredients)) {
+            const key = ingName.toLowerCase();
+            // If it's NOT a recipe, it's a raw material.
+            if (!recipesByName[key]) {
+                if (!ingredientSummaryMap[key]) {
+                    ingredientSummaryMap[key] = { amount: 0, unit: ingData.unit };
+                }
+                // Handle base dough recipes which are already in "resep" units
+                if (ingData.unit === 'resep') {
+                    const baseDoughRecipe = recipesByName[key];
+                    if (baseDoughRecipe) {
+                         for (const subIng of baseDoughRecipe.ingredients) {
+                            const subKey = subIng.name.toLowerCase();
+                             if (!ingredientSummaryMap[subKey]) {
+                                ingredientSummaryMap[subKey] = { amount: 0, unit: subIng.unit };
+                            }
+                            ingredientSummaryMap[subKey].amount += subIng.amount * ingData.amount * quantity;
+                        }
+                    }
+                } else {
+                     ingredientSummaryMap[key].amount += ingData.amount * quantity;
+                }
+            }
+        }
+    }
+
+    const ingredientSummary = Object.entries(ingredientSummaryMap)
+        .map(([name, data]) => [name, data.amount.toFixed(2), data.unit] as [string, string, string])
+        .sort((a, b) => a[0].localeCompare(b[0]));
+        
     return {
         productionCalculations,
-        ingredientSummary: [], // Placeholder for now
+        ingredientSummary,
     };
 }
 

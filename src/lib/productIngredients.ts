@@ -22,50 +22,15 @@ export interface AllProductsData {
 }
 
 const donutPahaAyamBase = {
-    "tepung": { amount: 12.25, unit: "g" },
-    "premix": { amount: 12.25, unit: "g" },
-    "gula pasir": { amount: 2.94, unit: "g" },
-    "susu bubuk": { amount: 1.225, unit: "g" },
-    "ragi": { amount: 0.3675, unit: "g" },
-    "pelembut": { amount: 0.0735, unit: "g" },
-    "telur utuh": { amount: 0.0735, unit: "g" },
-    "margarin": { amount: 1.8375, unit: "g" },
-    "bos": { amount: 1.8375, unit: "g" },
-    "garam": { amount: 0.294, unit: "g" },
-    "air": { amount: 3.675, unit: "g" },
-    "es batu": { amount: 3.675, unit: "g" },
+    "Adonan Donut Paha Ayam": { amount: 1, unit: "resep" },
 };
 
 const adonanRotiManisMesin = {
-    "tepung": { amount: 24.5, unit: "g" },
-    "gula pasir": { amount: 3.675, unit: "g" },
-    "susu bubuk": { amount: 1.225, unit: "g" },
-    "pelembut": { amount: 0.196, unit: "g" },
-    "ragi": { amount: 0.3675, unit: "g" },
-    "es batu": { amount: 3.675, unit: "g" },
-    "air": { amount: 4.9, unit: "g" },
-    "margarin": { amount: 1.8375, unit: "g" },
-    "bos": { amount: 1.8375, unit: "g" },
-    "garam": { amount: 0.3675, unit: "g" },
-    "bakom": { amount: 0.6125, unit: "g" },
-    "telur utuh": { amount: 0.0735, unit: "g" },
-    "telur kuning": { amount: 0.049, unit: "g" },
+    "Adonan Roti Manis Mesin": { amount: 1, unit: "resep" },
 };
 
 const adonanRotiManisRoll = {
-    "tepung": { amount: 33.3333, unit: "g" },
-    "gula pasir": { amount: 5, unit: "g" },
-    "susu bubuk": { amount: 1.6666, unit: "g" },
-    "pelembut": { amount: 0.2666, unit: "g" },
-    "ragi": { amount: 0.5, unit: "g" },
-    "es batu": { amount: 5, unit: "g" },
-    "air": { amount: 6.6666, unit: "g" },
-    "margarin": { amount: 2.5, unit: "g" },
-    "bos": { amount: 2.5, unit: "g" },
-    "garam": { amount: 0.5, unit: "g" },
-    "bakom": { amount: 0.8333, unit: "g" },
-    "telur utuh": { amount: 0.1, unit: "g" },
-    "telur kuning": { amount: 0.06666, unit: "g" },
+    "Adonan Roti Manis Roll": { amount: 1, unit: "resep" },
 };
 
 export const productIngredientsData: AllProductsData = {

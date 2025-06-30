@@ -65,34 +65,57 @@ async function fetchDataAndSeed() {
 
     // 2. Fetch all data for the application directly from Firestore.
     const recipesSnapshot = await getDocs(collection(db, 'recipes'));
-    const recipes: Recipe[] = recipesSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Recipe));
+    const recipes: Recipe[] = recipesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Recipe));
 
     const productsDoc = await getDoc(doc(db, 'appData', 'products'));
-    const products: AllProductsData = productsDoc.exists() ? productsDoc.data().data : {};
+    let products: AllProductsData = productsDoc.exists() ? productsDoc.data().data : {};
 
     const inventorySnapshot = await getDocs(collection(db, 'inventory'));
-    let inventory: InventoryItem[] = inventorySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as InventoryItem));
+    let inventory: InventoryItem[] = inventorySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as InventoryItem));
 
-    // Data migration: ensure all inventory items have a department.
-    // This handles data that existed before the 'department' field was introduced.
-    const migrationBatch = writeBatch(db);
-    let migrationBatchHasUpdates = false;
+    // --- Data Migrations ---
+    // This section ensures that data stored in Firestore is compatible with the latest code changes.
+
+    // Migration for inventory items missing a 'department'.
+    const inventoryMigrationBatch = writeBatch(db);
+    let inventoryMigrationRequired = false;
     inventory = inventory.map(item => {
         if (!item.department) {
             const docRef = doc(db, 'inventory', item.id);
             // Default existing items to 'rotiManis'
-            migrationBatch.update(docRef, { department: 'rotiManis' });
-            migrationBatchHasUpdates = true;
-            // Update the item in memory immediately for the current page load
+            inventoryMigrationBatch.update(docRef, { department: 'rotiManis' });
+            inventoryMigrationRequired = true;
             return { ...item, department: 'rotiManis' };
         }
         return item;
     });
 
-    if (migrationBatchHasUpdates) {
+    if (inventoryMigrationRequired) {
         console.log("Performing one-time data migration for inventory items...");
-        await migrationBatch.commit();
+        await inventoryMigrationBatch.commit();
         console.log("Inventory migration complete.");
+    }
+    
+    // Migration for products missing 'ingredients' or 'calculation' data.
+    let productsMigrationRequired = false;
+    for (const productName in initialProductData) {
+        const masterData = initialProductData[productName];
+        const liveData = products[productName];
+
+        if (!liveData || !liveData.ingredients || !liveData.calculation) {
+            products[productName] = {
+                ...masterData, // Start with the master template
+                ...liveData,   // Then apply any existing live data over it
+            };
+            productsMigrationRequired = true;
+        }
+    }
+
+    if (productsMigrationRequired) {
+        console.log("Performing one-time data migration for products...");
+        const productsDocRef = doc(db, 'appData', 'products');
+        await setDoc(productsDocRef, { data: products });
+        console.log("Product data migration complete.");
     }
 
 

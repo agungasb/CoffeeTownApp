@@ -23,14 +23,22 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         return productIngredientsData[productName]?.calculation?.divisor || fallback;
     };
     
+    // --- Start of Calculations ---
+    const productionCalculations: [string, string][] = [];
+
+    // Total Roll
     const totalRollValue = (
         ( (numInputs['abon piramid'] || 0) / getDivisor('abon piramid', 11) ) +
         ( (numInputs['abon roll pedas'] || 0) / getDivisor('abon roll pedas', 12) ) +
         ( (numInputs['cheese roll'] || 0) / getDivisor('cheese roll', 12) )
     ) / 12;
-
+    productionCalculations.push(["Total Roll", `${totalRollValue.toFixed(2)} loyang`]);
+    
+    // Total Roti
     const totalRoti = Object.values(numInputs).reduce((sum, current) => sum + (current || 0), 0);
+    productionCalculations.push(["Total Roti", `${totalRoti.toFixed(0)} pcs`]);
 
+    // Total Box Tray
     const totalBoxTray = (
         (numInputs['abon ayam pedas'] || 0) / 15 +
         (numInputs['abon piramid'] || 0) / 20 +
@@ -49,7 +57,9 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         (numInputs['vanilla oreo'] || 0) / 15 +
         (numInputs['abon taiwan'] || 0) / 15
     );
-    
+    productionCalculations.push(["Total Box Tray", `${totalBoxTray.toFixed(2)} pcs`]);
+
+    // Total Loyang
     let totalLoyang = 0;
     for (const [productName, quantity] of Object.entries(numInputs)) {
         if (quantity > 0) {
@@ -60,14 +70,22 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
             }
         }
     }
-
-
-    const productionCalculations: [string, string][] = [];
-
-    productionCalculations.push(["Total Roll", `${totalRollValue.toFixed(2)} loyang`]);
-    productionCalculations.push(["Total Roti", `${totalRoti.toFixed(0)} pcs`]);
-    productionCalculations.push(["Total Box Tray", `${totalBoxTray.toFixed(2)} pcs`]);
     productionCalculations.push(["Total Loyang", `${totalLoyang.toFixed(2)} pcs`]);
+
+    // Total Slongsong
+    const totalSlongsong = (
+        (
+            (numInputs['abon ayam pedas'] || 0) + 
+            (numInputs['cream choco cheese'] || 0) + 
+            (numInputs['double coklat'] || 0) + 
+            (numInputs['hot sosis'] || 0) + 
+            (numInputs['strawberry almond'] || 0)
+        ) / 15
+    ) / 15;
+    productionCalculations.push(["Total Slongsong", `${totalSlongsong.toFixed(2)} trolley (*include hot sosis)`]);
+
+
+    // --- End of Calculations ---
 
 
     const ingredientTotals: Record<string, { amount: number, unit: string }> = {};

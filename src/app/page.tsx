@@ -37,7 +37,7 @@ async function fetchDataAndSeed() {
         
         // Seed Recipes
         initialRecipesData.forEach(recipe => {
-            const docRef = doc(db, 'recipes', recipe.id);
+            const docRef = doc(collection(db, 'recipes'));
             batch.set(docRef, recipe);
         });
 
@@ -47,8 +47,7 @@ async function fetchDataAndSeed() {
         
         // Seed Inventory
         initialInventoryData.forEach(item => {
-            // Firestore can auto-generate IDs, but we use predefined ones for seeding.
-            const docRef = doc(db, 'inventory', item.id);
+            const docRef = doc(collection(db, 'inventory'));
             batch.set(docRef, item);
         });
 
@@ -66,13 +65,36 @@ async function fetchDataAndSeed() {
 
     // 2. Fetch all data for the application directly from Firestore.
     const recipesSnapshot = await getDocs(collection(db, 'recipes'));
-    const recipes: Recipe[] = recipesSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Recipe));
+    const recipes: Recipe[] = recipesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Recipe));
 
     const productsDoc = await getDoc(doc(db, 'appData', 'products'));
     const products: ProductIngredients = productsDoc.exists() ? productsDoc.data().data : {};
 
     const inventorySnapshot = await getDocs(collection(db, 'inventory'));
-    const inventory: InventoryItem[] = inventorySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as InventoryItem));
+    let inventory: InventoryItem[] = inventorySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as InventoryItem));
+
+    // Data migration: ensure all inventory items have a department.
+    // This handles data that existed before the 'department' field was introduced.
+    const migrationBatch = writeBatch(db);
+    let migrationBatchHasUpdates = false;
+    inventory = inventory.map(item => {
+        if (!item.department) {
+            const docRef = doc(db, 'inventory', item.id);
+            // Default existing items to 'rotiManis'
+            migrationBatch.update(docRef, { department: 'rotiManis' });
+            migrationBatchHasUpdates = true;
+            // Update the item in memory immediately for the current page load
+            return { ...item, department: 'rotiManis' };
+        }
+        return item;
+    });
+
+    if (migrationBatchHasUpdates) {
+        console.log("Performing one-time data migration for inventory items...");
+        await migrationBatch.commit();
+        console.log("Inventory migration complete.");
+    }
+
 
     const dailyUsageSnapshot = await getDocs(query(collection(db, 'dailyUsage'), orderBy('date', 'desc')));
     const dailyUsage: DailyUsageRecord[] = dailyUsageSnapshot.docs.map(doc => {

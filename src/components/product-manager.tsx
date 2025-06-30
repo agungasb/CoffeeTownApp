@@ -79,7 +79,7 @@ export default function ProductManager({ products, recipes, updateProducts, isLo
             ingredients: newIngredients
         };
 
-        if (data.baseRecipe?.recipeName && data.baseRecipe.weight) {
+        if (data.baseRecipe?.recipeName && data.baseRecipe.recipeName !== 'none' && data.baseRecipe.weight) {
             newProductData.baseRecipe = {
                 recipeName: data.baseRecipe.recipeName,
                 weight: Number(data.baseRecipe.weight)

@@ -31,10 +31,15 @@ const productFormSchema = z.object({
         multiplier: z.coerce.number().positive("Multiplier must be a positive number.").optional().or(z.literal('')),
     }).optional()
 }).refine(data => {
-    if (data.baseRecipe?.recipeName && (data.baseRecipe.weight === undefined || data.baseRecipe.weight === '')) {
+    const recipeName = data.baseRecipe?.recipeName;
+    const weight = data.baseRecipe?.weight;
+    
+    // A real recipe is selected, but weight is missing
+    if (recipeName && recipeName !== 'none' && (weight === undefined || weight === '')) {
         return false;
     }
-    if ((data.baseRecipe?.weight) && !data.baseRecipe.recipeName) {
+    // Weight is entered, but no real recipe is selected
+    if ((weight || weight === 0) && (!recipeName || recipeName === 'none')) {
         return false;
     }
     return true;
@@ -42,6 +47,7 @@ const productFormSchema = z.object({
     message: "Weight is required if a base recipe is selected.",
     path: ["baseRecipe", "weight"],
 });
+
 
 type ProductFormData = z.infer<typeof productFormSchema>;
 
@@ -124,7 +130,7 @@ export function ProductForm({ productToEdit, recipes, onSubmit, onCancel }: Prod
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                <SelectItem value="">None</SelectItem>
+                                                <SelectItem value="none">None</SelectItem>
                                                 {doughRecipes.map(recipe => (
                                                     <SelectItem key={recipe.id} value={recipe.name}>
                                                         {capitalize(recipe.name)}

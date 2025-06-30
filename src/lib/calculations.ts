@@ -1,58 +1,47 @@
 
 import { z } from "zod";
-import { productItems } from "./products";
 import type { ProductIngredients } from "./productIngredients";
 
-export const productionSchema = z.object(
-    productItems.reduce((acc, item) => {
+// This function creates a Zod schema dynamically based on a list of product names.
+export function createProductionSchema(products: string[]) {
+    const shape = products.reduce((acc, item) => {
         acc[item] = z.coerce.number().min(0).default(0);
         return acc;
-    }, {} as Record<string, z.ZodType<number, any, number>>)
-);
+    }, {} as Record<string, z.ZodType<number, any, number>>);
+    return z.object(shape);
+}
 
-export type ProductionInputs = z.infer<typeof productionSchema>;
+export type ProductionInputs = Record<string, number>;
 
 export function calculateProductionMetrics(inputs: ProductionInputs, productIngredientsData: ProductIngredients) {
     const numInputs: { [key: string]: number } = {};
-    for (const key of Object.keys(productIngredientsData)) {
-        numInputs[key] = Number(inputs[key as keyof ProductionInputs]) || 0;
+    for (const key of Object.keys(inputs)) {
+        numInputs[key] = Number(inputs[key]) || 0;
     }
 
+    // These calculations are specific to the 'Roti Manis' department
+    // They will default to 0 if the products don't exist in the current `inputs`.
     const calculations = {
-        "Abon Ayam Pedas": `${(numInputs['abon ayam pedas'] / 15).toFixed(2)} loyang`,
-        "Abon Piramid": `${(numInputs['abon piramid'] / 11).toFixed(2)} loyang`,
-        "Abon Roll Pedas": `${(numInputs['abon roll pedas'] / 12).toFixed(2)} loyang`,
-        "Abon Sosis": `${(numInputs['abon sosis'] / 15).toFixed(2)} loyang`,
-        "Cheese Roll": `${(numInputs['cheese roll'] / 12).toFixed(2)} loyang`,
-        "Cream Choco Cheese": `${(numInputs['cream choco cheese'] / 15).toFixed(2)} loyang`,
-        "Donut Paha Ayam": `${(numInputs['donut paha ayam'] / 15).toFixed(2)} loyang`,
-        "Double Coklat": `${(numInputs['double coklat'] / 15).toFixed(2)} loyang`,
-        "Hot Sosis": `${(numInputs['hot sosis'] / 15).toFixed(2)} loyang`,
-        "Kacang Merah": `${(numInputs['kacang merah'] / 15).toFixed(2)} loyang`,
-        "Maxicana Coklat": `${(numInputs['maxicana coklat'] / 15).toFixed(2)} loyang`,
-        "Red Velvet Cream Cheese": `${(numInputs['red velvet cream cheese'] / 15).toFixed(2)} loyang`,
-        "Sosis Label": `${(numInputs['sosis label'] / 12).toFixed(2)} loyang`,
-        "Strawberry Almond": `${(numInputs['strawberry almond'] / 15).toFixed(2)} loyang`,
-        "Vanilla Oreo": `${(numInputs['vanilla oreo'] / 15).toFixed(2)} loyang`,
-        "Abon Taiwan": `${((numInputs['abon taiwan'] * 2) / 15).toFixed(2)} loyang`,
-        "Total Sosis": `${((((numInputs['abon sosis'] / 2) + numInputs['hot sosis'] + numInputs['sosis label']) / 10) / 28).toFixed(2)} dus`,
-        "Adonan Donat": `${((numInputs['donut paha ayam'] * 48) / 1800).toFixed(2)} resep`,
-        "Adonan Roti Manis Roll": `${(((numInputs['abon piramid'] / 11) + (numInputs['abon roll pedas'] / 12) + (numInputs['cheese roll'] / 12)) * 800 / 2013).toFixed(2)} resep`,
-        "Adonan Roti Manis Mesin": `${((numInputs['abon ayam pedas'] + numInputs['abon sosis'] + numInputs['cream choco cheese'] + numInputs['double coklat'] + numInputs['hot sosis'] + numInputs['kacang merah'] + numInputs['maxicana coklat'] + numInputs['sosis label'] + numInputs['strawberry almond'] + numInputs['vanilla oreo']) * 49 / 1948).toFixed(2)} resep`,
-        "Total Roll": `${(((numInputs['abon piramid'] / 11) + (numInputs['abon roll pedas'] / 12) + (numInputs['cheese roll'] / 12)) / 12).toFixed(2)} loyang`,
-        "Total Roti": `${Object.values(numInputs).reduce((acc, curr) => acc + curr, 0).toFixed(2)} pcs`,
-        "Total Box Container": `${((numInputs['abon ayam pedas'] / 15) + (numInputs['abon piramid'] / 20) + (numInputs['abon roll pedas'] / 25) + (numInputs['abon sosis'] / 15) + (numInputs['cheese roll'] / 35) + (numInputs['cream choco cheese'] / 12) + (numInputs['donut paha ayam'] / 15) + (numInputs['double coklat'] / 15) + (numInputs['hot sosis'] / 15) + (numInputs['kacang merah'] / 15) + (numInputs['maxicana coklat'] / 15) + (numInputs['red velvet cream cheese'] / 15) + (numInputs['sosis label'] / 15) + (numInputs['strawberry almond'] / 15) + (numInputs['vanilla oreo'] / 15) + (numInputs['abon taiwan'] / 15)).toFixed(2)} pcs`,
-        "Total Loyang": `${((numInputs['abon ayam pedas'] / 15) + (numInputs['abon piramid'] / 11) + (numInputs['abon roll pedas'] / 12) + (numInputs['abon sosis'] / 15) + (numInputs['cheese roll'] / 12) + (numInputs['cream choco cheese'] / 15) + (numInputs['donut paha ayam'] / 15) + (numInputs['double coklat'] / 15) + (numInputs['hot sosis'] / 15) + (numInputs['kacang merah'] / 15) + (numInputs['maxicana coklat'] / 15) + (numInputs['red velvet cream cheese'] / 15) + (numInputs['sosis label'] / 12) + (numInputs['strawberry almond'] / 15) + (numInputs['vanilla oreo'] / 15) + (numInputs['abon taiwan'] / 15)).toFixed(2)} pcs`,
-        "Total Slongsong": `${(((numInputs['abon ayam pedas'] + numInputs['cream choco cheese'] + numInputs['double coklat'] + numInputs['hot sosis'] + numInputs['strawberry almond']) / 15) / 15).toFixed(2)} trolley`,
-        "Adonan Manual": `${(((numInputs['abon sosis'] + numInputs['kacang merah'] + numInputs['sosis label']) / 15) / 7).toFixed(2)} loyang`,
-        "Egg Cream": `${((numInputs['abon ayam pedas'] * 18 + numInputs['abon sosis'] * 10 + numInputs['abon piramid'] * 24 + numInputs['abon roll pedas'] * 18) / 22260).toFixed(2)} resep`,
-        "Cream Cheese": `${((numInputs['red velvet cream cheese'] * 48) / 10000).toFixed(2)} resep`,
-        "Butter": `${((numInputs['cream choco cheese'] * 17 + numInputs['cheese roll'] * 13) / 9000).toFixed(2)} resep`,
-        "Butter Donat": `${((numInputs['donut paha ayam'] * 12) / 10000).toFixed(2)} resep`,
-        "Coklat Ganache": `${((numInputs['double coklat'] * 17) / 6000).toFixed(2)} resep`,
-        "Topping Maxicana": `${((numInputs['maxicana coklat'] * 10) / 13100).toFixed(2)} resep`,
-        "Fla Abon Taiwan": `${((numInputs['abon taiwan'] * 30) / 328).toFixed(2)} resep`,
-        "Adonan Abon Taiwan": `${(numInputs['abon taiwan'] / 4).toFixed(2)} resep`,
+        "Abon Ayam Pedas": `${(numInputs['abon ayam pedas'] / 15 || 0).toFixed(2)} loyang`,
+        "Abon Piramid": `${(numInputs['abon piramid'] / 11 || 0).toFixed(2)} loyang`,
+        "Abon Roll Pedas": `${(numInputs['abon roll pedas'] / 12 || 0).toFixed(2)} loyang`,
+        "Abon Sosis": `${(numInputs['abon sosis'] / 15 || 0).toFixed(2)} loyang`,
+        "Cheese Roll": `${(numInputs['cheese roll'] / 12 || 0).toFixed(2)} loyang`,
+        "Cream Choco Cheese": `${(numInputs['cream choco cheese'] / 15 || 0).toFixed(2)} loyang`,
+        "Donut Paha Ayam": `${(numInputs['donut paha ayam'] / 15 || 0).toFixed(2)} loyang`,
+        "Double Coklat": `${(numInputs['double coklat'] / 15 || 0).toFixed(2)} loyang`,
+        "Hot Sosis": `${(numInputs['hot sosis'] / 15 || 0).toFixed(2)} loyang`,
+        "Kacang Merah": `${(numInputs['kacang merah'] / 15 || 0).toFixed(2)} loyang`,
+        "Maxicana Coklat": `${(numInputs['maxicana coklat'] / 15 || 0).toFixed(2)} loyang`,
+        "Red Velvet Cream Cheese": `${(numInputs['red velvet cream cheese'] / 15 || 0).toFixed(2)} loyang`,
+        "Sosis Label": `${(numInputs['sosis label'] / 12 || 0).toFixed(2)} loyang`,
+        "Strawberry Almond": `${(numInputs['strawberry almond'] / 15 || 0).toFixed(2)} loyang`,
+        "Vanilla Oreo": `${(numInputs['vanilla oreo'] / 15 || 0).toFixed(2)} loyang`,
+        "Abon Taiwan": `${(((numInputs['abon taiwan'] || 0) * 2) / 15).toFixed(2)} loyang`,
+        "Total Sosis": `${(((((numInputs['abon sosis'] || 0) / 2) + (numInputs['hot sosis'] || 0) + (numInputs['sosis label'] || 0)) / 10) / 28).toFixed(2)} dus`,
+        "Adonan Donat": `${(((numInputs['donut paha ayam'] || 0) * 48) / 1800).toFixed(2)} resep`,
+        "Adonan Roti Manis Roll": `${((((numInputs['abon piramid'] || 0) / 11) + ((numInputs['abon roll pedas'] || 0) / 12) + ((numInputs['cheese roll'] || 0) / 12)) * 800 / 2013).toFixed(2)} resep`,
+        "Adonan Roti Manis Mesin": `${(((numInputs['abon ayam pedas'] || 0) + (numInputs['abon sosis'] || 0) + (numInputs['cream choco cheese'] || 0) + (numInputs['double coklat'] || 0) + (numInputs['hot sosis'] || 0) + (numInputs['kacang merah'] || 0) + (numInputs['maxicana coklat'] || 0) + (numInputs['sosis label'] || 0) + (numInputs['strawberry almond'] || 0) + (numInputs['vanilla oreo'] || 0)) * 49 / 1948).toFixed(2)} resep`,
     };
 
     const ingredientTotals: Record<string, { amount: number, unit: string }> = {};
@@ -76,7 +65,6 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         .map(([name, data]) => {
             return [name, data.amount.toFixed(2), data.unit];
         });
-
 
     return {
         productionCalculations: Object.entries(calculations),
@@ -105,20 +93,6 @@ const productionCalculations = [
     ["Adonan Donat", "0.00 resep"],
     ["Adonan Roti Manis Roll", "0.00 resep"],
     ["Adonan Roti Manis Mesin", "0.00 resep"],
-    ["Total Roll", "0.00 loyang"],
-    ["Total Roti", "0.00 pcs"],
-    ["Total Box Container", "0.00 pcs"],
-    ["Total Loyang", "0.00 pcs"],
-    ["Total Slongsong", "0.00 trolley"],
-    ["Adonan Manual", "0.00 loyang"],
-    ["Egg Cream", "0.00 resep"],
-    ["Cream Cheese", "0.00 resep"],
-    ["Butter", "0.00 resep"],
-    ["Butter Donat", "0.00 resep"],
-    ["Coklat Ganache", "0.00 resep"],
-    ["Topping Maxicana", "0.00 resep"],
-    ["Fla Abon Taiwan", "0.00 resep"],
-    ["Adonan Abon Taiwan", "0.00 resep"],
 ];
 
 export const initialMetrics = {

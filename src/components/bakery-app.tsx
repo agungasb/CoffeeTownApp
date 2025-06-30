@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
@@ -17,7 +17,9 @@ import { type Recipe } from '@/lib/recipes';
 import { type ProductIngredients } from '@/lib/productIngredients';
 import { type InventoryItem } from '@/lib/inventoryData';
 import type { IngredientFormData } from '@/components/ingredient-form';
+import { productDepartments, allProductItems } from '@/lib/products';
 import { useToast } from '@/hooks/use-toast';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   LogIn, 
   LogOut, 
@@ -27,7 +29,8 @@ import {
   Archive, 
   Warehouse,
   Settings,
-  History
+  History,
+  Building
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
@@ -45,6 +48,8 @@ export type DailyUsageRecord = {
   date: Date;
   usage: DailyUsageIngredient[];
 };
+
+type Department = 'rotiManis' | 'donut';
 
 interface BakeryAppProps {
     initialRecipes: Recipe[];
@@ -92,6 +97,25 @@ export default function BakeryApp({
   const [blur, setBlur] = useState(16);
   const [opacity, setOpacity] = useState(40);
   const [activeTab, setActiveTab] = useState(TABS[0].id);
+  const [activeDepartment, setActiveDepartment] = useState<Department>('rotiManis');
+
+  const departmentProducts = useMemo(() => {
+    return productDepartments[activeDepartment];
+  }, [activeDepartment]);
+
+  const filteredProducts = useMemo(() => {
+    const departmentProductSet = new Set(departmentProducts);
+    return Object.entries(products)
+      .filter(([name]) => departmentProductSet.has(name))
+      .reduce((acc, [name, ingredients]) => {
+        acc[name] = ingredients;
+        return acc;
+      }, {} as ProductIngredients);
+  }, [products, departmentProducts]);
+
+  const filteredInventory = useMemo(() => {
+    return inventory.filter(item => item.department === activeDepartment);
+  }, [inventory, activeDepartment]);
 
   useEffect(() => {
     document.documentElement.style.setProperty('--glass-blur', `${blur}px`);
@@ -99,7 +123,6 @@ export default function BakeryApp({
   }, [blur, opacity]);
 
   useEffect(() => {
-    // This effect runs only on the client, after hydration
     const userIsLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     if (userIsLoggedIn) {
       setIsLoggedIn(true);
@@ -140,13 +163,13 @@ export default function BakeryApp({
     };
     
     const updateProductsHandler = async (newProducts: ProductIngredients) => {
-        setProducts(newProducts);
-        await actions.updateProducts(newProducts);
+        setProducts(prev => ({...prev, ...newProducts}));
+        await actions.updateProducts({...products, ...newProducts});
         toast({ title: 'Success', description: 'Product list updated.' });
         router.refresh(); 
     };
     
-    const addInventoryItemHandler = async (itemData: IngredientFormData) => {
+    const addInventoryItemHandler = async (itemData: Omit<InventoryItem, 'id'>) => {
         setInventory(prev => [...prev, { ...itemData, id: 'temp-id' } as InventoryItem]); // Optimistic add
         await actions.addInventoryItem(itemData);
         toast({ title: 'Success', description: 'Ingredient added.' });
@@ -257,8 +280,8 @@ export default function BakeryApp({
             </div>
         </header>
 
-        <nav className="fixed top-[74px] md:top-[96px] left-0 w-full z-10 py-2 glassmorphic flex items-center justify-center">
-            <div className="overflow-x-auto hide-scrollbar">
+        <div className="fixed top-[74px] md:top-[96px] left-0 w-full z-10 py-2 glassmorphic flex flex-col items-center justify-center gap-4">
+            <div className="overflow-x-auto hide-scrollbar w-full">
                 <div className="flex justify-start md:justify-center items-center gap-5 px-4">
                   {TABS.map((tab) => (
                      <button 
@@ -272,16 +295,32 @@ export default function BakeryApp({
                   ))}
                 </div>
             </div>
-        </nav>
+             <div className="flex items-center gap-2 px-4">
+                <Building className="h-5 w-5 text-primary-foreground" />
+                <Label htmlFor="department" className="text-primary-foreground font-semibold">Department:</Label>
+                <Select onValueChange={(value: Department) => setActiveDepartment(value)} value={activeDepartment}>
+                    <SelectTrigger id="department" className="w-[200px] bg-background/80">
+                        <SelectValue placeholder="Select Department" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="rotiManis">Department Roti Manis</SelectItem>
+                        <SelectItem value="donut">Department Donut</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+        </div>
 
 
-        <main className="w-full max-w-7xl mt-[136px] md:mt-[160px] p-4 sm:p-6 md:p-8">
+        <main className="w-full max-w-7xl mt-[190px] md:mt-[212px] p-4 sm:p-6 md:p-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsContent value="calculator">
               <ProductionCalculator 
-                products={products} 
+                key={activeDepartment}
+                products={filteredProducts}
+                productList={departmentProducts}
                 addDailyUsageRecord={addDailyUsageRecordHandler} 
                 isLoggedIn={isLoggedIn}
+                department={activeDepartment}
               />
             </TabsContent>
             <TabsContent value="recipe">
@@ -298,20 +337,21 @@ export default function BakeryApp({
             </TabsContent>
             <TabsContent value="product_management">
               <ProductManager 
-                products={products}
+                products={filteredProducts}
                 updateProducts={updateProductsHandler}
                 isLoggedIn={isLoggedIn} 
               />
             </TabsContent>
              <TabsContent value="inventory">
                 <InventoryManager 
-                    inventory={inventory}
+                    inventory={filteredInventory}
                     addInventoryItem={addInventoryItemHandler}
                     updateInventoryItem={updateInventoryItemHandler}
                     deleteInventoryItem={deleteInventoryItemHandler}
                     dailyUsageRecords={initialDailyUsage}
                     resetDailyUsage={resetDailyUsageHandler}
                     isLoggedIn={isLoggedIn}
+                    department={activeDepartment}
                 />
             </TabsContent>
             <TabsContent value="daily_usage">

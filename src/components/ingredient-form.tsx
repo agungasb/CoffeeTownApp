@@ -17,17 +17,19 @@ const ingredientFormSchema = z.object({
     unit: z.string().min(1, "Unit is required (e.g., g, pcs, ml)."),
     orderUnit: z.string().optional(),
     orderUnitConversion: z.coerce.number().positive("Conversion must be a positive number").optional().or(z.literal('')),
+    department: z.enum(['rotiManis', 'donut'])
 });
 
 export type IngredientFormData = Omit<InventoryItem, 'id'> & { id?: string };
 
 interface IngredientFormProps {
     ingredientToEdit?: InventoryItem | null;
+    department: 'rotiManis' | 'donut';
     onSubmit: (data: IngredientFormData) => void;
     onCancel: () => void;
 }
 
-export function IngredientForm({ ingredientToEdit, onSubmit, onCancel }: IngredientFormProps) {
+export function IngredientForm({ ingredientToEdit, department, onSubmit, onCancel }: IngredientFormProps) {
     const form = useForm<z.infer<typeof ingredientFormSchema>>({
         resolver: zodResolver(ingredientFormSchema),
         defaultValues: ingredientToEdit ?? {
@@ -37,6 +39,7 @@ export function IngredientForm({ ingredientToEdit, onSubmit, onCancel }: Ingredi
             unit: 'g',
             orderUnit: '',
             orderUnitConversion: '',
+            department: department,
         },
     });
 
@@ -135,6 +138,7 @@ export function IngredientForm({ ingredientToEdit, onSubmit, onCancel }: Ingredi
                     </div>
                 </div>
 
+                <input type="hidden" {...form.register('department')} />
 
                 <div className="flex justify-end gap-2 pt-4 border-t">
                     <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>

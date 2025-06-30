@@ -18,15 +18,16 @@ import { capitalize, calculateAverageDailyUsage } from '@/lib/utils';
 
 interface InventoryManagerProps {
     inventory: InventoryItem[];
-    addInventoryItem: (itemData: IngredientFormData) => Promise<void>;
+    addInventoryItem: (itemData: Omit<InventoryItem, 'id'>) => Promise<void>;
     updateInventoryItem: (item: InventoryItem) => Promise<void>;
     deleteInventoryItem: (itemId: string) => Promise<void>;
     dailyUsageRecords: DailyUsageRecord[];
     resetDailyUsage: () => Promise<void>;
     isLoggedIn: boolean;
+    department: 'rotiManis' | 'donut';
 }
 
-export default function InventoryManager({ inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, dailyUsageRecords, resetDailyUsage, isLoggedIn }: InventoryManagerProps) {
+export default function InventoryManager({ inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, dailyUsageRecords, resetDailyUsage, isLoggedIn, department }: InventoryManagerProps) {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isOrderOpen, setIsOrderOpen] = useState(false);
     const [itemToEdit, setItemToEdit] = useState<InventoryItem | null>(null);
@@ -36,6 +37,7 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
     const [averageUsageToday, setAverageUsageToday] = useState<{name: string, amount: number, unit: string}[]>([]);
 
     useEffect(() => {
+        // Only run on client after mount
         const today = new Date().getDay();
         setAverageUsageToday(calculateAverageDailyUsage(dailyUsageRecords, today));
     }, [dailyUsageRecords]);
@@ -187,6 +189,7 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
                     </DialogHeader>
                     <IngredientForm 
                         ingredientToEdit={itemToEdit}
+                        department={department}
                         onSubmit={handleFormSubmit}
                         onCancel={() => setIsFormOpen(false)}
                     />

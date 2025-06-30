@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useTransition, useRef } from "react";
+import { useState, useTransition, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UploadCloud, Loader2, Calculator, ShoppingBasket, Save } from "lucide-react";
@@ -12,38 +12,45 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { calculateProductionMetrics, initialMetrics, productionSchema } from "@/lib/calculations";
+import { calculateProductionMetrics, initialMetrics, createProductionSchema } from "@/lib/calculations";
 import type { ProductionInputs } from "@/lib/calculations";
 import { getQuantitiesFromImage } from "@/app/actions";
 import type { ProductIngredients } from "@/lib/productIngredients";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { productItems } from "@/lib/products";
 import { capitalize } from "@/lib/utils";
 import type { DailyUsageRecord, DailyUsageIngredient } from "@/components/bakery-app";
 
 type ProductionFormValues = {
-  [K in keyof ProductionInputs]: number | '';
+  [key: string]: number | '';
 };
 
 interface ProductionCalculatorProps {
     products: ProductIngredients;
+    productList: string[];
     addDailyUsageRecord: (record: { usage: DailyUsageIngredient[] }) => Promise<void>;
     isLoggedIn: boolean;
+    department: 'rotiManis' | 'donut';
 }
 
-export default function ProductionCalculator({ products, addDailyUsageRecord, isLoggedIn }: ProductionCalculatorProps) {
+export default function ProductionCalculator({ products, productList, addDailyUsageRecord, isLoggedIn, department }: ProductionCalculatorProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [results, setResults] = useState(initialMetrics);
   const [hasCalculated, setHasCalculated] = useState(false);
 
-  const productList = productItems;
+  const productionSchema = createProductionSchema(productList);
 
   const form = useForm<ProductionFormValues>({
     resolver: zodResolver(productionSchema),
     defaultValues: productList.reduce((acc, item) => ({ ...acc, [item]: '' }), {}),
   });
+
+  useEffect(() => {
+    form.reset(productList.reduce((acc, item) => ({ ...acc, [item]: '' }), {}));
+    setResults(initialMetrics);
+    setHasCalculated(false);
+  }, [productList, form]);
 
   const handleCalculate = (data: ProductionFormValues) => {
     const newResults = calculateProductionMetrics(data as ProductionInputs, products);
@@ -172,29 +179,31 @@ export default function ProductionCalculator({ products, addDailyUsageRecord, is
 
           {hasCalculated ? (
             <Accordion type="multiple" defaultValue={['results', 'summary']} className="w-full space-y-4">
-                <AccordionItem value="results" className="bg-background/70 border-none rounded-lg">
-                    <AccordionTrigger className="p-4 hover:no-underline text-foreground font-semibold text-lg">
-                        <h3 className="flex items-center gap-2"><Calculator /> Calculation Results</h3>
-                    </AccordionTrigger>
-                    <AccordionContent className="p-4 pt-0">
-                      <Table>
-                        <TableHeader>
-                          <TableRow className="border-border">
-                            <TableHead className="font-semibold text-foreground">Metric</TableHead>
-                            <TableHead className="text-right font-semibold text-foreground">Result</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {results.productionCalculations.map(([key, value]) => (
-                            <TableRow key={key} className="border-border">
-                                <TableCell className="font-medium text-card-foreground">{key}</TableCell>
-                                <TableCell className="text-right text-card-foreground">{value}</TableCell>
+                {department === 'rotiManis' && (
+                  <AccordionItem value="results" className="bg-background/70 border-none rounded-lg">
+                      <AccordionTrigger className="p-4 hover:no-underline text-foreground font-semibold text-lg">
+                          <h3 className="flex items-center gap-2"><Calculator /> Calculation Results</h3>
+                      </AccordionTrigger>
+                      <AccordionContent className="p-4 pt-0">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="border-border">
+                              <TableHead className="font-semibold text-foreground">Metric</TableHead>
+                              <TableHead className="text-right font-semibold text-foreground">Result</TableHead>
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </AccordionContent>
-                </AccordionItem>
+                          </TableHeader>
+                          <TableBody>
+                            {results.productionCalculations.map(([key, value]) => (
+                              <TableRow key={key} className="border-border">
+                                  <TableCell className="font-medium text-card-foreground">{key}</TableCell>
+                                  <TableCell className="text-right text-card-foreground">{value}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </AccordionContent>
+                  </AccordionItem>
+                )}
 
                 <AccordionItem value="summary" className="bg-background/70 border-none rounded-lg">
                     <AccordionTrigger className="p-4 hover:no-underline text-foreground font-semibold text-lg">

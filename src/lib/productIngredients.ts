@@ -10,9 +10,23 @@ export interface ProductIngredients {
     };
 }
 
-// Note: The unit for all ingredient amounts is grams (g),
-// except for items where the unit is pieces (pcs).
+const donutPahaAyamBase = {
+    "tepung": { amount: 12.25, unit: "g" },
+    "premix": { amount: 12.25, unit: "g" },
+    "gula pasir": { amount: 2.94, unit: "g" },
+    "susu bubuk": { amount: 1.225, unit: "g" },
+    "ragi": { amount: 0.3675, unit: "g" },
+    "pelembut": { amount: 0.0735, unit: "g" },
+    "telur utuh": { amount: 0.0735, unit: "g" },
+    "margarin": { amount: 10.8375, unit: "g" },
+    "bos": { amount: 1.8375, unit: "g" },
+    "garam": { amount: 0.294, unit: "g" },
+    "air": { amount: 3.675, unit: "g" },
+    "es batu": { amount: 3.675, unit: "g" },
+};
+
 export const productIngredientsData: ProductIngredients = {
+    // Roti Manis
     "maxicana coklat": {
         "tepung": { amount: 29.794, unit: "g" },
         "gula pasir": { amount: 3.675, unit: "g" },
@@ -300,18 +314,7 @@ export const productIngredientsData: ProductIngredients = {
         "gula halus": { amount: 1.777, unit: "g" }
     },
     "donut paha ayam": {
-    	"tepung": { amount: 12.25, unit: "g" },
-    	"premix": { amount: 12.25, unit: "g" },
-    	"gula pasir": { amount: 2.94, unit: "g" },
-    	"susu bubuk": { amount: 1.225, unit: "g" },
-    	"ragi": { amount: 0.3675, unit: "g" },
-    	"pelembut": { amount: 0.0735, unit: "g" },
-    	"telur utuh": { amount: 0.0735, unit: "g" },
-    	"margarin": { amount: 10.8375, unit: "g" },
-    	"bos": { amount: 1.8375, unit: "g" },
-    	"garam": { amount: 0.294, unit: "g" },
-    	"air": { amount: 3.675, unit: "g" },
-    	"es batu": { amount: 3.675, unit: "g" },
+    	...donutPahaAyamBase,
     	"ceres": { amount: 20, unit: "g" },
     	"tusuk sate": { amount: 1, unit: "pcs" },
     	"gula halus": { amount: 6, unit: "g" }
@@ -330,5 +333,16 @@ export const productIngredientsData: ProductIngredients = {
     	"wijen hitam": { amount: 0.5, unit: "g" },
     	"maizena": { amount: 0.29411, unit: "g" },
     	"everwhip": { amount: 4.70588, unit: "g" }
-    }
+    },
+    // Donut Department
+    "Donut Almond": { ...donutPahaAyamBase, "almond": { amount: 15, unit: "g" } },
+    "Donut Coklat Ceres": { ...donutPahaAyamBase, "ceres": { amount: 15, unit: "g" } },
+    "Donut Coklat Kacang": { ...donutPahaAyamBase, "kacang tanah": { amount: 10, unit: "g" }, "coklat filling": { amount: 5, unit: "g" } },
+    "Donut Gula Halus": { ...donutPahaAyamBase, "gula halus": { amount: 15, unit: "g" } },
+    "Donut Keju": { ...donutPahaAyamBase, "keju": { amount: 15, unit: "g" } },
+    "Donut Oreo": { ...donutPahaAyamBase, "crumble oreo": { amount: 15, unit: "g" } },
+    "7K BOMBOLONI CAPPUCINO": { ...donutPahaAyamBase, "cappucino filling": { amount: 20, unit: "g" } },
+    "7K BOMBOLONI DARK COKLAT": { ...donutPahaAyamBase, "dark coklat filling (bomboloni)": { amount: 20, unit: "g" } },
+    "7K BOMBOLONI GREENTEA": { ...donutPahaAyamBase, "greentea filling": { amount: 20, unit: "g" } },
+    "7K BOMBOLONI TIRAMISU": { ...donutPahaAyamBase, "tiramisu filling": { amount: 20, unit: "g" } },
 };

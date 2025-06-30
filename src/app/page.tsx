@@ -47,6 +47,7 @@ async function fetchDataAndSeed() {
         
         // Seed Inventory
         initialInventoryData.forEach(item => {
+            // Firestore can auto-generate IDs, but we use predefined ones for seeding.
             const docRef = doc(db, 'inventory', item.id);
             batch.set(docRef, item);
         });
@@ -71,7 +72,7 @@ async function fetchDataAndSeed() {
     const products: ProductIngredients = productsDoc.exists() ? productsDoc.data().data : {};
 
     const inventorySnapshot = await getDocs(collection(db, 'inventory'));
-    const inventory: InventoryItem[] = inventorySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as InventoryItem));
+    const inventory: InventoryItem[] = inventorySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as InventoryItem));
 
     const dailyUsageSnapshot = await getDocs(query(collection(db, 'dailyUsage'), orderBy('date', 'desc')));
     const dailyUsage: DailyUsageRecord[] = dailyUsageSnapshot.docs.map(doc => {

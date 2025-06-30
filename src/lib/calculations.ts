@@ -1,6 +1,7 @@
 
 import { z } from "zod";
 import type { AllProductsData } from "./productIngredients";
+import { recipes as initialRecipesData } from './recipes';
 
 // This function creates a Zod schema dynamically based on a list of product names.
 export function createProductionSchema(products: string[]) {
@@ -23,7 +24,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         return productIngredientsData[productName]?.calculation?.divisor || fallback;
     };
     
-    // --- Start of Calculations ---
+    // --- Start of Base Calculations ---
     const productionCalculations: [string, string][] = [];
 
     // Total Roll
@@ -85,9 +86,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     productionCalculations.push(["Total Slongsong", `${totalSlongsong.toFixed(2)} trolley (*include hot sosis)`]);
 
 
-    // --- End of Calculations ---
-
-
+    // --- Recipe and Ingredient Summary Calculations ---
     const ingredientTotals: Record<string, { amount: number, unit: string }> = {};
 
     for (const [productName, quantity] of Object.entries(numInputs)) {
@@ -100,21 +99,70 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
                         ingredientTotals[ingredient] = { amount: 0, unit: data.unit };
                     }
                     ingredientTotals[ingredient].amount += data.amount * quantity;
-                    ingredientTotals[ingredient].unit = data.unit; 
                 }
             }
         }
     }
 
-    const ingredientSummary = Object.entries(ingredientTotals)
+    const recipeCalculations: [string, string][] = [];
+    const recipeIngredientNames = new Set<string>();
+
+    const orderedRecipeMetrics = [
+        "Egg Cream",
+        "Cream Cheese",
+        "Butter",
+        "Butter Donat",
+        "Coklat Ganache",
+        "Topping Maxicana",
+        "Fla Abon Taiwan",
+        "Adonan Abon Taiwan",
+    ];
+
+    for (const recipeName of orderedRecipeMetrics) {
+        const lowerRecipeName = recipeName.toLowerCase();
+        const recipeDef = initialRecipesData.find(r => r.name.toLowerCase() === lowerRecipeName);
+        
+        let totalAmountNeeded = 0;
+        // Find the ingredient that matches the recipe name, case-insensitively
+        const ingredientKey = Object.keys(ingredientTotals).find(k => k.toLowerCase() === lowerRecipeName);
+
+        if (ingredientKey) {
+            totalAmountNeeded = ingredientTotals[ingredientKey].amount;
+        }
+
+        if (recipeDef && totalAmountNeeded > 0) {
+            // The recipe weight for "Adonan Abon Taiwan" is a special case (1 resep for 4 pcs), so we treat its weight as 1 unit.
+            const recipeWeight = lowerRecipeName === 'adonan abon taiwan' 
+                ? 1 
+                : recipeDef.ingredients.reduce((sum: number, ing: { amount: number; }) => sum + ing.amount, 0);
+
+            if (recipeWeight > 0) {
+                const resepCount = totalAmountNeeded / recipeWeight;
+                let displayText = `${resepCount.toFixed(2)} resep`;
+                if(recipeName === "Adonan Abon Taiwan") {
+                    displayText += ` (*kali 2 telur)`;
+                }
+                recipeCalculations.push([recipeName, displayText]);
+                // We use the original case `recipeName` here to make sure it's filtered correctly from the summary.
+                recipeIngredientNames.add(recipeName);
+            }
+        }
+    }
+    
+    // Combine all calculations in the desired order
+    const finalCalculations = [ ...productionCalculations, ...recipeCalculations ];
+
+    // Filter out the component recipes from the final ingredient summary
+    const finalIngredientSummary = Object.entries(ingredientTotals)
+        .filter(([name]) => !recipeIngredientNames.has(name))
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([name, data]) => {
             return [name, data.amount.toFixed(2), data.unit];
         });
 
     return {
-        productionCalculations: productionCalculations,
-        ingredientSummary: ingredientSummary,
+        productionCalculations: finalCalculations,
+        ingredientSummary: finalIngredientSummary,
     };
 }
 

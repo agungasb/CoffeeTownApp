@@ -30,19 +30,16 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
 
     // --- Start with the fixed order of metrics ---
 
-    // 1. Total Roll
     const totalRollValue = (
-        ( (numInputs['abon piramid'] || 0) / getDivisor('abon piramid') ) +
-        ( (numInputs['abon roll pedas'] || 0) / getDivisor('abon roll pedas') ) +
-        ( (numInputs['cheese roll'] || 0) / getDivisor('cheese roll') )
+        ( (numInputs['abon piramid'] || 0) / getDivisor('abon piramid', 11) ) +
+        ( (numInputs['abon roll pedas'] || 0) / getDivisor('abon roll pedas', 12) ) +
+        ( (numInputs['cheese roll'] || 0) / getDivisor('cheese roll', 12) )
     ) / 12;
     productionCalculations.push(["Total Roll", `${totalRollValue.toFixed(2)} loyang`]);
     
-    // 2. Total Roti
     const totalRoti = Object.values(numInputs).reduce((sum, current) => sum + (current || 0), 0);
     productionCalculations.push(["Total Roti", `${totalRoti.toFixed(0)} pcs`]);
 
-    // 3. Total Box Tray
     const totalBoxTray = (
         (numInputs['abon ayam pedas'] || 0) / 15 +
         (numInputs['abon piramid'] || 0) / 20 +
@@ -63,7 +60,6 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     );
     productionCalculations.push(["Total Box Tray", `${totalBoxTray.toFixed(2)} pcs`]);
 
-    // 4. Total Loyang
     let totalLoyang = 0;
     for (const [productName, quantity] of Object.entries(numInputs)) {
         if (quantity > 0 && productIngredientsData[productName]) {
@@ -72,7 +68,6 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     }
     productionCalculations.push(["Total Loyang", `${totalLoyang.toFixed(2)} pcs`]);
     
-    // 5. Total Slongsong
     const totalSlongsong = (
         (
             (numInputs['abon ayam pedas'] || 0) + 

@@ -26,7 +26,6 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         return (divisor && divisor > 0) ? divisor : fallback;
     };
     
-    // --- Metric Calculations ---
     const productionCalculations: [string, string][] = [];
 
     // --- Start with the fixed order of metrics ---
@@ -67,7 +66,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     // 4. Total Loyang
     let totalLoyang = 0;
     for (const [productName, quantity] of Object.entries(numInputs)) {
-        if (quantity > 0) {
+        if (quantity > 0 && productIngredientsData[productName]) {
             totalLoyang += quantity / getDivisor(productName);
         }
     }
@@ -85,61 +84,30 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     ) / 15;
     productionCalculations.push(["Total Slongsong", `${totalSlongsong.toFixed(2)} trolley (*include hot sosis)`]);
 
-
-    // --- Dynamic Recipe and Ingredient Summary Calculations ---
-    const ingredientTotals: Record<string, { amount: number, unit: string }> = {};
-
-    // First pass: aggregate all top-level ingredients, including component recipes.
-    for (const [productName, quantity] of Object.entries(numInputs)) {
-        const productKey = productName as keyof typeof productIngredientsData;
-        if (quantity > 0 && productIngredientsData[productKey]) {
-            const ingredients = productIngredientsData[productKey].ingredients;
-            if (ingredients) {
-                for (const [ingredient, data] of Object.entries(ingredients)) {
-                    // Use a case-insensitive key for aggregation
-                    const key = ingredient.toLowerCase();
-                    if (!ingredientTotals[key]) {
-                        // Store with original casing for unit lookup later
-                        ingredientTotals[key] = { amount: 0, unit: data.unit };
-                    }
-                    ingredientTotals[key].amount += data.amount * quantity;
-                }
-            }
-        }
-    }
-
-    const componentRecipesToCalculate = [
-        "Egg Cream", "Cream Cheese", "Butter", "Butter Donat",
-        "Coklat Ganache", "Topping Maxicana", "Fla Abon Taiwan", "Adonan Abon Taiwan"
-    ];
+    // --- Component Recipe Calculations (Hardcoded from original HTML) ---
+    const eggCreamResep = ((numInputs['abon ayam pedas'] * 18 + numInputs['abon sosis'] * 10 + numInputs['abon piramid'] * 24 + numInputs['abon roll pedas'] * 18) / 22260);
+    productionCalculations.push(["Egg Cream", `${eggCreamResep.toFixed(2)} resep`]);
     
-    const finalRawIngredients: Record<string, { amount: number, unit: string }> = {};
+    const creamCheeseResep = ((numInputs['red velvet cream cheese'] * 48) / 10000);
+    productionCalculations.push(["Cream Cheese", `${creamCheeseResep.toFixed(2)} resep`]);
 
-    // Second pass: process component recipes and add them to the calculation results.
-    for (const recipeName of componentRecipesToCalculate) {
-        const lowerRecipeName = recipeName.toLowerCase();
-        const componentData = ingredientTotals[lowerRecipeName];
+    const butterResep = ((numInputs['cream choco cheese'] * 17 + numInputs['cheese roll'] * 13) / 9000);
+    productionCalculations.push(["Butter", `${butterResep.toFixed(2)} resep`]);
 
-        if (componentData && componentData.amount > 0) {
-            // Handle the special case for "Adonan Abon Taiwan" which is already in "resep" units
-            if (componentData.unit === 'resep') {
-                let displayText = `${componentData.amount.toFixed(2)} resep`;
-                if(recipeName === "Adonan Abon Taiwan") {
-                    displayText += ` (*kali 2 telur)`;
-                }
-                productionCalculations.push([recipeName, displayText]);
-            } else {
-                 const recipeDef = initialRecipesData.find(r => r.name.toLowerCase() === lowerRecipeName);
-                if (recipeDef) {
-                    const recipeYield = recipeDef.ingredients.reduce((sum, ing) => sum + ing.amount, 0);
-                    if (recipeYield > 0) {
-                        const resepCount = componentData.amount / recipeYield;
-                        productionCalculations.push([recipeName, `${resepCount.toFixed(2)} resep`]);
-                    }
-                }
-            }
-        }
-    }
+    const butterDonatResep = ((numInputs['donut paha ayam'] * 12) / 10000);
+    productionCalculations.push(["Butter Donat", `${butterDonatResep.toFixed(2)} resep`]);
+    
+    const coklatGanacheResep = ((numInputs['double coklat'] * 17) / 6000);
+    productionCalculations.push(["Coklat Ganache", `${coklatGanacheResep.toFixed(2)} resep`]);
+
+    const toppingMaxicanaResep = ((numInputs['maxicana coklat'] * 10) / 13100);
+    productionCalculations.push(["Topping Maxicana", `${toppingMaxicanaResep.toFixed(2)} resep`]);
+    
+    const flaAbonTaiwanResep = ((numInputs['abon taiwan'] * 30) / 328);
+    productionCalculations.push(["Fla Abon Taiwan", `${flaAbonTaiwanResep.toFixed(2)} resep`]);
+
+    const adonanAbonTaiwanResep = (numInputs['abon taiwan'] / 4);
+    productionCalculations.push(["Adonan Abon Taiwan", `${adonanAbonTaiwanResep.toFixed(2)} resep (*kali 2 telur)`]);
     
     return {
         productionCalculations,

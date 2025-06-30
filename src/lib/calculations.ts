@@ -29,8 +29,11 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         ( (numInputs['cheese roll'] || 0) / getDivisor('cheese roll', 12) )
     ) / 12;
 
+    const totalRoti = Object.values(numInputs).reduce((sum, current) => sum + (current || 0), 0);
+
     const productionCalculations: [string, string][] = [
         ["Total Roll", `${totalRollValue.toFixed(2)} loyang`],
+        ["Total Roti", `${totalRoti.toFixed(0)} pcs`],
     ];
 
     const ingredientTotals: Record<string, { amount: number, unit: string }> = {};

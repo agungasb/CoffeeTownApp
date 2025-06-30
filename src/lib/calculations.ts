@@ -29,6 +29,9 @@ const findRecipe = (recipeName: string, allRecipes: Recipe[]): Recipe | null => 
 const getRecipeBaseWeight = (recipeName: string, allRecipes: Recipe[]): number => {
     const recipe = findRecipe(recipeName, allRecipes);
     if (!recipe) return 0;
+    if (recipe.baseWeight && recipe.baseWeight > 0) {
+        return recipe.baseWeight;
+    }
     return recipe.ingredients.reduce((sum, ing) => sum + ing.amount, 0);
 };
 
@@ -60,8 +63,8 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     // --- Hardcoded Total & Combined Calculations ---
     const safeGetDivisor = (productName: string): number => {
         const productData = findProductData(productName, productIngredientsData);
-        // Default to 1 to avoid division by zero if divisor is not set
-        return productData?.calculation?.divisor || 1;
+        // Default to 1 to avoid division by zero if divisor is not set or is 0
+        return (productData?.calculation?.divisor && productData.calculation.divisor > 0) ? productData.calculation.divisor : 1;
     };
     
     const totalRollProducts = ["abon piramid", "abon roll pedas", "cheese roll"];
@@ -90,7 +93,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         productionCalculations.push(['Total Sosis', `${totalSosisPack.toFixed(2)} pack`]);
     }
 
-    // --- Recipe Calculations (Your Formula) ---
+    // --- Recipe Calculations (Your Formula: (Input * Dough Weight) / Recipe Base Weight) ---
     const calculateRecipeNeeded = (productNames: string[], recipeIngredientName: string, recipeName: string): number => {
         const recipeBaseWeight = getRecipeBaseWeight(recipeName, allRecipes);
         if (recipeBaseWeight === 0) return 0;
@@ -125,25 +128,25 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     if (adonanMesinTotalResep > 0) productionCalculations.push(['Adonan Roti Manis Mesin', `${adonanMesinTotalResep.toFixed(2)} resep`]);
     
     // --- Other Hardcoded Recipe Calculations ---
-    const eggCreamResep = ((numInputs['abon ayam pedas'] || 0) * 18 + (numInputs['abon sosis'] || 0) * 10 + (numInputs['abon piramid'] || 0) * 24 + (numInputs['abon roll pedas'] || 0) * 18) / 22260;
+    const eggCreamResep = ((numInputs['abon ayam pedas'] || 0) * 18 + (numInputs['abon sosis'] || 0) * 10 + (numInputs['abon piramid'] || 0) * 24 + (numInputs['abon roll pedas'] || 0) * 18) / (getRecipeBaseWeight('Egg Cream', allRecipes) || 22260);
     if (eggCreamResep > 0) productionCalculations.push(["Egg Cream", `${eggCreamResep.toFixed(2)} resep`]);
 
-    const creamCheeseResep = ((numInputs['red velvet cream cheese'] || 0) * 48) / 10000;
+    const creamCheeseResep = ((numInputs['red velvet cream cheese'] || 0) * 48) / (getRecipeBaseWeight('Cream Cheese', allRecipes) || 10000);
     if (creamCheeseResep > 0) productionCalculations.push(["Cream Cheese", `${creamCheeseResep.toFixed(2)} resep`]);
 
-    const butterResep = ((numInputs['cream choco cheese'] || 0) * 17 + (numInputs['cheese roll'] || 0) * 13) / 9000;
+    const butterResep = ((numInputs['cream choco cheese'] || 0) * 17 + (numInputs['cheese roll'] || 0) * 13) / (getRecipeBaseWeight('Butter', allRecipes) || 9000);
     if (butterResep > 0) productionCalculations.push(["Butter", `${butterResep.toFixed(2)} resep`]);
 
-    const butterDonatResep = ((numInputs['donut paha ayam'] || 0) * 12) / 10000;
+    const butterDonatResep = ((numInputs['donut paha ayam'] || 0) * 12) / (getRecipeBaseWeight('Butter Donat', allRecipes) || 10000);
     if (butterDonatResep > 0) productionCalculations.push(["Butter Donat", `${butterDonatResep.toFixed(2)} resep`]);
 
-    const coklatGanacheResep = ((numInputs['double coklat'] || 0) * 17) / 6000;
+    const coklatGanacheResep = ((numInputs['double coklat'] || 0) * 17) / (getRecipeBaseWeight('Coklat Ganache', allRecipes) || 6000);
     if (coklatGanacheResep > 0) productionCalculations.push(["Coklat Ganache", `${coklatGanacheResep.toFixed(2)} resep`]);
 
-    const toppingMaxicanaResep = ((numInputs['maxicana coklat'] || 0) * 10) / 13100;
+    const toppingMaxicanaResep = ((numInputs['maxicana coklat'] || 0) * 10) / (getRecipeBaseWeight('Topping Maxicana', allRecipes) || 13100);
     if (toppingMaxicanaResep > 0) productionCalculations.push(["Topping Maxicana", `${toppingMaxicanaResep.toFixed(2)} resep`]);
 
-    const flaAbonTaiwanResep = ((numInputs['abon taiwan'] || 0) * 30) / 328;
+    const flaAbonTaiwanResep = ((numInputs['abon taiwan'] || 0) * 30) / (getRecipeBaseWeight('Fla Abon Taiwan', allRecipes) || 328);
     if (flaAbonTaiwanResep > 0) productionCalculations.push(["Fla Abon Taiwan", `${flaAbonTaiwanResep.toFixed(2)} resep`]);
 
     const adonanAbonTaiwanResep = (numInputs['abon taiwan'] || 0) / 4;

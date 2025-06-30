@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import type { Recipe } from '@/lib/recipes';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { PlusCircle, Trash2 } from 'lucide-react';
 import { Textarea } from './ui/textarea';
@@ -14,6 +14,7 @@ import { Textarea } from './ui/textarea';
 const recipeFormSchema = z.object({
     id: z.string().optional(),
     name: z.string().min(3, "Recipe name must be at least 3 characters."),
+    baseWeight: z.coerce.number().positive("Base weight must be a positive number.").optional().or(z.literal('')),
     ingredients: z.array(z.object({
         name: z.string().min(1, "Name is required."),
         amount: z.coerce.number({ invalid_type_error: "Amount is required." }).positive("Amount must be positive."),
@@ -33,8 +34,12 @@ interface RecipeFormProps {
 export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps) {
     const form = useForm<RecipeFormData>({
         resolver: zodResolver(recipeFormSchema),
-        defaultValues: recipeToEdit ?? {
+        defaultValues: recipeToEdit ? {
+            ...recipeToEdit,
+            baseWeight: recipeToEdit.baseWeight ?? '',
+        } : {
             name: '',
+            baseWeight: '',
             ingredients: [{ name: '', amount: '' as any, unit: '' }],
             steps: [''],
         },
@@ -52,7 +57,11 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
 
 
     const handleSubmit = (data: RecipeFormData) => {
-        onSubmit(data as Recipe);
+        const finalData = {
+            ...data,
+            baseWeight: data.baseWeight === '' ? undefined : data.baseWeight,
+        };
+        onSubmit(finalData as unknown as Recipe);
     };
 
     return (
@@ -68,6 +77,23 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
                                 <FormControl>
                                     <Input placeholder="e.g. Chocolate Chip Cookies" {...field} />
                                 </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="baseWeight"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Base Weight Override (g)</FormLabel>
+                                <FormControl>
+                                    <Input type="number" step="0.01" placeholder="Leave blank to auto-calculate" {...field} />
+                                </FormControl>
+                                <FormDescription>
+                                    Optionally, set a fixed base weight. If left blank, it will be calculated from the sum of ingredients.
+                                </FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}

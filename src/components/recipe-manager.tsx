@@ -26,7 +26,10 @@ export default function RecipeManager({ recipes, addRecipe, updateRecipe, delete
     const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
     const [recipeToEdit, setRecipeToEdit] = useState<Recipe | null>(null);
 
-    const calculateBaseWeight = (recipe: Recipe) => {
+    const getBaseWeight = (recipe: Recipe) => {
+        if (recipe.baseWeight && recipe.baseWeight > 0) {
+            return recipe.baseWeight;
+        }
         return recipe.ingredients.reduce((total, ingredient) => total + ingredient.amount, 0);
     };
 
@@ -49,7 +52,8 @@ export default function RecipeManager({ recipes, addRecipe, updateRecipe, delete
         if (recipeToEdit && data.id) {
             await updateRecipe(data);
         } else {
-            await addRecipe(data);
+            const { id, ...recipeData } = data;
+            await addRecipe(recipeData);
         }
         setRecipeToEdit(null);
     };
@@ -76,7 +80,7 @@ export default function RecipeManager({ recipes, addRecipe, updateRecipe, delete
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {recipes.map((recipe) => {
-                        const baseWeight = calculateBaseWeight(recipe);
+                        const baseWeight = getBaseWeight(recipe);
                         return (
                         <Card key={recipe.id} className="flex flex-col bg-background/70">
                             <CardHeader>

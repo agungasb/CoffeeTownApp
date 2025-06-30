@@ -10,6 +10,7 @@ export interface Recipe {
     name: string;
     ingredients: Ingredient[];
     steps: string[];
+    baseWeight?: number;
 }
 
 export const recipes: Recipe[] = [

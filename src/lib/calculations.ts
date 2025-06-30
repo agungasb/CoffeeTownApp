@@ -29,7 +29,8 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
 
     const productionCalculations: [string, string][] = [];
 
-    // --- Dynamic Calculations as per user request ---
+    // --- Dynamic & Hardcoded Calculations from original HTML ---
+    
     const totalRollValue = (
         ( (numInputs['abon piramid'] || 0) / getDivisor('abon piramid', productIngredientsData) ) +
         ( (numInputs['abon roll pedas'] || 0) / getDivisor('abon roll pedas', productIngredientsData) ) +
@@ -40,7 +41,6 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     const totalRoti = Object.values(numInputs).reduce((sum, current) => sum + (current || 0), 0);
     productionCalculations.push(["Total Roti", `${totalRoti.toFixed(0)} pcs`]);
 
-    // --- Hardcoded Calculations from original HTML ---
     const totalBoxTray = (
         (numInputs['abon ayam pedas'] || 0) / 15 +
         (numInputs['abon piramid'] || 0) / 20 +
@@ -61,7 +61,6 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     );
     productionCalculations.push(["Total Box Tray", `${totalBoxTray.toFixed(2)} pcs`]);
 
-    // --- Dynamic Calculation as per user request ---
     let totalLoyang = 0;
     for (const [productName, quantity] of Object.entries(numInputs)) {
         if (quantity > 0 && productIngredientsData[productName]) {
@@ -70,7 +69,6 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     }
     productionCalculations.push(["Total Loyang", `${totalLoyang.toFixed(2)} pcs`]);
 
-    // --- Hardcoded Calculations from original HTML ---
     const totalSlongsong = (
         (
             (numInputs['abon ayam pedas'] || 0) +
@@ -82,32 +80,30 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     ) / 15;
     productionCalculations.push(["Total Slongsong", `${totalSlongsong.toFixed(2)} trolley (*include hot sosis)`]);
 
-    // --- Recipe Calculations (Hardcoded as per original script) ---
-    const eggCreamResep = ((numInputs['abon ayam pedas'] || 0) * 18 + (numInputs['abon sosis'] || 0) * 10 + (numInputs['abon piramid'] || 0) * 24 + (numInputs['abon roll pedas'] || 0) * 18) / 22260;
+    const eggCreamResep = (( (numInputs['abon ayam pedas'] || 0) * 18 + (numInputs['abon sosis'] || 0) * 10 + (numInputs['abon piramid'] || 0) * 24 + (numInputs['abon roll pedas'] || 0) * 18) / 22260);
     productionCalculations.push(["Egg Cream", `${eggCreamResep.toFixed(2)} resep`]);
 
-    const creamCheeseResep = ((numInputs['red velvet cream cheese'] || 0) * 48) / 10000;
+    const creamCheeseResep = (((numInputs['red velvet cream cheese'] || 0) * 48) / 10000);
     productionCalculations.push(["Cream Cheese", `${creamCheeseResep.toFixed(2)} resep`]);
 
-    const butterResep = ((numInputs['cream choco cheese'] || 0) * 17 + (numInputs['cheese roll'] || 0) * 13) / 9000;
+    const butterResep = (((numInputs['cream choco cheese'] || 0) * 17 + (numInputs['cheese roll'] || 0) * 13) / 9000);
     productionCalculations.push(["Butter", `${butterResep.toFixed(2)} resep`]);
 
-    const butterDonatResep = ((numInputs['donut paha ayam'] || 0) * 12) / 10000;
+    const butterDonatResep = (((numInputs['donut paha ayam'] || 0) * 12) / 10000);
     productionCalculations.push(["Butter Donat", `${butterDonatResep.toFixed(2)} resep`]);
 
-    const coklatGanacheResep = ((numInputs['double coklat'] || 0) * 17) / 6000;
+    const coklatGanacheResep = (((numInputs['double coklat'] || 0) * 17) / 6000);
     productionCalculations.push(["Coklat Ganache", `${coklatGanacheResep.toFixed(2)} resep`]);
 
-    const toppingMaxicanaResep = ((numInputs['maxicana coklat'] || 0) * 10) / 13100;
+    const toppingMaxicanaResep = (((numInputs['maxicana coklat'] || 0) * 10) / 13100);
     productionCalculations.push(["Topping Maxicana", `${toppingMaxicanaResep.toFixed(2)} resep`]);
 
-    const flaAbonTaiwanResep = ((numInputs['abon taiwan'] || 0) * 30) / 328;
+    const flaAbonTaiwanResep = (((numInputs['abon taiwan'] || 0) * 30) / 328);
     productionCalculations.push(["Fla Abon Taiwan", `${flaAbonTaiwanResep.toFixed(2)} resep`]);
 
-    const adonanAbonTaiwanResep = (numInputs['abon taiwan'] || 0) / 4;
+    const adonanAbonTaiwanResep = ((numInputs['abon taiwan'] || 0) / 4);
     productionCalculations.push(["Adonan Abon Taiwan", `${adonanAbonTaiwanResep.toFixed(2)} resep (*kali 2 telur)`]);
 
-    // TODO: Implement ingredient summary based on these resep counts.
     const ingredientSummary: [string, string, string][] = [];
     
     return {

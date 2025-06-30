@@ -21,23 +21,14 @@ export interface AllProductsData {
     [productName: string]: ProductData;
 }
 
-const donutPahaAyamBase = {
-    "Adonan Donut Paha Ayam": { amount: 1, unit: "resep" },
-};
-
-const adonanRotiManisMesin = {
-    "Adonan Roti Manis Mesin": { amount: 1, unit: "resep" },
-};
-
-const adonanRotiManisRoll = {
-    "Adonan Roti Manis Roll": { amount: 1, unit: "resep" },
-};
+// Standard dough weight per piece
+const standardDoughWeight = 45; // in grams
 
 export const productIngredientsData: AllProductsData = {
     // Roti Manis
     "maxicana coklat": {
         ingredients: {
-            ...adonanRotiManisMesin,
+            "Adonan Roti Manis Mesin": { amount: standardDoughWeight, unit: "g"},
             "Topping Maxicana": { amount: 10, unit: "g"},
             "coklat filling": { amount: 10, unit: "g" },
         },
@@ -45,7 +36,7 @@ export const productIngredientsData: AllProductsData = {
     },
     "abon ayam pedas": {
         ingredients: {
-            ...adonanRotiManisMesin,
+            "Adonan Roti Manis Mesin": { amount: standardDoughWeight, unit: "g" },
             "Egg Cream": { amount: 18, unit: "g" },
             "abon": { amount: 15, unit: "g" },
         },
@@ -53,7 +44,7 @@ export const productIngredientsData: AllProductsData = {
     },
     "red velvet cream cheese": {
         ingredients: {
-            ...adonanRotiManisMesin,
+            "Adonan Roti Manis Mesin": { amount: standardDoughWeight, unit: "g" },
             "Cream Cheese": { amount: 48, unit: "g" },
             "crumble velvet": { amount: 15, unit: "g" },
             "white chox": { amount: 20.5, unit: "g" },
@@ -62,7 +53,7 @@ export const productIngredientsData: AllProductsData = {
     },
     "abon sosis": {
         ingredients: {
-            ...adonanRotiManisMesin,
+            "Adonan Roti Manis Mesin": { amount: standardDoughWeight, unit: "g" },
             "Egg Cream": { amount: 10, unit: "g" },
             "sosis": { amount: 0.5, unit: "pcs" },
             "abon": { amount: 5, unit: "g" },
@@ -71,7 +62,7 @@ export const productIngredientsData: AllProductsData = {
     },
     "cream choco cheese": {
         ingredients: {
-            ...adonanRotiManisMesin,
+            "Adonan Roti Manis Mesin": { amount: standardDoughWeight, unit: "g" },
             "Butter": { amount: 17, unit: "g" },
             "keju": { amount: 15, unit: "g" },
             "ceres": { amount: 20, unit: "g" },
@@ -80,7 +71,7 @@ export const productIngredientsData: AllProductsData = {
     },
     "double coklat": {
         ingredients: {
-            ...adonanRotiManisMesin,
+            "Adonan Roti Manis Mesin": { amount: standardDoughWeight, unit: "g" },
             "Coklat Ganache": { amount: 17, unit: "g"},
             "ceres": { amount: 25, unit: "g" },
             "coklat filling": { amount: 15, unit: "g" },
@@ -89,7 +80,7 @@ export const productIngredientsData: AllProductsData = {
     },
     "hot sosis": {
         ingredients: {
-            ...adonanRotiManisMesin,
+            "Adonan Roti Manis Mesin": { amount: standardDoughWeight, unit: "g" },
             "sosis": { amount: 1, unit: "pcs" },
             "daun bawang": { amount: 0.5, unit: "g" },
             "puratos": { amount: 1, unit: "g" }
@@ -98,7 +89,7 @@ export const productIngredientsData: AllProductsData = {
     },
     "kacang merah": {
         ingredients: {
-            ...adonanRotiManisMesin,
+            "Adonan Roti Manis Mesin": { amount: standardDoughWeight, unit: "g" },
             "kacang merah": { amount: 35, unit: "g" },
             "puratos": { amount: 1, unit: "g" }
         },
@@ -106,7 +97,7 @@ export const productIngredientsData: AllProductsData = {
     },
     "sosis label": {
         ingredients: {
-            ...adonanRotiManisMesin,
+            "Adonan Roti Manis Mesin": { amount: standardDoughWeight, unit: "g" },
             "saos sambal": { amount: 0.5, unit: "g" },
             "saos tomat": { amount: 0.5, unit: "g" },
             "daun bawang": { amount: 0.5, unit: "g" },
@@ -117,7 +108,7 @@ export const productIngredientsData: AllProductsData = {
     },
     "strawberry almond": {
         ingredients: {
-            ...adonanRotiManisMesin,
+            "Adonan Roti Manis Mesin": { amount: standardDoughWeight, unit: "g" },
             "selai straw": { amount: 10, unit: "g" },
             "almond": { amount: 15, unit: "g" },
             "white chox": { amount: 15, "unit": "g" }
@@ -126,7 +117,7 @@ export const productIngredientsData: AllProductsData = {
     },
     "vanilla oreo": {
         ingredients: {
-            ...adonanRotiManisMesin,
+            "Adonan Roti Manis Mesin": { amount: standardDoughWeight, unit: "g" },
             "sonton vanilla": { amount: 10, unit: "g" },
             "crumble oreo": { amount: 15, unit: "g" },
             "coklat filling": { amount: 20, unit: "g" },
@@ -136,7 +127,7 @@ export const productIngredientsData: AllProductsData = {
     },
     "abon piramid": {
         ingredients: {
-            ...adonanRotiManisRoll,
+            "Adonan Roti Manis Roll": { amount: standardDoughWeight, unit: "g" },
             "Egg Cream": { amount: 24, unit: "g" },
             "daun bawang": { amount: 0.5, unit: "g" },
             "abon": { amount: 1.5, unit: "g" },
@@ -146,7 +137,7 @@ export const productIngredientsData: AllProductsData = {
     },
     "abon roll pedas": {
         ingredients: {
-            ...adonanRotiManisRoll,
+            "Adonan Roti Manis Roll": { amount: standardDoughWeight, unit: "g" },
             "Egg Cream": { amount: 18, unit: "g" },
             "daun bawang": { amount: 0.5, unit: "g" },
             "abon": { amount: 1.5, unit: "g" },
@@ -156,7 +147,7 @@ export const productIngredientsData: AllProductsData = {
     },
     "cheese roll": {
         ingredients: {
-            ...adonanRotiManisRoll,
+            "Adonan Roti Manis Roll": { amount: standardDoughWeight, unit: "g" },
             "Butter": { amount: 13, unit: "g" },
             "keju": { amount: 20, unit: "g" },
             "mayonaise": { amount: 0.5, unit: "g" },
@@ -166,7 +157,7 @@ export const productIngredientsData: AllProductsData = {
     },
     "donut paha ayam": {
         ingredients: {
-    	    ...donutPahaAyamBase,
+    	    "Adonan Donut Paha Ayam": { amount: standardDoughWeight, unit: "g" },
             "Butter Donat": { amount: 12, unit: "g" },
     	    "ceres": { amount: 20, unit: "g" },
     	    "tusuk sate": { amount: 1, unit: "pcs" },
@@ -186,43 +177,43 @@ export const productIngredientsData: AllProductsData = {
     },
     // Donut Department
     "Donut Almond": { 
-        ingredients: { ...donutPahaAyamBase, "almond": { amount: 15, unit: "g" } },
+        ingredients: { "Adonan Donat Joko": { amount: standardDoughWeight, unit: "g" }, "almond": { amount: 15, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "Donut Coklat Ceres": { 
-        ingredients: { ...donutPahaAyamBase, "ceres": { amount: 15, unit: "g" } },
+        ingredients: { "Adonan Donat Joko": { amount: standardDoughWeight, unit: "g" }, "ceres": { amount: 15, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "Donut Coklat Kacang": { 
-        ingredients: { ...donutPahaAyamBase, "kacang tanah": { amount: 10, unit: "g" }, "coklat filling": { amount: 5, unit: "g" } },
+        ingredients: { "Adonan Donat Joko": { amount: standardDoughWeight, unit: "g" }, "kacang tanah": { amount: 10, unit: "g" }, "coklat filling": { amount: 5, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "Donut Gula Halus": { 
-        ingredients: { ...donutPahaAyamBase, "gula halus": { amount: 15, unit: "g" } },
+        ingredients: { "Adonan Donat Joko": { amount: standardDoughWeight, unit: "g" }, "gula halus": { amount: 15, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "Donut Keju": { 
-        ingredients: { ...donutPahaAyamBase, "keju": { amount: 15, unit: "g" } },
+        ingredients: { "Adonan Donat Joko": { amount: standardDoughWeight, unit: "g" }, "keju": { amount: 15, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "Donut Oreo": { 
-        ingredients: { ...donutPahaAyamBase, "crumble oreo": { amount: 15, unit: "g" } },
+        ingredients: { "Adonan Donat Joko": { amount: standardDoughWeight, unit: "g" }, "crumble oreo": { amount: 15, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "7K BOMBOLONI CAPPUCINO": { 
-        ingredients: { ...donutPahaAyamBase, "cappucino filling": { amount: 20, unit: "g" } },
+        ingredients: { "Adonan Donat Joko": { amount: standardDoughWeight, unit: "g" }, "cappucino filling": { amount: 20, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "7K BOMBOLONI DARK COKLAT": { 
-        ingredients: { ...donutPahaAyamBase, "dark coklat filling (bomboloni)": { amount: 20, unit: "g" } },
+        ingredients: { "Adonan Donat Joko": { amount: standardDoughWeight, unit: "g" }, "dark coklat filling (bomboloni)": { amount: 20, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "7K BOMBOLONI GREENTEA": { 
-        ingredients: { ...donutPahaAyamBase, "greentea filling": { amount: 20, unit: "g" } },
+        ingredients: { "Adonan Donat Joko": { amount: standardDoughWeight, unit: "g" }, "greentea filling": { amount: 20, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "7K BOMBOLONI TIRAMISU": { 
-        ingredients: { ...donutPahaAyamBase, "tiramisu filling": { amount: 20, unit: "g" } },
+        ingredients: { "Adonan Donat Joko": { amount: standardDoughWeight, unit: "g" }, "tiramisu filling": { amount: 20, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
 };

@@ -318,6 +318,7 @@ export default function BakeryApp({
                 key={activeDepartment}
                 products={filteredProducts}
                 productList={departmentProducts}
+                recipes={recipes}
                 addDailyUsageRecord={addDailyUsageRecordHandler} 
                 isLoggedIn={isLoggedIn}
                 department={activeDepartment}

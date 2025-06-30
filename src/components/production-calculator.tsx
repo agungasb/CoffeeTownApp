@@ -16,6 +16,7 @@ import { calculateProductionMetrics, initialMetrics, createProductionSchema } fr
 import type { ProductionInputs } from "@/lib/calculations";
 import { getQuantitiesFromImage } from "@/app/actions";
 import type { AllProductsData } from "@/lib/productIngredients";
+import type { Recipe } from "@/lib/recipes";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { capitalize } from "@/lib/utils";
 import type { DailyUsageRecord, DailyUsageIngredient } from "@/components/bakery-app";
@@ -27,12 +28,13 @@ type ProductionFormValues = {
 interface ProductionCalculatorProps {
     products: AllProductsData;
     productList: string[];
+    recipes: Recipe[];
     addDailyUsageRecord: (record: { usage: DailyUsageIngredient[] }) => Promise<void>;
     isLoggedIn: boolean;
     department: 'rotiManis' | 'donut';
 }
 
-export default function ProductionCalculator({ products, productList, addDailyUsageRecord, isLoggedIn, department }: ProductionCalculatorProps) {
+export default function ProductionCalculator({ products, productList, recipes, addDailyUsageRecord, isLoggedIn, department }: ProductionCalculatorProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -53,7 +55,7 @@ export default function ProductionCalculator({ products, productList, addDailyUs
   }, [productList, form]);
 
   const handleCalculate = (data: ProductionFormValues) => {
-    const newResults = calculateProductionMetrics(data as ProductionInputs, products);
+    const newResults = calculateProductionMetrics(data as ProductionInputs, products, recipes);
     setResults(newResults);
     setHasCalculated(true);
     toast({ title: "Success", description: "Calculations complete." });

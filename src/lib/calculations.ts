@@ -49,12 +49,26 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         (numInputs['vanilla oreo'] || 0) / 15 +
         (numInputs['abon taiwan'] || 0) / 15
     );
+    
+    let totalLoyang = 0;
+    for (const [productName, quantity] of Object.entries(numInputs)) {
+        if (quantity > 0) {
+            const productData = productIngredientsData[productName];
+            const divisor = productData?.calculation?.divisor;
+            if (divisor && divisor > 0) {
+                totalLoyang += quantity / divisor;
+            }
+        }
+    }
 
-    const productionCalculations: [string, string][] = [
-        ["Total Roll", `${totalRollValue.toFixed(2)} loyang`],
-        ["Total Roti", `${totalRoti.toFixed(0)} pcs`],
-        ["Total Box Tray", `${totalBoxTray.toFixed(2)} pcs`],
-    ];
+
+    const productionCalculations: [string, string][] = [];
+
+    productionCalculations.push(["Total Roll", `${totalRollValue.toFixed(2)} loyang`]);
+    productionCalculations.push(["Total Roti", `${totalRoti.toFixed(0)} pcs`]);
+    productionCalculations.push(["Total Box Tray", `${totalBoxTray.toFixed(2)} pcs`]);
+    productionCalculations.push(["Total Loyang", `${totalLoyang.toFixed(2)} pcs`]);
+
 
     const ingredientTotals: Record<string, { amount: number, unit: string }> = {};
 

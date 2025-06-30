@@ -13,41 +13,55 @@ export function createProductionSchema(products: string[]) {
 
 export type ProductionInputs = Record<string, number>;
 
-// Helper to get a product's divisor, with a fallback to prevent errors.
-const getDivisor = (productName: string, productIngredientsData: AllProductsData): number => {
-    const divisor = productIngredientsData[productName]?.calculation?.divisor;
-    // Fallback to 1 if divisor is not defined, 0, or negative to avoid division by zero errors.
-    return (divisor && divisor > 0) ? divisor : 1;
-};
-
 export function calculateProductionMetrics(inputs: ProductionInputs, productIngredientsData: AllProductsData) {
     // Sanitize inputs to ensure they are always numbers, defaulting to 0 to prevent NaN errors.
     const numInputs: { [key: string]: number } = {};
-    for (const key in inputs) {
-        numInputs[key] = Number(inputs[key]) || 0;
+    for (const key of Object.keys(inputs)) {
+        const val = inputs[key];
+        numInputs[key] = (typeof val === 'number' && !isNaN(val)) ? val : 0;
     }
 
     const productionCalculations: [string, string][] = [];
 
-    // --- Formulas from HTML ---
-
-    const totalRoll = Object.keys(numInputs)
-        .filter(p => ["abon piramid", "abon roll pedas", "cheese roll"].includes(p))
-        .reduce((sum, p) => sum + (numInputs[p] / getDivisor(p, productIngredientsData)), 0);
-    productionCalculations.push(["Total Roll", `${totalRoll.toFixed(2)} loyang`]);
+    // Helper to safely get a divisor for a product, defaulting to 1 if not found or invalid.
+    const safeGetDivisor = (productName: string): number => {
+        const product = productIngredientsData[productName];
+        if (product && product.calculation && product.calculation.divisor && product.calculation.divisor > 0) {
+            return product.calculation.divisor;
+        }
+        return 1; // Safe fallback
+    };
     
-    const totalRoti = Object.keys(numInputs)
-        .filter(p => ![
-            "abon piramid", 
-            "abon roll pedas", 
-            "cheese roll", 
-            "donut paha ayam",
-            "Donut Almond", "Donut Coklat Ceres", "Donut Coklat Kacang", "Donut Gula Halus", "Donut Keju", "Donut Oreo",
-            "7K BOMBOLONI CAPPUCINO", "7K BOMBOLONI DARK COKLAT", "7K BOMBOLONI GREENTEA", "7K BOMBOLONI TIRAMISU"
-            ].includes(p))
-        .reduce((sum, p) => sum + (numInputs[p] / getDivisor(p, productIngredientsData)), 0);
+    // --- Dynamic Divisor Calculations ---
+
+    const totalRollProducts = ["abon piramid", "abon roll pedas", "cheese roll"];
+    const totalRoll = totalRollProducts.reduce((sum, p) => {
+        const quantity = numInputs[p] || 0;
+        return sum + (quantity / safeGetDivisor(p));
+    }, 0);
+    productionCalculations.push(["Total Roll", `${totalRoll.toFixed(2)} loyang`]);
+
+    const nonRotiProducts = new Set([
+        "abon piramid", "abon roll pedas", "cheese roll", "donut paha ayam",
+        "Donut Almond", "Donut Coklat Ceres", "Donut Coklat Kacang", "Donut Gula Halus", "Donut Keju", "Donut Oreo",
+        "7K BOMBOLONI CAPPUCINO", "7K BOMBOLONI DARK COKLAT", "7K BOMBOLONI GREENTEA", "7K BOMBOLONI TIRAMISU"
+    ]);
+    const totalRoti = Object.keys(numInputs).reduce((sum, p) => {
+        if (nonRotiProducts.has(p)) {
+            return sum;
+        }
+        const quantity = numInputs[p] || 0;
+        return sum + (quantity / safeGetDivisor(p));
+    }, 0);
     productionCalculations.push(["Total Roti", `${totalRoti.toFixed(2)} loyang`]);
     
+    const totalLoyang = Object.keys(numInputs).reduce((sum, p) => {
+        const quantity = numInputs[p] || 0;
+        return sum + (quantity / safeGetDivisor(p));
+    }, 0);
+
+    // --- Hardcoded Sum & Recipe Calculations ---
+
     const totalBoxTray = (
         (numInputs['donut paha ayam'] || 0) + 
         (numInputs['sosis label'] || 0) + 
@@ -68,14 +82,12 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     );
     productionCalculations.push(["Total Box Tray", `${totalBoxTray.toFixed(2)} pcs`]);
 
-    const totalLoyang = Object.keys(numInputs)
-        .reduce((sum, p) => sum + (numInputs[p] / getDivisor(p, productIngredientsData)), 0);
+    // Push Total Loyang after Box Tray, as per the original script's order.
     productionCalculations.push(["Total Loyang", `${totalLoyang.toFixed(2)} loyang`]);
-    
+
     const totalSlongsong = numInputs['donut paha ayam'] || 0;
     productionCalculations.push(["Total Slongsong", `${totalSlongsong.toFixed(2)} pcs`]);
 
-    // --- Recipes ---
     const eggCreamResep = ((
         (numInputs['abon ayam pedas'] || 0) * 18 + 
         (numInputs['abon sosis'] || 0) * 10 + 
@@ -108,7 +120,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     const adonanAbonTaiwanResep = ((numInputs['abon taiwan'] || 0) / 4);
     productionCalculations.push(["Adonan Abon Taiwan", `${adonanAbonTaiwanResep.toFixed(2)} resep (*kali 2 telur)`]);
     
-    // --- Ingredient Summary (not implemented yet) ---
+    // Ingredient Summary is not implemented yet in this version.
     const ingredientSummary: [string, string, string][] = [];
     
     return {

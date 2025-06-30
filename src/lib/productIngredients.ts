@@ -29,7 +29,7 @@ const donutPahaAyamBase = {
     "ragi": { amount: 0.3675, unit: "g" },
     "pelembut": { amount: 0.0735, unit: "g" },
     "telur utuh": { amount: 0.0735, unit: "g" },
-    "margarin": { amount: 10.8375, unit: "g" },
+    "margarin": { amount: 1.8375, unit: "g" },
     "bos": { amount: 1.8375, unit: "g" },
     "garam": { amount: 0.294, unit: "g" },
     "air": { amount: 3.675, unit: "g" },
@@ -99,7 +99,7 @@ export const productIngredientsData: AllProductsData = {
         ingredients: {
             ...adonanRotiManisMesin,
             "Egg Cream": { amount: 10, unit: "g" },
-            "sosis": { amount: 0.5, unit: "g" },
+            "sosis": { amount: 0.5, unit: "pcs" },
             "abon": { amount: 5, unit: "g" },
         },
         calculation: { divisor: 15, unit: 'loyang' }
@@ -125,7 +125,7 @@ export const productIngredientsData: AllProductsData = {
     "hot sosis": {
         ingredients: {
             ...adonanRotiManisMesin,
-            "sosis": { amount: 1, unit: "g" },
+            "sosis": { amount: 1, unit: "pcs" },
             "daun bawang": { amount: 0.5, unit: "g" },
             "puratos": { amount: 1, unit: "g" }
         },
@@ -146,7 +146,7 @@ export const productIngredientsData: AllProductsData = {
             "saos tomat": { amount: 0.5, unit: "g" },
             "daun bawang": { amount: 0.5, unit: "g" },
             "puratos": { amount: 1, unit: "g" },
-            "sosis": { amount: 1, unit: "g" }
+            "sosis": { amount: 1, unit: "pcs" }
         },
         calculation: { divisor: 12, unit: 'loyang' }
     },
@@ -210,7 +210,7 @@ export const productIngredientsData: AllProductsData = {
     },
     "abon taiwan": {
         ingredients: {
-            "Adonan Abon Taiwan": { amount: 0.25, unit: "resep" },
+            "Adonan Abon Taiwan": { amount: 0.25, unit: "resep" }, // This is a special case representing 1/4 of the recipe yield for 1 piece
             "Fla Abon Taiwan": { amount: 30, unit: "g" },
     	    "abon": { amount: 5, unit: "g" },
     	    "mayonaise": { amount: 1.5, unit: "g" },

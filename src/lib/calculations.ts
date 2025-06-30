@@ -20,26 +20,30 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         numInputs[key] = Number(inputs[key]) || 0;
     }
 
-    const getDivisor = (productName: string, fallback: number): number => {
-        return productIngredientsData[productName]?.calculation?.divisor || fallback;
+    const getDivisor = (productName: string, fallback: number = 1): number => {
+        const divisor = productIngredientsData[productName]?.calculation?.divisor;
+        // Ensure divisor is a positive number, otherwise default to the fallback (or 1)
+        return (divisor && divisor > 0) ? divisor : fallback;
     };
     
-    // --- Start of Base Calculations ---
+    // --- Metric Calculations ---
     const productionCalculations: [string, string][] = [];
 
-    // Total Roll
+    // --- Start with the fixed order of metrics ---
+
+    // 1. Total Roll
     const totalRollValue = (
-        ( (numInputs['abon piramid'] || 0) / getDivisor('abon piramid', 11) ) +
-        ( (numInputs['abon roll pedas'] || 0) / getDivisor('abon roll pedas', 12) ) +
-        ( (numInputs['cheese roll'] || 0) / getDivisor('cheese roll', 12) )
+        ( (numInputs['abon piramid'] || 0) / getDivisor('abon piramid') ) +
+        ( (numInputs['abon roll pedas'] || 0) / getDivisor('abon roll pedas') ) +
+        ( (numInputs['cheese roll'] || 0) / getDivisor('cheese roll') )
     ) / 12;
     productionCalculations.push(["Total Roll", `${totalRollValue.toFixed(2)} loyang`]);
     
-    // Total Roti
+    // 2. Total Roti
     const totalRoti = Object.values(numInputs).reduce((sum, current) => sum + (current || 0), 0);
     productionCalculations.push(["Total Roti", `${totalRoti.toFixed(0)} pcs`]);
 
-    // Total Box Tray
+    // 3. Total Box Tray
     const totalBoxTray = (
         (numInputs['abon ayam pedas'] || 0) / 15 +
         (numInputs['abon piramid'] || 0) / 20 +
@@ -60,20 +64,16 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     );
     productionCalculations.push(["Total Box Tray", `${totalBoxTray.toFixed(2)} pcs`]);
 
-    // Total Loyang
+    // 4. Total Loyang
     let totalLoyang = 0;
     for (const [productName, quantity] of Object.entries(numInputs)) {
         if (quantity > 0) {
-            const productData = productIngredientsData[productName];
-            const divisor = productData?.calculation?.divisor;
-            if (divisor && divisor > 0) {
-                totalLoyang += quantity / divisor;
-            }
+            totalLoyang += quantity / getDivisor(productName);
         }
     }
     productionCalculations.push(["Total Loyang", `${totalLoyang.toFixed(2)} pcs`]);
-
-    // Total Slongsong
+    
+    // 5. Total Slongsong
     const totalSlongsong = (
         (
             (numInputs['abon ayam pedas'] || 0) + 
@@ -86,82 +86,84 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     productionCalculations.push(["Total Slongsong", `${totalSlongsong.toFixed(2)} trolley (*include hot sosis)`]);
 
 
-    // --- Recipe and Ingredient Summary Calculations ---
+    // --- Dynamic Recipe and Ingredient Summary Calculations ---
     const ingredientTotals: Record<string, { amount: number, unit: string }> = {};
 
+    // First pass: aggregate all top-level ingredients, including component recipes.
     for (const [productName, quantity] of Object.entries(numInputs)) {
         const productKey = productName as keyof typeof productIngredientsData;
         if (quantity > 0 && productIngredientsData[productKey]) {
             const ingredients = productIngredientsData[productKey].ingredients;
             if (ingredients) {
                 for (const [ingredient, data] of Object.entries(ingredients)) {
-                    if (!ingredientTotals[ingredient]) {
-                        ingredientTotals[ingredient] = { amount: 0, unit: data.unit };
+                    // Use a case-insensitive key for aggregation
+                    const key = ingredient.toLowerCase();
+                    if (!ingredientTotals[key]) {
+                        // Store with original casing for unit lookup later
+                        ingredientTotals[key] = { amount: 0, unit: data.unit };
                     }
-                    ingredientTotals[ingredient].amount += data.amount * quantity;
+                    ingredientTotals[key].amount += data.amount * quantity;
                 }
             }
         }
     }
 
-    const recipeCalculations: [string, string][] = [];
-    const recipeIngredientNames = new Set<string>();
-
-    const orderedRecipeMetrics = [
-        "Egg Cream",
-        "Cream Cheese",
-        "Butter",
-        "Butter Donat",
-        "Coklat Ganache",
-        "Topping Maxicana",
-        "Fla Abon Taiwan",
-        "Adonan Abon Taiwan",
+    const componentRecipesToCalculate = [
+        "Egg Cream", "Cream Cheese", "Butter", "Butter Donat",
+        "Coklat Ganache", "Topping Maxicana", "Fla Abon Taiwan", "Adonan Abon Taiwan"
     ];
+    
+    const finalRawIngredients: Record<string, { amount: number, unit: string }> = {};
 
-    for (const recipeName of orderedRecipeMetrics) {
+    // Second pass: process component recipes and break them down into raw ingredients.
+    for (const recipeName of componentRecipesToCalculate) {
         const lowerRecipeName = recipeName.toLowerCase();
         const recipeDef = initialRecipesData.find(r => r.name.toLowerCase() === lowerRecipeName);
-        
-        let totalAmountNeeded = 0;
-        // Find the ingredient that matches the recipe name, case-insensitively
-        const ingredientKey = Object.keys(ingredientTotals).find(k => k.toLowerCase() === lowerRecipeName);
 
-        if (ingredientKey) {
-            totalAmountNeeded = ingredientTotals[ingredientKey].amount;
-        }
+        if (recipeDef && ingredientTotals[lowerRecipeName] && ingredientTotals[lowerRecipeName].amount > 0) {
+            const totalAmountNeeded = ingredientTotals[lowerRecipeName].amount;
+            
+            const recipeYield = recipeDef.ingredients.reduce((sum, ing) => sum + ing.amount, 0);
 
-        if (recipeDef && totalAmountNeeded > 0) {
-            // The recipe weight for "Adonan Abon Taiwan" is a special case (1 resep for 4 pcs), so we treat its weight as 1 unit.
-            const recipeWeight = lowerRecipeName === 'adonan abon taiwan' 
-                ? 1 
-                : recipeDef.ingredients.reduce((sum: number, ing: { amount: number; }) => sum + ing.amount, 0);
-
-            if (recipeWeight > 0) {
-                const resepCount = totalAmountNeeded / recipeWeight;
+            if (recipeYield > 0) {
+                const resepCount = totalAmountNeeded / recipeYield;
                 let displayText = `${resepCount.toFixed(2)} resep`;
                 if(recipeName === "Adonan Abon Taiwan") {
                     displayText += ` (*kali 2 telur)`;
                 }
-                recipeCalculations.push([recipeName, displayText]);
-                // We use the original case `recipeName` here to make sure it's filtered correctly from the summary.
-                recipeIngredientNames.add(recipeName);
+                productionCalculations.push([recipeName, displayText]);
+
+                // Add the broken-down ingredients to the final raw list
+                for (const ing of recipeDef.ingredients) {
+                    const rawKey = ing.name.toLowerCase();
+                    if (!finalRawIngredients[rawKey]) {
+                        finalRawIngredients[rawKey] = { amount: 0, unit: ing.unit };
+                    }
+                    finalRawIngredients[rawKey].amount += ing.amount * resepCount;
+                }
             }
         }
     }
     
-    // Combine all calculations in the desired order
-    const finalCalculations = [ ...productionCalculations, ...recipeCalculations ];
-
-    // Filter out the component recipes from the final ingredient summary
-    const finalIngredientSummary = Object.entries(ingredientTotals)
-        .filter(([name]) => !recipeIngredientNames.has(name))
+    // Third pass: Add all other raw ingredients from the first pass to the final list
+    for (const [name, data] of Object.entries(ingredientTotals)) {
+        // If it's not a component recipe we just calculated, add it to the final list.
+        const isComponentRecipe = componentRecipesToCalculate.some(r => r.toLowerCase() === name.toLowerCase());
+        if (!isComponentRecipe) {
+            const rawKey = name.toLowerCase();
+            if(!finalRawIngredients[rawKey]) {
+                finalRawIngredients[rawKey] = { amount: 0, unit: data.unit };
+            }
+            finalRawIngredients[rawKey].amount += data.amount;
+        }
+    }
+    
+    const finalIngredientSummary = Object.entries(finalRawIngredients)
         .sort(([a], [b]) => a.localeCompare(b))
-        .map(([name, data]) => {
-            return [name, data.amount.toFixed(2), data.unit];
-        });
+        .map(([name, data]) => [name, data.amount.toFixed(2), data.unit]);
 
     return {
-        productionCalculations: finalCalculations,
+        productionCalculations,
         ingredientSummary: finalIngredientSummary,
     };
 }

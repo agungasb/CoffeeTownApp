@@ -19,32 +19,19 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         numInputs[key] = Number(inputs[key]) || 0;
     }
 
-    const productionCalculations: [string, string][] = [];
-
-    // Dynamically calculate metrics based on product data
-    for (const [productName, quantity] of Object.entries(numInputs)) {
-        if (quantity > 0 && productIngredientsData[productName]?.calculation) {
-            const calc = productIngredientsData[productName].calculation!;
-            if (calc.divisor && calc.unit) {
-                const multiplier = calc.multiplier || 1;
-                const result = (quantity * multiplier) / calc.divisor;
-                productionCalculations.push([productName, `${result.toFixed(2)} ${calc.unit}`]);
-            }
-        }
-    }
-    // Sort alphabetically for consistent order
-    productionCalculations.sort(([a], [b]) => a.localeCompare(b));
-
-
-    // These aggregate calculations are specific to the 'Roti Manis' department
-    // They will remain hardcoded for now.
-    const aggregateCalculations = {
-        "Total Sosis": `${(((((numInputs['abon sosis'] || 0) / 2) + (numInputs['hot sosis'] || 0) + (numInputs['sosis label'] || 0)) / 10) / 28).toFixed(2)} dus`,
-        "Adonan Donat": `${(((numInputs['donut paha ayam'] || 0) * 48) / 1800).toFixed(2)} resep`,
-        "Adonan Roti Manis Roll": `${((((numInputs['abon piramid'] || 0) / 11) + ((numInputs['abon roll pedas'] || 0) / 12) + ((numInputs['cheese roll'] || 0) / 12)) * 800 / 2013).toFixed(2)} resep`,
-        "Adonan Roti Manis Mesin": `${(((numInputs['abon ayam pedas'] || 0) + (numInputs['abon sosis'] || 0) + (numInputs['cream choco cheese'] || 0) + (numInputs['double coklat'] || 0) + (numInputs['hot sosis'] || 0) + (numInputs['kacang merah'] || 0) + (numInputs['maxicana coklat'] || 0) + (numInputs['sosis label'] || 0) + (numInputs['strawberry almond'] || 0) + (numInputs['vanilla oreo'] || 0)) * 49 / 1948).toFixed(2)} resep`,
-        "Total Roll": `${((((numInputs['abon piramid'] || 0) / 11) + ((numInputs['abon roll pedas'] || 0) / 12) + ((numInputs['cheese roll'] || 0) / 12)) / 12).toFixed(2)} loyang`,
+    const getDivisor = (productName: string, fallback: number): number => {
+        return productIngredientsData[productName]?.calculation?.divisor || fallback;
     };
+    
+    const totalRollValue = (
+        ( (numInputs['abon piramid'] || 0) / getDivisor('abon piramid', 11) ) +
+        ( (numInputs['abon roll pedas'] || 0) / getDivisor('abon roll pedas', 12) ) +
+        ( (numInputs['cheese roll'] || 0) / getDivisor('cheese roll', 12) )
+    ) / 12;
+
+    const productionCalculations: [string, string][] = [
+        ["Total Roll", `${totalRollValue.toFixed(2)} loyang`],
+    ];
 
     const ingredientTotals: Record<string, { amount: number, unit: string }> = {};
 
@@ -69,21 +56,14 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         .map(([name, data]) => {
             return [name, data.amount.toFixed(2), data.unit];
         });
-        
-    const finalCalculations = [...productionCalculations, ...Object.entries(aggregateCalculations)];
 
     return {
-        productionCalculations: finalCalculations,
+        productionCalculations: productionCalculations,
         ingredientSummary: ingredientSummary,
     };
 }
 
 export const initialMetrics = {
-    productionCalculations: [
-        ["Total Sosis", "0.00 dus"],
-        ["Adonan Donat", "0.00 resep"],
-        ["Adonan Roti Manis Roll", "0.00 resep"],
-        ["Adonan Roti Manis Mesin", "0.00 resep"],
-    ],
+    productionCalculations: [] as [string, string][],
     ingredientSummary: [] as [string, string, string][]
 };

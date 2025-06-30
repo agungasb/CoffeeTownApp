@@ -185,14 +185,44 @@ export const productIngredientsData: AllProductsData = {
         calculation: { divisor: 15, unit: 'loyang', multiplier: 2 }
     },
     // Donut Department
-    "Donut Almond": { ingredients: { ...donutPahaAyamBase, "almond": { amount: 15, unit: "g" } } },
-    "Donut Coklat Ceres": { ingredients: { ...donutPahaAyamBase, "ceres": { amount: 15, unit: "g" } } },
-    "Donut Coklat Kacang": { ingredients: { ...donutPahaAyamBase, "kacang tanah": { amount: 10, unit: "g" }, "coklat filling": { amount: 5, unit: "g" } } },
-    "Donut Gula Halus": { ingredients: { ...donutPahaAyamBase, "gula halus": { amount: 15, unit: "g" } } },
-    "Donut Keju": { ingredients: { ...donutPahaAyamBase, "keju": { amount: 15, unit: "g" } } },
-    "Donut Oreo": { ingredients: { ...donutPahaAyamBase, "crumble oreo": { amount: 15, unit: "g" } } },
-    "7K BOMBOLONI CAPPUCINO": { ingredients: { ...donutPahaAyamBase, "cappucino filling": { amount: 20, unit: "g" } } },
-    "7K BOMBOLONI DARK COKLAT": { ingredients: { ...donutPahaAyamBase, "dark coklat filling (bomboloni)": { amount: 20, unit: "g" } } },
-    "7K BOMBOLONI GREENTEA": { ingredients: { ...donutPahaAyamBase, "greentea filling": { amount: 20, unit: "g" } } },
-    "7K BOMBOLONI TIRAMISU": { ingredients: { ...donutPahaAyamBase, "tiramisu filling": { amount: 20, unit: "g" } } },
+    "Donut Almond": { 
+        ingredients: { ...donutPahaAyamBase, "almond": { amount: 15, unit: "g" } },
+        calculation: { divisor: 15, unit: 'loyang' }
+    },
+    "Donut Coklat Ceres": { 
+        ingredients: { ...donutPahaAyamBase, "ceres": { amount: 15, unit: "g" } },
+        calculation: { divisor: 15, unit: 'loyang' }
+    },
+    "Donut Coklat Kacang": { 
+        ingredients: { ...donutPahaAyamBase, "kacang tanah": { amount: 10, unit: "g" }, "coklat filling": { amount: 5, unit: "g" } },
+        calculation: { divisor: 15, unit: 'loyang' }
+    },
+    "Donut Gula Halus": { 
+        ingredients: { ...donutPahaAyamBase, "gula halus": { amount: 15, unit: "g" } },
+        calculation: { divisor: 15, unit: 'loyang' }
+    },
+    "Donut Keju": { 
+        ingredients: { ...donutPahaAyamBase, "keju": { amount: 15, unit: "g" } },
+        calculation: { divisor: 15, unit: 'loyang' }
+    },
+    "Donut Oreo": { 
+        ingredients: { ...donutPahaAyamBase, "crumble oreo": { amount: 15, unit: "g" } },
+        calculation: { divisor: 15, unit: 'loyang' }
+    },
+    "7K BOMBOLONI CAPPUCINO": { 
+        ingredients: { ...donutPahaAyamBase, "cappucino filling": { amount: 20, unit: "g" } },
+        calculation: { divisor: 15, unit: 'loyang' }
+    },
+    "7K BOMBOLONI DARK COKLAT": { 
+        ingredients: { ...donutPahaAyamBase, "dark coklat filling (bomboloni)": { amount: 20, unit: "g" } },
+        calculation: { divisor: 15, unit: 'loyang' }
+    },
+    "7K BOMBOLONI GREENTEA": { 
+        ingredients: { ...donutPahaAyamBase, "greentea filling": { amount: 20, unit: "g" } },
+        calculation: { divisor: 15, unit: 'loyang' }
+    },
+    "7K BOMBOLONI TIRAMISU": { 
+        ingredients: { ...donutPahaAyamBase, "tiramisu filling": { amount: 20, unit: "g" } },
+        calculation: { divisor: 15, unit: 'loyang' }
+    },
 };

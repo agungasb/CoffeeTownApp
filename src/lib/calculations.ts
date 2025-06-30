@@ -31,9 +31,29 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
 
     const totalRoti = Object.values(numInputs).reduce((sum, current) => sum + (current || 0), 0);
 
+    const totalBoxTray = (
+        (numInputs['abon ayam pedas'] || 0) / 15 +
+        (numInputs['abon piramid'] || 0) / 20 +
+        (numInputs['abon roll pedas'] || 0) / 25 +
+        (numInputs['abon sosis'] || 0) / 15 +
+        (numInputs['cheese roll'] || 0) / 35 +
+        (numInputs['cream choco cheese'] || 0) / 12 +
+        (numInputs['donut paha ayam'] || 0) / 15 +
+        (numInputs['double coklat'] || 0) / 15 +
+        (numInputs['hot sosis'] || 0) / 15 +
+        (numInputs['kacang merah'] || 0) / 15 +
+        (numInputs['maxicana coklat'] || 0) / 15 +
+        (numInputs['red velvet cream cheese'] || 0) / 15 +
+        (numInputs['sosis label'] || 0) / 15 +
+        (numInputs['strawberry almond'] || 0) / 15 +
+        (numInputs['vanilla oreo'] || 0) / 15 +
+        (numInputs['abon taiwan'] || 0) / 15
+    );
+
     const productionCalculations: [string, string][] = [
         ["Total Roll", `${totalRollValue.toFixed(2)} loyang`],
         ["Total Roti", `${totalRoti.toFixed(0)} pcs`],
+        ["Total Box Tray", `${totalBoxTray.toFixed(2)} pcs`],
     ];
 
     const ingredientTotals: Record<string, { amount: number, unit: string }> = {};

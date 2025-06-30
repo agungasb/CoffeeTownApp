@@ -51,12 +51,14 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         const productKey = productName as keyof typeof productIngredientsData;
         if (quantity > 0 && productIngredientsData[productKey]) {
             const ingredients = productIngredientsData[productKey].ingredients;
-            for (const [ingredient, data] of Object.entries(ingredients)) {
-                if (!ingredientTotals[ingredient]) {
-                    ingredientTotals[ingredient] = { amount: 0, unit: data.unit };
+            if (ingredients) {
+                for (const [ingredient, data] of Object.entries(ingredients)) {
+                    if (!ingredientTotals[ingredient]) {
+                        ingredientTotals[ingredient] = { amount: 0, unit: data.unit };
+                    }
+                    ingredientTotals[ingredient].amount += data.amount * quantity;
+                    ingredientTotals[ingredient].unit = data.unit; 
                 }
-                ingredientTotals[ingredient].amount += data.amount * quantity;
-                ingredientTotals[ingredient].unit = data.unit; 
             }
         }
     }

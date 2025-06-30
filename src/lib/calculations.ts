@@ -26,7 +26,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
 
     const productionCalculations: [string, string][] = [];
 
-    // Helper to safely get a divisor, defaulting to 1 to prevent division by zero.
+    // Helper to safely get a divisor, defaulting to 1 to prevent division by zero or errors.
     const safeGetDivisor = (productName: string): number => {
         const product = productIngredientsData[productName];
         if (product && product.calculation && product.calculation.divisor && product.calculation.divisor > 0) {
@@ -65,14 +65,13 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         "7K BOMBOLONI CAPPUCINO", "7K BOMBOLONI DARK COKLAT", "7K BOMBOLONI GREENTEA", "7K BOMBOLONI TIRAMISU"
     ]);
 
-    const totalRoti = Object.keys(numInputs).reduce((sum, p) => {
-        if (nonRotiProducts.has(p) || (numInputs[p] || 0) === 0) {
+    const totalRotiPcs = Object.keys(numInputs).reduce((sum, p) => {
+        if (nonRotiProducts.has(p)) {
             return sum;
         }
-        const quantity = numInputs[p] || 0;
-        return sum + (quantity / safeGetDivisor(p));
+        return sum + (numInputs[p] || 0);
     }, 0);
-    if (totalRoti > 0) productionCalculations.push(["Total Roti", `${totalRoti.toFixed(2)} loyang`]);
+    if (totalRotiPcs > 0) productionCalculations.push(["Total Roti", `${totalRotiPcs.toFixed(0)} pcs`]);
 
     const totalBoxTray = (
         (numInputs['donut paha ayam'] || 0) +
@@ -117,37 +116,38 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     }
 
     // Recipe Totals
-    let adonanDonutTotal = 0;
-    let adonanRollTotal = 0;
-    let adonanMesinTotal = 0;
+    const recipeTotals: Record<string, number> = {
+        'Adonan Donut Paha Ayam': 0,
+        'Adonan Roti Manis Roll': 0,
+        'Adonan Roti Manis Mesin': 0,
+    };
 
     for (const productName in numInputs) {
-        if ((numInputs[productName] || 0) === 0) continue;
+        const quantity = numInputs[productName];
+        if (!quantity || quantity === 0) continue;
 
         const productData = productIngredientsData[productName];
         if (!productData || !productData.ingredients) continue;
-        
-        const productBaseAmount = (numInputs[productName] || 0) / safeGetDivisor(productName);
 
-        if (productData.ingredients['Adonan Donut Paha Ayam']) {
-            adonanDonutTotal += productBaseAmount * (productData.ingredients['Adonan Donut Paha Ayam'].amount || 1);
-        }
-        if (productData.ingredients['Adonan Roti Manis Roll']) {
-            adonanRollTotal += productBaseAmount * (productData.ingredients['Adonan Roti Manis Roll'].amount || 1);
-        }
-        if (productData.ingredients['Adonan Roti Manis Mesin']) {
-            adonanMesinTotal += productBaseAmount * (productData.ingredients['Adonan Roti Manis Mesin'].amount || 1);
-        }
-    }
+        const productBaseAmount = quantity / safeGetDivisor(productName);
 
-    if (adonanDonutTotal > 0) {
-        productionCalculations.push(['Adonan Donat', `${adonanDonutTotal.toFixed(2)} resep`]);
+        for (const recipeName in recipeTotals) {
+            if (productData.ingredients[recipeName]) {
+                const ingredientInfo = productData.ingredients[recipeName];
+                const recipeMultiplier = (typeof ingredientInfo.amount === 'number' && !isNaN(ingredientInfo.amount)) ? ingredientInfo.amount : 1;
+                recipeTotals[recipeName] += productBaseAmount * recipeMultiplier;
+            }
+        }
     }
-    if (adonanRollTotal > 0) {
-        productionCalculations.push(['Adonan Roti Manis Roll', `${adonanRollTotal.toFixed(2)} resep`]);
+    
+    if (recipeTotals['Adonan Donut Paha Ayam'] > 0) {
+        productionCalculations.push(['Adonan Donat', `${recipeTotals['Adonan Donut Paha Ayam'].toFixed(2)} resep`]);
     }
-    if (adonanMesinTotal > 0) {
-        productionCalculations.push(['Adonan Roti Manis Mesin', `${adonanMesinTotal.toFixed(2)} resep`]);
+    if (recipeTotals['Adonan Roti Manis Roll'] > 0) {
+        productionCalculations.push(['Adonan Roti Manis Roll', `${recipeTotals['Adonan Roti Manis Roll'].toFixed(2)} resep`]);
+    }
+    if (recipeTotals['Adonan Roti Manis Mesin'] > 0) {
+        productionCalculations.push(['Adonan Roti Manis Mesin', `${recipeTotals['Adonan Roti Manis Mesin'].toFixed(2)} resep`]);
     }
 
 

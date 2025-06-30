@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useForm, useFieldArray } from 'react-hook-form';
@@ -103,8 +102,6 @@ export function ProductForm({ productToEdit, recipes, onSubmit, onCancel }: Prod
         onSubmit(data);
     };
 
-    const doughRecipes = recipes.filter(r => r.name.toLowerCase().includes('adonan'));
-
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -124,8 +121,8 @@ export function ProductForm({ productToEdit, recipes, onSubmit, onCancel }: Prod
                     />
 
                     <div className="p-4 border rounded-md space-y-4 bg-muted/50">
-                        <h3 className="text-md font-medium">Base Dough Recipes</h3>
-                        <FormDescription>Link this product to one or more base dough recipes for automated calculations.</FormDescription>
+                        <h3 className="text-md font-medium">Base Recipes</h3>
+                        <FormDescription>Link this product to one or more base recipes for automated calculations.</FormDescription>
                          {baseRecipeFields.map((field, index) => (
                             <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-4 md:gap-2 p-2 border rounded-md md:items-end bg-background/50">
                                 <FormField
@@ -142,7 +139,7 @@ export function ProductForm({ productToEdit, recipes, onSubmit, onCancel }: Prod
                                                 </FormControl>
                                                 <SelectContent>
                                                     <SelectItem value="none">None</SelectItem>
-                                                    {doughRecipes.map(recipe => (
+                                                    {recipes.map(recipe => (
                                                         <SelectItem key={recipe.id} value={recipe.name}>
                                                             {capitalize(recipe.name)}
                                                         </SelectItem>

@@ -30,59 +30,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
 
     const productionCalculations: [string, string][] = [];
 
-    // --- Direct translation of all formulas from HTML ---
-
-    const totalRollValue = (
-        ( (numInputs['abon piramid'] || 0) / getDivisor('abon piramid', productIngredientsData) ) +
-        ( (numInputs['abon roll pedas'] || 0) / getDivisor('abon roll pedas', productIngredientsData) ) +
-        ( (numInputs['cheese roll'] || 0) / getDivisor('cheese roll', productIngredientsData) )
-    ) / 12;
-    productionCalculations.push(["Total Roll", `${totalRollValue.toFixed(2)} loyang`]);
-
-    const totalRoti = Object.values(numInputs).reduce((sum, current) => sum + (current || 0), 0);
-    productionCalculations.push(["Total Roti", `${totalRoti.toFixed(0)} pcs`]);
-
-    const totalBoxTray = (
-        ((numInputs['abon ayam pedas'] || 0) / 15) +
-        ((numInputs['abon piramid'] || 0) / 20) +
-        ((numInputs['abon roll pedas'] || 0) / 25) +
-        ((numInputs['abon sosis'] || 0) / 15) +
-        ((numInputs['cheese roll'] || 0) / 35) +
-        ((numInputs['cream choco cheese'] || 0) / 12) +
-        ((numInputs['donut paha ayam'] || 0) / 15) +
-        ((numInputs['double coklat'] || 0) / 15) +
-        ((numInputs['hot sosis'] || 0) / 15) +
-        ((numInputs['kacang merah'] || 0) / 15) +
-        ((numInputs['maxicana coklat'] || 0) / 15) +
-        ((numInputs['red velvet cream cheese'] || 0) / 15) +
-        ((numInputs['sosis label'] || 0) / 15) +
-        ((numInputs['strawberry almond'] || 0) / 15) +
-        ((numInputs['vanilla oreo'] || 0) / 15) +
-        ((numInputs['abon taiwan'] || 0) / 15)
-    );
-    productionCalculations.push(["Total Box Tray", `${totalBoxTray.toFixed(2)} pcs`]);
-
-    let totalLoyang = 0;
-    for (const [productName, quantity] of Object.entries(numInputs)) {
-        if (quantity > 0 && productIngredientsData[productName]) {
-            totalLoyang += quantity / getDivisor(productName, productIngredientsData);
-        }
-    }
-    productionCalculations.push(["Total Loyang", `${totalLoyang.toFixed(2)} pcs`]);
-
-    const totalSlongsong = (
-        (
-            (numInputs['abon ayam pedas'] || 0) +
-            (numInputs['cream choco cheese'] || 0) +
-            (numInputs['double coklat'] || 0) +
-            (numInputs['hot sosis'] || 0) +
-            (numInputs['strawberry almond'] || 0)
-        ) / 15
-    ) / 15;
-    productionCalculations.push(["Total Slongsong", `${totalSlongsong.toFixed(2)} trolley (*include hot sosis)`]);
-
-    const eggCreamResep = (( (numInputs['abon ayam pedas'] || 0) * 18 + (numInputs['abon sosis'] || 0) * 10 + (numInputs['abon piramid'] || 0) * 24 + (numInputs['abon roll pedas'] || 0) * 18) / 22260);
-    productionCalculations.push(["Egg Cream", `${eggCreamResep.toFixed(2)} resep`]);
+    // --- Testing only the hardcoded formulas that were previously not appearing ---
 
     const creamCheeseResep = (((numInputs['red velvet cream cheese'] || 0) * 48) / 10000);
     productionCalculations.push(["Cream Cheese", `${creamCheeseResep.toFixed(2)} resep`]);

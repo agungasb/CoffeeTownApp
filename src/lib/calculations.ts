@@ -27,8 +27,9 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     const productionCalculations: [string, string][] = [];
 
     // Helper to safely get a divisor, defaulting to 1 to prevent division by zero or errors.
+    // This now handles inconsistent casing in product names.
     const safeGetDivisor = (productName: string): number => {
-        const product = productIngredientsData[productName];
+        const product = productIngredientsData[productName.toLowerCase()];
         if (product && product.calculation && product.calculation.divisor && product.calculation.divisor > 0) {
             return product.calculation.divisor;
         }
@@ -40,7 +41,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     for (const productName in numInputs) {
         const quantity = numInputs[productName];
         if (quantity > 0) {
-            const productData = productIngredientsData[productName];
+            const productData = productIngredientsData[productName.toLowerCase()];
             if (productData && productData.calculation && productData.calculation.divisor) {
                  const divisor = safeGetDivisor(productName);
                  const result = quantity / divisor;
@@ -61,12 +62,12 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
 
     const nonRotiProducts = new Set([
         "abon piramid", "abon roll pedas", "cheese roll", "donut paha ayam",
-        "Donut Almond", "Donut Coklat Ceres", "Donut Coklat Kacang", "Donut Gula Halus", "Donut Keju", "Donut Oreo",
-        "7K BOMBOLONI CAPPUCINO", "7K BOMBOLONI DARK COKLAT", "7K BOMBOLONI GREENTEA", "7K BOMBOLONI TIRAMISU"
+        "donut almond", "donut coklat ceres", "donut coklat kacang", "donut gula halus", "donut keju", "donut oreo",
+        "7k bomboloni cappucino", "7k bomboloni dark coklat", "7k bomboloni greentea", "7k bomboloni tiramisu"
     ]);
 
     const totalRotiPcs = Object.keys(numInputs).reduce((sum, p) => {
-        if (nonRotiProducts.has(p)) {
+        if (nonRotiProducts.has(p.toLowerCase())) {
             return sum;
         }
         return sum + (numInputs[p] || 0);
@@ -91,7 +92,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         (numInputs['cheese roll'] || 0) +
         (numInputs['abon taiwan'] || 0)
     );
-    if (totalBoxTray > 0) productionCalculations.push(["Total Box Tray", `${totalBoxTray.toFixed(2)} pcs`]);
+    if (totalBoxTray > 0) productionCalculations.push(["Total Box Tray", `${totalBoxTray.toFixed(0)} pcs`]);
 
     const totalLoyang = Object.keys(numInputs).reduce((sum, p) => {
          if ((numInputs[p] || 0) === 0) return sum;
@@ -101,7 +102,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     if (totalLoyang > 0) productionCalculations.push(["Total Loyang", `${totalLoyang.toFixed(2)} loyang`]);
 
     const totalSlongsong = numInputs['donut paha ayam'] || 0;
-    if (totalSlongsong > 0) productionCalculations.push(["Total Slongsong", `${totalSlongsong.toFixed(2)} pcs`]);
+    if (totalSlongsong > 0) productionCalculations.push(["Total Slongsong", `${totalSlongsong.toFixed(0)} pcs`]);
     
     const totalSosisPcs =
         (numInputs['abon sosis'] || 0) * 0.5 +
@@ -113,25 +114,34 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         productionCalculations.push(['Total Sosis', `${totalSosisPack.toFixed(2)} pack`]);
     }
     
-    // --- Hardcoded Adonan Recipe Totals ---
-    let adonanDonutTotalResep = 0;
-    const donutProducts = [
-        "donut paha ayam", "Donut Almond", "Donut Coklat Ceres", "Donut Coklat Kacang", "Donut Gula Halus", "Donut Keju", "Donut Oreo",
-        "7K BOMBOLONI CAPPUCINO", "7K BOMBOLONI DARK COKLAT", "7K BOMBOLONI GREENTEA", "7K BOMBOLONI TIRAMISU"
-    ];
-    donutProducts.forEach(p => {
-        if (numInputs[p] > 0) {
-            adonanDonutTotalResep += (numInputs[p] / safeGetDivisor(p));
-        }
-    });
-    if (adonanDonutTotalResep > 0) {
-        productionCalculations.push(['Adonan Donat', `${adonanDonutTotalResep.toFixed(2)} resep`]);
+    // --- Hardcoded Adonan Recipe Totals (Split by department as requested) ---
+    
+    // Adonan for Donut Paha Ayam (Roti Manis Dept)
+    const adonanPahaAyamResep = (numInputs['donut paha ayam'] || 0) / safeGetDivisor('donut paha ayam');
+    if (adonanPahaAyamResep > 0) {
+        productionCalculations.push(['Adonan Donut Paha Ayam', `${adonanPahaAyamResep.toFixed(2)} resep`]);
     }
 
+    // Adonan for Donut Dept products
+    let adonanDonutDeptResep = 0;
+    const donutDeptProducts = [
+        "Donut Almond", "Donut Coklat Ceres", "Donut Coklat Kacang", "Donut Gula Halus", "Donut Keju", "Donut Oreo",
+        "7K BOMBOLONI CAPPUCINO", "7K BOMBOLONI DARK COKLAT", "7K BOMBOLONI GREENTEA", "7K BOMBOLONI TIRAMISU"
+    ];
+    donutDeptProducts.forEach(p => {
+        if ((numInputs[p] || 0) > 0) {
+            adonanDonutDeptResep += (numInputs[p] / safeGetDivisor(p));
+        }
+    });
+    if (adonanDonutDeptResep > 0) {
+        productionCalculations.push(['Adonan Donat', `${adonanDonutDeptResep.toFixed(2)} resep`]);
+    }
+    
+    // Adonan Roti Manis Roll
     let adonanRollTotalResep = 0;
     const rollProductsList = ["abon piramid", "abon roll pedas", "cheese roll"];
     rollProductsList.forEach(p => {
-        if (numInputs[p] > 0) {
+        if ((numInputs[p] || 0) > 0) {
             adonanRollTotalResep += (numInputs[p] / safeGetDivisor(p));
         }
     });
@@ -139,13 +149,14 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         productionCalculations.push(['Adonan Roti Manis Roll', `${adonanRollTotalResep.toFixed(2)} resep`]);
     }
     
+    // Adonan Roti Manis Mesin
     let adonanMesinTotalResep = 0;
     const mesinProducts = [
         "maxicana coklat", "abon ayam pedas", "red velvet cream cheese", "abon sosis", "cream choco cheese",
         "double coklat", "hot sosis", "kacang merah", "sosis label", "strawberry almond", "vanilla oreo"
     ];
      mesinProducts.forEach(p => {
-        if (numInputs[p] > 0) {
+        if ((numInputs[p] || 0) > 0) {
             adonanMesinTotalResep += (numInputs[p] / safeGetDivisor(p));
         }
     });

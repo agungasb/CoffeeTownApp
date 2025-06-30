@@ -103,54 +103,49 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     const totalSlongsong = numInputs['donut paha ayam'] || 0;
     if (totalSlongsong > 0) productionCalculations.push(["Total Slongsong", `${totalSlongsong.toFixed(2)} pcs`]);
     
-    // Total Sosis
     const totalSosisPcs =
         (numInputs['abon sosis'] || 0) * 0.5 +
         (numInputs['hot sosis'] || 0) * 1 +
         (numInputs['sosis label'] || 0) * 1;
 
-    // The conversion factor is 28 pcs per pack, based on inventoryData.
     if (totalSosisPcs > 0) {
         const totalSosisPack = totalSosisPcs / 28;
         productionCalculations.push(['Total Sosis', `${totalSosisPack.toFixed(2)} pack`]);
     }
+    
+    // --- Hardcoded Adonan Recipe Totals ---
+    const adonanDonutTotalResep = ((numInputs['donut paha ayam'] || 0) / safeGetDivisor('donut paha ayam'));
+    if (adonanDonutTotalResep > 0) {
+        productionCalculations.push(['Adonan Donat', `${adonanDonutTotalResep.toFixed(2)} resep`]);
+    }
 
-    // Recipe Totals
-    const recipeTotals: Record<string, number> = {
-        'Adonan Donut Paha Ayam': 0,
-        'Adonan Roti Manis Roll': 0,
-        'Adonan Roti Manis Mesin': 0,
-    };
-
-    for (const productName in numInputs) {
-        const quantity = numInputs[productName];
-        if (!quantity || quantity === 0) continue;
-
-        const productData = productIngredientsData[productName];
-        if (!productData || !productData.ingredients) continue;
-
-        const productBaseAmount = quantity / safeGetDivisor(productName);
-
-        for (const recipeName in recipeTotals) {
-            if (productData.ingredients[recipeName]) {
-                const ingredientInfo = productData.ingredients[recipeName];
-                const recipeMultiplier = (typeof ingredientInfo.amount === 'number' && !isNaN(ingredientInfo.amount)) ? ingredientInfo.amount : 1;
-                recipeTotals[recipeName] += productBaseAmount * recipeMultiplier;
-            }
-        }
+    const adonanRollTotalResep = (
+        ((numInputs['abon piramid'] || 0) / safeGetDivisor('abon piramid')) +
+        ((numInputs['abon roll pedas'] || 0) / safeGetDivisor('abon roll pedas')) +
+        ((numInputs['cheese roll'] || 0) / safeGetDivisor('cheese roll'))
+    );
+    if (adonanRollTotalResep > 0) {
+        productionCalculations.push(['Adonan Roti Manis Roll', `${adonanRollTotalResep.toFixed(2)} resep`]);
     }
     
-    if (recipeTotals['Adonan Donut Paha Ayam'] > 0) {
-        productionCalculations.push(['Adonan Donat', `${recipeTotals['Adonan Donut Paha Ayam'].toFixed(2)} resep`]);
-    }
-    if (recipeTotals['Adonan Roti Manis Roll'] > 0) {
-        productionCalculations.push(['Adonan Roti Manis Roll', `${recipeTotals['Adonan Roti Manis Roll'].toFixed(2)} resep`]);
-    }
-    if (recipeTotals['Adonan Roti Manis Mesin'] > 0) {
-        productionCalculations.push(['Adonan Roti Manis Mesin', `${recipeTotals['Adonan Roti Manis Mesin'].toFixed(2)} resep`]);
+    const adonanMesinTotalResep = (
+        ((numInputs['maxicana coklat'] || 0) / safeGetDivisor('maxicana coklat')) +
+        ((numInputs['abon ayam pedas'] || 0) / safeGetDivisor('abon ayam pedas')) +
+        ((numInputs['red velvet cream cheese'] || 0) / safeGetDivisor('red velvet cream cheese')) +
+        ((numInputs['abon sosis'] || 0) / safeGetDivisor('abon sosis')) +
+        ((numInputs['cream choco cheese'] || 0) / safeGetDivisor('cream choco cheese')) +
+        ((numInputs['double coklat'] || 0) / safeGetDivisor('double coklat')) +
+        ((numInputs['hot sosis'] || 0) / safeGetDivisor('hot sosis')) +
+        ((numInputs['kacang merah'] || 0) / safeGetDivisor('kacang merah')) +
+        ((numInputs['sosis label'] || 0) / safeGetDivisor('sosis label')) +
+        ((numInputs['strawberry almond'] || 0) / safeGetDivisor('strawberry almond')) +
+        ((numInputs['vanilla oreo'] || 0) / safeGetDivisor('vanilla oreo'))
+    );
+    if (adonanMesinTotalResep > 0) {
+        productionCalculations.push(['Adonan Roti Manis Mesin', `${adonanMesinTotalResep.toFixed(2)} resep`]);
     }
 
-
+    // --- Other Hardcoded Recipe Calculations ---
     const eggCreamResep = ((
         (numInputs['abon ayam pedas'] || 0) * 18 +
         (numInputs['abon sosis'] || 0) * 10 +

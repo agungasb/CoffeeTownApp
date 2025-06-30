@@ -179,69 +179,67 @@ export default function ProductionCalculator({ products, productList, addDailyUs
 
           {hasCalculated ? (
             <Accordion type="multiple" defaultValue={['results', 'summary']} className="w-full space-y-4">
-                {department === 'rotiManis' && (
-                  <AccordionItem value="results" className="bg-background/70 border-none rounded-lg">
-                      <AccordionTrigger className="p-4 hover:no-underline text-foreground font-semibold text-lg">
-                          <h3 className="flex items-center gap-2"><Calculator /> Calculation Results</h3>
-                      </AccordionTrigger>
-                      <AccordionContent className="p-4 pt-0">
-                        <Table>
-                          <TableHeader>
-                            <TableRow className="border-border">
-                              <TableHead className="font-semibold text-foreground">Metric</TableHead>
-                              <TableHead className="text-right font-semibold text-foreground">Result</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {results.productionCalculations.map(([key, value]) => (
-                              <TableRow key={key} className="border-border">
-                                  <TableCell className="font-medium text-card-foreground">{capitalize(key)}</TableCell>
-                                  <TableCell className="text-right text-card-foreground">{value}</TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </AccordionContent>
-                  </AccordionItem>
-                )}
-
-                <AccordionItem value="summary" className="bg-background/70 border-none rounded-lg">
-                    <AccordionTrigger className="p-4 hover:no-underline text-foreground font-semibold text-lg">
-                         <h3 className="flex items-center gap-2"><ShoppingBasket /> Ingredient Summary</h3>
-                    </AccordionTrigger>
-                    <AccordionContent className="p-4 pt-0">
-                      <Table>
-                          <TableHeader>
-                          <TableRow className="border-border">
-                              <TableHead className="font-semibold text-foreground">Ingredient</TableHead>
-                              <TableHead className="text-right font-semibold text-foreground">Total Amount</TableHead>
+              <AccordionItem value="results" className="bg-background/70 border-none rounded-lg">
+                  <AccordionTrigger className="p-4 hover:no-underline text-foreground font-semibold text-lg">
+                      <h3 className="flex items-center gap-2"><Calculator /> Calculation Results</h3>
+                  </AccordionTrigger>
+                  <AccordionContent className="p-4 pt-0">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-border">
+                          <TableHead className="font-semibold text-foreground">Metric</TableHead>
+                          <TableHead className="text-right font-semibold text-foreground">Result</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {results.productionCalculations.map(([key, value]) => (
+                          <TableRow key={key} className="border-border">
+                              <TableCell className="font-medium text-card-foreground">{capitalize(key)}</TableCell>
+                              <TableCell className="text-right text-card-foreground">{value}</TableCell>
                           </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                          {results.ingredientSummary.length > 0 ? (
-                              results.ingredientSummary.map(([key, value, unit]) => (
-                              <TableRow key={key} className="border-border">
-                                  <TableCell className="font-medium text-card-foreground">{capitalize(key)}</TableCell>
-                                  <TableCell className="text-right text-card-foreground">{value} {unit}</TableCell>
-                              </TableRow>
-                              ))
-                          ) : (
-                              <TableRow>
-                                  <TableCell colSpan={2} className="text-center h-24 text-foreground italic">
-                                      No ingredients for the entered quantities.
-                                  </TableCell>
-                              </TableRow>
-                          )}
-                          </TableBody>
-                      </Table>
-                       <div className="flex justify-end mt-4">
-                          <Button onClick={handleSaveUsage} variant="success" disabled={!isLoggedIn}>
-                              <Save className="mr-2 h-4 w-4" />
-                              Save as Daily Usage
-                          </Button>
-                      </div>
-                    </AccordionContent>
-                </AccordionItem>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="summary" className="bg-background/70 border-none rounded-lg">
+                  <AccordionTrigger className="p-4 hover:no-underline text-foreground font-semibold text-lg">
+                       <h3 className="flex items-center gap-2"><ShoppingBasket /> Ingredient Summary</h3>
+                  </AccordionTrigger>
+                  <AccordionContent className="p-4 pt-0">
+                    <Table>
+                        <TableHeader>
+                        <TableRow className="border-border">
+                            <TableHead className="font-semibold text-foreground">Ingredient</TableHead>
+                            <TableHead className="text-right font-semibold text-foreground">Total Amount</TableHead>
+                        </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                        {results.ingredientSummary.length > 0 ? (
+                            results.ingredientSummary.map(([key, value, unit]) => (
+                            <TableRow key={key} className="border-border">
+                                <TableCell className="font-medium text-card-foreground">{capitalize(key)}</TableCell>
+                                <TableCell className="text-right text-card-foreground">{value} {unit}</TableCell>
+                            </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={2} className="text-center h-24 text-foreground italic">
+                                    No ingredients for the entered quantities.
+                                </TableCell>
+                            </TableRow>
+                        )}
+                        </TableBody>
+                    </Table>
+                     <div className="flex justify-end mt-4">
+                        <Button onClick={handleSaveUsage} variant="success" disabled={!isLoggedIn}>
+                            <Save className="mr-2 h-4 w-4" />
+                            Save as Daily Usage
+                        </Button>
+                    </div>
+                  </AccordionContent>
+              </AccordionItem>
             </Accordion>
           ) : (
             <div className="text-center text-muted-foreground italic py-8 border-2 border-dashed border-border rounded-lg">

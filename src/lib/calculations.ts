@@ -29,8 +29,8 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
 
     const productionCalculations: [string, string][] = [];
 
-    // --- Dynamic & Hardcoded Calculations from original HTML ---
-    
+    // --- Direct translation of all formulas from HTML ---
+
     const totalRollValue = (
         ( (numInputs['abon piramid'] || 0) / getDivisor('abon piramid', productIngredientsData) ) +
         ( (numInputs['abon roll pedas'] || 0) / getDivisor('abon roll pedas', productIngredientsData) ) +
@@ -42,22 +42,22 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     productionCalculations.push(["Total Roti", `${totalRoti.toFixed(0)} pcs`]);
 
     const totalBoxTray = (
-        (numInputs['abon ayam pedas'] || 0) / 15 +
-        (numInputs['abon piramid'] || 0) / 20 +
-        (numInputs['abon roll pedas'] || 0) / 25 +
-        (numInputs['abon sosis'] || 0) / 15 +
-        (numInputs['cheese roll'] || 0) / 35 +
-        (numInputs['cream choco cheese'] || 0) / 12 +
-        (numInputs['donut paha ayam'] || 0) / 15 +
-        (numInputs['double coklat'] || 0) / 15 +
-        (numInputs['hot sosis'] || 0) / 15 +
-        (numInputs['kacang merah'] || 0) / 15 +
-        (numInputs['maxicana coklat'] || 0) / 15 +
-        (numInputs['red velvet cream cheese'] || 0) / 15 +
-        (numInputs['sosis label'] || 0) / 15 +
-        (numInputs['strawberry almond'] || 0) / 15 +
-        (numInputs['vanilla oreo'] || 0) / 15 +
-        (numInputs['abon taiwan'] || 0) / 15
+        ((numInputs['abon ayam pedas'] || 0) / 15) +
+        ((numInputs['abon piramid'] || 0) / 20) +
+        ((numInputs['abon roll pedas'] || 0) / 25) +
+        ((numInputs['abon sosis'] || 0) / 15) +
+        ((numInputs['cheese roll'] || 0) / 35) +
+        ((numInputs['cream choco cheese'] || 0) / 12) +
+        ((numInputs['donut paha ayam'] || 0) / 15) +
+        ((numInputs['double coklat'] || 0) / 15) +
+        ((numInputs['hot sosis'] || 0) / 15) +
+        ((numInputs['kacang merah'] || 0) / 15) +
+        ((numInputs['maxicana coklat'] || 0) / 15) +
+        ((numInputs['red velvet cream cheese'] || 0) / 15) +
+        ((numInputs['sosis label'] || 0) / 15) +
+        ((numInputs['strawberry almond'] || 0) / 15) +
+        ((numInputs['vanilla oreo'] || 0) / 15) +
+        ((numInputs['abon taiwan'] || 0) / 15)
     );
     productionCalculations.push(["Total Box Tray", `${totalBoxTray.toFixed(2)} pcs`]);
 
@@ -104,6 +104,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     const adonanAbonTaiwanResep = ((numInputs['abon taiwan'] || 0) / 4);
     productionCalculations.push(["Adonan Abon Taiwan", `${adonanAbonTaiwanResep.toFixed(2)} resep (*kali 2 telur)`]);
 
+    // The ingredient summary is not yet implemented. This will be a separate step.
     const ingredientSummary: [string, string, string][] = [];
     
     return {

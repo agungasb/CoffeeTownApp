@@ -5,7 +5,7 @@ import { db } from '@/lib/firebase';
 import { collection, doc, addDoc, updateDoc, deleteDoc, setDoc, Timestamp, writeBatch, getDocs, getDoc } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 import type { Recipe } from '@/lib/recipes';
-import type { ProductIngredients, IngredientData } from '@/lib/productIngredients';
+import type { AllProductsData, ProductData, IngredientData } from '@/lib/productIngredients';
 import type { InventoryItem } from '@/lib/inventoryData';
 import type { DailyUsageRecord, DailyUsageIngredient } from '@/components/bakery-app';
 import type { OcrProductionMappingOutput } from '@/ai/flows/ocr-production-mapping';
@@ -38,7 +38,7 @@ export async function deleteRecipe(recipeId: string) {
 }
 
 // --- Product Actions ---
-export async function updateProducts(products: ProductIngredients) {
+export async function updateProducts(products: AllProductsData) {
     checkDb();
     await setDoc(doc(db!, 'appData', 'products'), { data: products });
     revalidatePath('/');
@@ -102,14 +102,14 @@ export async function updateInventoryItem(item: InventoryItem) {
     const productsDocRef = doc(db, 'appData', 'products');
     const productsDoc = await getDoc(productsDocRef);
     if (productsDoc.exists()) {
-        const productsData = productsDoc.data().data as ProductIngredients;
+        const productsData = productsDoc.data().data as AllProductsData;
         let needsUpdate = false;
-        const newProductsData: ProductIngredients = {};
+        const newProductsData: AllProductsData = {};
 
-        for (const [productName, ingredients] of Object.entries(productsData)) {
+        for (const [productName, productConfig] of Object.entries(productsData)) {
             const newIngredients: { [ingredientName: string]: IngredientData } = {};
             let ingredientNameChangedInProduct = false;
-            for (const [ingredientName, ingredientData] of Object.entries(ingredients)) {
+            for (const [ingredientName, ingredientData] of Object.entries(productConfig.ingredients)) {
                 if (ingredientName.toLowerCase() === oldNameLower) {
                     // Use the new name (lowercased) as the key
                     newIngredients[newName.toLowerCase()] = ingredientData;
@@ -118,9 +118,15 @@ export async function updateInventoryItem(item: InventoryItem) {
                     newIngredients[ingredientName] = ingredientData;
                 }
             }
-            newProductsData[productName] = newIngredients;
+            
             if (ingredientNameChangedInProduct) {
+                newProductsData[productName] = {
+                    ...productConfig,
+                    ingredients: newIngredients
+                };
                 needsUpdate = true;
+            } else {
+                 newProductsData[productName] = productConfig;
             }
         }
 

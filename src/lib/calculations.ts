@@ -1,6 +1,6 @@
 
 import { z } from "zod";
-import type { ProductIngredients } from "./productIngredients";
+import type { AllProductsData } from "./productIngredients";
 
 // This function creates a Zod schema dynamically based on a list of product names.
 export function createProductionSchema(products: string[]) {
@@ -13,31 +13,32 @@ export function createProductionSchema(products: string[]) {
 
 export type ProductionInputs = Record<string, number>;
 
-export function calculateProductionMetrics(inputs: ProductionInputs, productIngredientsData: ProductIngredients) {
+export function calculateProductionMetrics(inputs: ProductionInputs, productIngredientsData: AllProductsData) {
     const numInputs: { [key: string]: number } = {};
     for (const key of Object.keys(inputs)) {
         numInputs[key] = Number(inputs[key]) || 0;
     }
 
-    // These calculations are specific to the 'Roti Manis' department
-    // They will default to 0 if the products don't exist in the current `inputs`.
-    const calculations = {
-        "Abon Ayam Pedas": `${(numInputs['abon ayam pedas'] / 15 || 0).toFixed(2)} loyang`,
-        "Abon Piramid": `${(numInputs['abon piramid'] / 11 || 0).toFixed(2)} loyang`,
-        "Abon Roll Pedas": `${(numInputs['abon roll pedas'] / 12 || 0).toFixed(2)} loyang`,
-        "Abon Sosis": `${(numInputs['abon sosis'] / 15 || 0).toFixed(2)} loyang`,
-        "Cheese Roll": `${(numInputs['cheese roll'] / 12 || 0).toFixed(2)} loyang`,
-        "Cream Choco Cheese": `${(numInputs['cream choco cheese'] / 15 || 0).toFixed(2)} loyang`,
-        "Donut Paha Ayam": `${(numInputs['donut paha ayam'] / 15 || 0).toFixed(2)} loyang`,
-        "Double Coklat": `${(numInputs['double coklat'] / 15 || 0).toFixed(2)} loyang`,
-        "Hot Sosis": `${(numInputs['hot sosis'] / 15 || 0).toFixed(2)} loyang`,
-        "Kacang Merah": `${(numInputs['kacang merah'] / 15 || 0).toFixed(2)} loyang`,
-        "Maxicana Coklat": `${(numInputs['maxicana coklat'] / 15 || 0).toFixed(2)} loyang`,
-        "Red Velvet Cream Cheese": `${(numInputs['red velvet cream cheese'] / 15 || 0).toFixed(2)} loyang`,
-        "Sosis Label": `${(numInputs['sosis label'] / 12 || 0).toFixed(2)} loyang`,
-        "Strawberry Almond": `${(numInputs['strawberry almond'] / 15 || 0).toFixed(2)} loyang`,
-        "Vanilla Oreo": `${(numInputs['vanilla oreo'] / 15 || 0).toFixed(2)} loyang`,
-        "Abon Taiwan": `${(((numInputs['abon taiwan'] || 0) * 2) / 15).toFixed(2)} loyang`,
+    const productionCalculations: [string, string][] = [];
+
+    // Dynamically calculate metrics based on product data
+    for (const [productName, quantity] of Object.entries(numInputs)) {
+        if (quantity > 0 && productIngredientsData[productName]?.calculation) {
+            const calc = productIngredientsData[productName].calculation!;
+            if (calc.divisor && calc.unit) {
+                const multiplier = calc.multiplier || 1;
+                const result = (quantity * multiplier) / calc.divisor;
+                productionCalculations.push([productName, `${result.toFixed(2)} ${calc.unit}`]);
+            }
+        }
+    }
+    // Sort alphabetically for consistent order
+    productionCalculations.sort(([a], [b]) => a.localeCompare(b));
+
+
+    // These aggregate calculations are specific to the 'Roti Manis' department
+    // They will remain hardcoded for now.
+    const aggregateCalculations = {
         "Total Sosis": `${(((((numInputs['abon sosis'] || 0) / 2) + (numInputs['hot sosis'] || 0) + (numInputs['sosis label'] || 0)) / 10) / 28).toFixed(2)} dus`,
         "Adonan Donat": `${(((numInputs['donut paha ayam'] || 0) * 48) / 1800).toFixed(2)} resep`,
         "Adonan Roti Manis Roll": `${((((numInputs['abon piramid'] || 0) / 11) + ((numInputs['abon roll pedas'] || 0) / 12) + ((numInputs['cheese roll'] || 0) / 12)) * 800 / 2013).toFixed(2)} resep`,
@@ -49,7 +50,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     for (const [productName, quantity] of Object.entries(numInputs)) {
         const productKey = productName as keyof typeof productIngredientsData;
         if (quantity > 0 && productIngredientsData[productKey]) {
-            const ingredients = productIngredientsData[productKey];
+            const ingredients = productIngredientsData[productKey].ingredients;
             for (const [ingredient, data] of Object.entries(ingredients)) {
                 if (!ingredientTotals[ingredient]) {
                     ingredientTotals[ingredient] = { amount: 0, unit: data.unit };
@@ -65,37 +66,21 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         .map(([name, data]) => {
             return [name, data.amount.toFixed(2), data.unit];
         });
+        
+    const finalCalculations = [...productionCalculations, ...Object.entries(aggregateCalculations)];
 
     return {
-        productionCalculations: Object.entries(calculations),
+        productionCalculations: finalCalculations,
         ingredientSummary: ingredientSummary,
     };
 }
 
-const productionCalculations = [
-    ["Abon Ayam Pedas", "0.00 loyang"],
-    ["Abon Piramid", "0.00 loyang"],
-    ["Abon Roll Pedas", "0.00 loyang"],
-    ["Abon Sosis", "0.00 loyang"],
-    ["Cheese Roll", "0.00 loyang"],
-    ["Cream Choco Cheese", "0.00 loyang"],
-    ["Donut Paha Ayam", "0.00 loyang"],
-    ["Double Coklat", "0.00 loyang"],
-    ["Hot Sosis", "0.00 loyang"],
-    ["Kacang Merah", "0.00 loyang"],
-    ["Maxicana Coklat", "0.00 loyang"],
-    ["Red Velvet Cream Cheese", "0.00 loyang"],
-    ["Sosis Label", "0.00 loyang"],
-    ["Strawberry Almond", "0.00 loyang"],
-    ["Vanilla Oreo", "0.00 loyang"],
-    ["Abon Taiwan", "0.00 loyang"],
-    ["Total Sosis", "0.00 dus"],
-    ["Adonan Donat", "0.00 resep"],
-    ["Adonan Roti Manis Roll", "0.00 resep"],
-    ["Adonan Roti Manis Mesin", "0.00 resep"],
-];
-
 export const initialMetrics = {
-    productionCalculations,
+    productionCalculations: [
+        ["Total Sosis", "0.00 dus"],
+        ["Adonan Donat", "0.00 resep"],
+        ["Adonan Roti Manis Roll", "0.00 resep"],
+        ["Adonan Roti Manis Mesin", "0.00 resep"],
+    ],
     ingredientSummary: [] as [string, string, string][]
 };

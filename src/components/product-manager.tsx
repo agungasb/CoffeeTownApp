@@ -9,20 +9,30 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { type ProductIngredients, type IngredientData } from "@/lib/productIngredients";
+import { type AllProductsData, type ProductData, type IngredientData } from "@/lib/productIngredients";
 import { Edit, PlusCircle, ShieldAlert, Trash2, Archive } from "lucide-react";
 import { ProductForm } from './product-form';
 import { capitalize } from '@/lib/utils';
 
 interface ProductManagerProps {
-    products: ProductIngredients;
-    updateProducts: (products: ProductIngredients) => Promise<void>;
+    products: AllProductsData;
+    updateProducts: (products: AllProductsData) => Promise<void>;
     isLoggedIn: boolean;
 }
 
+type ProductFormData = { 
+    name: string; 
+    ingredients: { name: string; amount: number; unit: string }[];
+    calculation?: { divisor?: number | '', unit?: string, multiplier?: number | '' } 
+};
+
 export default function ProductManager({ products, updateProducts, isLoggedIn }: ProductManagerProps) {
     const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-    const [productToEdit, setProductToEdit] = useState<{ name: string; ingredients: { name: string; amount: number; unit: string }[] } | null>(null);
+    const [productToEdit, setProductToEdit] = useState<{ 
+        name: string; 
+        ingredients: { name: string; amount: number; unit: string }[];
+        calculation?: { divisor?: number; unit?: string; multiplier?: number; }
+    } | null>(null);
     const productCount = Object.keys(products).length;
 
     const handleAddClick = () => {
@@ -30,10 +40,11 @@ export default function ProductManager({ products, updateProducts, isLoggedIn }:
         setIsFormDialogOpen(true);
     };
 
-    const handleEditClick = (productName: string, ingredients: Record<string, IngredientData>) => {
+    const handleEditClick = (productName: string, productData: ProductData) => {
         setProductToEdit({
             name: productName,
-            ingredients: Object.entries(ingredients).map(([name, data]) => ({ name, amount: data.amount, unit: data.unit }))
+            ingredients: Object.entries(productData.ingredients).map(([name, data]) => ({ name, amount: data.amount, unit: data.unit })),
+            calculation: productData.calculation
         });
         setIsFormDialogOpen(true);
     };
@@ -44,18 +55,36 @@ export default function ProductManager({ products, updateProducts, isLoggedIn }:
         await updateProducts(newProducts);
     };
 
-    const handleFormSubmit = async (data: { name: string; ingredients: { name: string; amount: number; unit: string }[] }) => {
+    const handleFormSubmit = async (data: ProductFormData) => {
         const newProducts = { ...products };
         const newIngredients: Record<string, IngredientData> = {};
         data.ingredients.forEach(ing => {
             newIngredients[ing.name.toLowerCase()] = { amount: ing.amount, unit: ing.unit };
         });
 
-        if (productToEdit && productToEdit.name !== data.name) {
+        const newProductData: ProductData = {
+            ingredients: newIngredients
+        };
+
+        if (data.calculation && (data.calculation.divisor || data.calculation.unit || data.calculation.multiplier)) {
+            newProductData.calculation = {
+                divisor: data.calculation.divisor ? Number(data.calculation.divisor) : undefined,
+                unit: data.calculation.unit || undefined,
+                multiplier: data.calculation.multiplier ? Number(data.calculation.multiplier) : undefined
+            };
+            if (!newProductData.calculation.divisor) delete newProductData.calculation.divisor;
+            if (!newProductData.calculation.unit) delete newProductData.calculation.unit;
+            if (!newProductData.calculation.multiplier) delete newProductData.calculation.multiplier;
+            if (Object.keys(newProductData.calculation).length === 0) {
+                delete newProductData.calculation;
+            }
+        }
+
+        if (productToEdit && productToEdit.name.toLowerCase() !== data.name.toLowerCase()) {
             delete newProducts[productToEdit.name];
         }
         
-        newProducts[data.name] = newIngredients;
+        newProducts[data.name] = newProductData;
         
         await updateProducts(newProducts);
 
@@ -84,11 +113,11 @@ export default function ProductManager({ products, updateProducts, isLoggedIn }:
                     </Alert>
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {Object.entries(products).sort(([a], [b]) => a.localeCompare(b)).map(([productName, ingredients]) => (
+                    {Object.entries(products).sort(([a], [b]) => a.localeCompare(b)).map(([productName, productData]) => (
                         <Card key={productName} className="flex flex-col bg-background/70">
                             <CardHeader>
                                 <CardTitle className="text-lg">{capitalize(productName)}</CardTitle>
-                                <CardDescription>{Object.keys(ingredients).length} ingredients</CardDescription>
+                                <CardDescription>{Object.keys(productData.ingredients).length} ingredients</CardDescription>
                             </CardHeader>
                             <CardContent className="flex-grow pb-0">
                                  <Accordion type="single" collapsible className="w-full">
@@ -104,7 +133,7 @@ export default function ProductManager({ products, updateProducts, isLoggedIn }:
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
-                                                    {Object.entries(ingredients).map(([ingredientName, ingredientData]) => (
+                                                    {Object.entries(productData.ingredients).map(([ingredientName, ingredientData]) => (
                                                     <TableRow key={ingredientName}>
                                                         <TableCell className="p-2">{capitalize(ingredientName)}</TableCell>
                                                         <TableCell className="p-2 text-right">{typeof ingredientData.amount === 'number' ? ingredientData.amount.toFixed(3) : ingredientData.amount}</TableCell>
@@ -118,7 +147,7 @@ export default function ProductManager({ products, updateProducts, isLoggedIn }:
                                 </Accordion>
                             </CardContent>
                             <CardFooter className="mt-auto flex justify-end gap-2 pt-4">
-                                <Button variant="info" size="sm" disabled={!isLoggedIn} onClick={() => handleEditClick(productName, ingredients)}>
+                                <Button variant="info" size="sm" disabled={!isLoggedIn} onClick={() => handleEditClick(productName, productData)}>
                                     <Edit className="mr-2 h-4 w-4" /> Edit
                                 </Button>
                                 <AlertDialog>

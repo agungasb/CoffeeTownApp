@@ -3,7 +3,7 @@ import BakeryApp from '@/components/bakery-app';
 import { collection, getDocs, writeBatch, doc, getDoc, Timestamp, query, orderBy, limit, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { recipes as initialRecipesData, Recipe } from '@/lib/recipes';
-import { productIngredientsData as initialProductData, ProductIngredients } from '@/lib/productIngredients';
+import { productIngredientsData as initialProductData, AllProductsData } from '@/lib/productIngredients';
 import { inventoryData as initialInventoryData, InventoryItem } from '@/lib/inventoryData';
 import {
   addRecipe,
@@ -68,7 +68,7 @@ async function fetchDataAndSeed() {
     const recipes: Recipe[] = recipesSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Recipe));
 
     const productsDoc = await getDoc(doc(db, 'appData', 'products'));
-    const products: ProductIngredients = productsDoc.exists() ? productsDoc.data().data : {};
+    const products: AllProductsData = productsDoc.exists() ? productsDoc.data().data : {};
 
     const inventorySnapshot = await getDocs(collection(db, 'inventory'));
     let inventory: InventoryItem[] = inventorySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as InventoryItem));

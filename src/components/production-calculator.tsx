@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { calculateProductionMetrics, initialMetrics, createProductionSchema } from "@/lib/calculations";
 import type { ProductionInputs } from "@/lib/calculations";
 import { getQuantitiesFromImage } from "@/app/actions";
-import type { ProductIngredients } from "@/lib/productIngredients";
+import type { AllProductsData } from "@/lib/productIngredients";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { capitalize } from "@/lib/utils";
 import type { DailyUsageRecord, DailyUsageIngredient } from "@/components/bakery-app";
@@ -25,7 +25,7 @@ type ProductionFormValues = {
 };
 
 interface ProductionCalculatorProps {
-    products: ProductIngredients;
+    products: AllProductsData;
     productList: string[];
     addDailyUsageRecord: (record: { usage: DailyUsageIngredient[] }) => Promise<void>;
     isLoggedIn: boolean;
@@ -195,7 +195,7 @@ export default function ProductionCalculator({ products, productList, addDailyUs
                           <TableBody>
                             {results.productionCalculations.map(([key, value]) => (
                               <TableRow key={key} className="border-border">
-                                  <TableCell className="font-medium text-card-foreground">{key}</TableCell>
+                                  <TableCell className="font-medium text-card-foreground">{capitalize(key)}</TableCell>
                                   <TableCell className="text-right text-card-foreground">{value}</TableCell>
                               </TableRow>
                             ))}

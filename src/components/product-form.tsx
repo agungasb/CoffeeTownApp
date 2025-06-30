@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { PlusCircle, Trash2 } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 const productFormSchema = z.object({
     name: z.string().min(3, "Product name must be at least 3 characters."),
@@ -16,12 +17,25 @@ const productFormSchema = z.object({
         amount: z.coerce.number({ invalid_type_error: "Amount is required."}).positive("Amount must be positive."),
         unit: z.string().min(1, "Unit is required."),
     })).min(1, "A product must have at least one ingredient."),
+    calculation: z.object({
+        divisor: z.coerce.number().positive("Divisor must be a positive number.").optional().or(z.literal('')),
+        unit: z.string().optional(),
+        multiplier: z.coerce.number().positive("Multiplier must be a positive number.").optional().or(z.literal('')),
+    }).optional()
 });
 
 type ProductFormData = z.infer<typeof productFormSchema>;
 
 interface ProductFormProps {
-    productToEdit?: { name: string, ingredients: { name: string, amount: number, unit: string }[] } | null;
+    productToEdit?: { 
+        name: string, 
+        ingredients: { name: string, amount: number, unit: string }[],
+        calculation?: {
+            divisor?: number,
+            unit?: string,
+            multiplier?: number
+        }
+    } | null;
     onSubmit: (data: ProductFormData) => void;
     onCancel: () => void;
 }
@@ -32,9 +46,11 @@ export function ProductForm({ productToEdit, onSubmit, onCancel }: ProductFormPr
         defaultValues: productToEdit ? {
             ...productToEdit,
             name: productToEdit.name,
+            calculation: productToEdit.calculation ?? { divisor: '', unit: '', multiplier: '' },
         } : {
             name: '',
             ingredients: [{ name: '', amount: '' as any, unit: 'g' }],
+            calculation: { divisor: '', unit: '', multiplier: '' }
         },
     });
 
@@ -131,6 +147,55 @@ export function ProductForm({ productToEdit, onSubmit, onCancel }: ProductFormPr
                             <PlusCircle className="mr-2" /> Add Ingredient
                         </Button>
                     </div>
+
+                    <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="item-1">
+                            <AccordionTrigger>Production Calculation (Optional)</AccordionTrigger>
+                            <AccordionContent>
+                                <div className="space-y-4 pt-4">
+                                     <FormField
+                                        control={form.control}
+                                        name="calculation.divisor"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Divisor</FormLabel>
+                                                <FormControl>
+                                                    <Input type="number" step="any" placeholder="e.g. 15" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="calculation.unit"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Metric Unit</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="e.g. loyang" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                     <FormField
+                                        control={form.control}
+                                        name="calculation.multiplier"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Multiplier (Optional)</FormLabel>
+                                                <FormControl>
+                                                    <Input type="number" step="any" placeholder="e.g. 2" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
                 </div>
                 <div className="flex justify-end gap-2 pt-4 border-t">
                     <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>

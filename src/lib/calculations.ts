@@ -54,7 +54,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         (numInputs['donut paha ayam'] || 0) / 15 +
         (numInputs['double coklat'] || 0) / 15 +
         (numInputs['hot sosis'] || 0) / 15 +
-        (numInputs['kacang merah'] || 0) / 15 +
+        (numInputs['kacang merah'] || 0) /15 +
         (numInputs['maxicana coklat'] || 0) / 15 +
         (numInputs['red velvet cream cheese'] || 0) / 15 +
         (numInputs['sosis label'] || 0) / 15 +
@@ -115,56 +115,35 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     
     const finalRawIngredients: Record<string, { amount: number, unit: string }> = {};
 
-    // Second pass: process component recipes and break them down into raw ingredients.
+    // Second pass: process component recipes and add them to the calculation results.
     for (const recipeName of componentRecipesToCalculate) {
         const lowerRecipeName = recipeName.toLowerCase();
-        const recipeDef = initialRecipesData.find(r => r.name.toLowerCase() === lowerRecipeName);
+        const componentData = ingredientTotals[lowerRecipeName];
 
-        if (recipeDef && ingredientTotals[lowerRecipeName] && ingredientTotals[lowerRecipeName].amount > 0) {
-            const totalAmountNeeded = ingredientTotals[lowerRecipeName].amount;
-            
-            const recipeYield = recipeDef.ingredients.reduce((sum, ing) => sum + ing.amount, 0);
-
-            if (recipeYield > 0) {
-                const resepCount = totalAmountNeeded / recipeYield;
-                let displayText = `${resepCount.toFixed(2)} resep`;
+        if (componentData && componentData.amount > 0) {
+            // Handle the special case for "Adonan Abon Taiwan" which is already in "resep" units
+            if (componentData.unit === 'resep') {
+                let displayText = `${componentData.amount.toFixed(2)} resep`;
                 if(recipeName === "Adonan Abon Taiwan") {
                     displayText += ` (*kali 2 telur)`;
                 }
                 productionCalculations.push([recipeName, displayText]);
-
-                // Add the broken-down ingredients to the final raw list
-                for (const ing of recipeDef.ingredients) {
-                    const rawKey = ing.name.toLowerCase();
-                    if (!finalRawIngredients[rawKey]) {
-                        finalRawIngredients[rawKey] = { amount: 0, unit: ing.unit };
+            } else {
+                 const recipeDef = initialRecipesData.find(r => r.name.toLowerCase() === lowerRecipeName);
+                if (recipeDef) {
+                    const recipeYield = recipeDef.ingredients.reduce((sum, ing) => sum + ing.amount, 0);
+                    if (recipeYield > 0) {
+                        const resepCount = componentData.amount / recipeYield;
+                        productionCalculations.push([recipeName, `${resepCount.toFixed(2)} resep`]);
                     }
-                    finalRawIngredients[rawKey].amount += ing.amount * resepCount;
                 }
             }
         }
     }
     
-    // Third pass: Add all other raw ingredients from the first pass to the final list
-    for (const [name, data] of Object.entries(ingredientTotals)) {
-        // If it's not a component recipe we just calculated, add it to the final list.
-        const isComponentRecipe = componentRecipesToCalculate.some(r => r.toLowerCase() === name.toLowerCase());
-        if (!isComponentRecipe) {
-            const rawKey = name.toLowerCase();
-            if(!finalRawIngredients[rawKey]) {
-                finalRawIngredients[rawKey] = { amount: 0, unit: data.unit };
-            }
-            finalRawIngredients[rawKey].amount += data.amount;
-        }
-    }
-    
-    const finalIngredientSummary = Object.entries(finalRawIngredients)
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([name, data]) => [name, data.amount.toFixed(2), data.unit]);
-
     return {
         productionCalculations,
-        ingredientSummary: finalIngredientSummary,
+        ingredientSummary: [], // Placeholder for now
     };
 }
 

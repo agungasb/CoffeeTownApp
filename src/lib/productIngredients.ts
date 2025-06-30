@@ -155,7 +155,7 @@ export const productIngredientsData: AllProductsData = {
             ...adonanRotiManisMesin,
             "selai straw": { amount: 10, unit: "g" },
             "almond": { amount: 15, unit: "g" },
-            "white chox": { amount: 15, unit: "g" }
+            "white chox": { amount: 15, "unit": "g" }
         },
         calculation: { divisor: 15, unit: 'loyang' }
     },
@@ -210,7 +210,7 @@ export const productIngredientsData: AllProductsData = {
     },
     "abon taiwan": {
         ingredients: {
-            "Adonan Abon Taiwan": { amount: 0.25, unit: "resep" }, // This is a special case representing 1/4 of the recipe yield for 1 piece
+            "Adonan Abon Taiwan": { amount: 0.25, unit: "resep" },
             "Fla Abon Taiwan": { amount: 30, unit: "g" },
     	    "abon": { amount: 5, unit: "g" },
     	    "mayonaise": { amount: 1.5, unit: "g" },

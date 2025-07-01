@@ -191,12 +191,59 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         }
     }
 
+    const capitalizedProductList = Object.keys(inputs).map(p => capitalize(p));
+
+    const customSortOrder = [
+        "Total Sosis",
+        "Adonan Donat",
+        "Adonan Roti Manis Roll",
+        "Adonan Roti Manis Mesin",
+        "Total Roll",
+        "Total Roti",
+        "Total Box Tray",
+        "Total Loyang",
+        "Total Slongsong",
+        "Egg Cream",
+        "Cream Cheese",
+        "Butter",
+        "Butter Donat",
+        "Coklat Ganache",
+        "Topping Maxicana",
+        "Fla Abon Taiwan",
+        "Adonan Abon Taiwan",
+    ];
+
+    const sortedCalculations = productionCalculations.sort((a, b) => {
+        const keyA = a[0];
+        const keyB = b[0];
+
+        const isAProduct = capitalizedProductList.includes(keyA);
+        const isBProduct = capitalizedProductList.includes(keyB);
+
+        // Group product calculations at the top
+        if (isAProduct && !isBProduct) return -1;
+        if (!isAProduct && isBProduct) return 1;
+        if (isAProduct && isBProduct) return keyA.localeCompare(keyB);
+
+        // For non-product calculations, use the custom sort order
+        const indexA = customSortOrder.indexOf(keyA);
+        const indexB = customSortOrder.indexOf(keyB);
+
+        if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+        if (indexA !== -1) return -1;
+        if (indexB !== -1) return 1;
+
+        // Fallback for any items not in the product list or custom sort order
+        return keyA.localeCompare(keyB);
+    });
+
+
     const ingredientSummary = Object.entries(ingredientSummaryMap)
         .map(([name, { amount, unit }]) => [capitalize(name), amount.toFixed(2), unit] as [string, string, string])
         .sort((a, b) => a[0].localeCompare(b[0]));
         
     return {
-        productionCalculations: productionCalculations.sort((a, b) => a[0].localeCompare(b[0])),
+        productionCalculations: sortedCalculations,
         ingredientSummary,
     };
 }

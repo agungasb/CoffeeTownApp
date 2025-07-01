@@ -7,7 +7,7 @@ export interface InventoryItem {
     unit: string;
     orderUnit?: string;
     orderUnitConversion?: number;
-    department: 'rotiManis' | 'donut';
+    department: 'rotiManis' | 'donut' | 'rotiSobek';
 }
 
 export const inventoryData: InventoryItem[] = [
@@ -81,5 +81,21 @@ export const inventoryData: InventoryItem[] = [
     { id: "ing-65", name: "Softer", currentStock: 0, minimumStock: 500, unit: "g", department: "donut" },
     { id: "ing-66", name: "Susu Bubuk", currentStock: 0, minimumStock: 2000, unit: "g", department: "donut" },
     { id: "ing-67", name: "Telur", currentStock: 0, minimumStock: 1000, unit: "g", department: "donut" },
-    { id: "ing-68", name: "Tepung Gerbang", currentStock: 0, minimumStock: 10000, unit: "g", orderUnit: "sak", orderUnitConversion: 25000, department: "donut" }
+    { id: "ing-68", name: "Tepung Gerbang", currentStock: 0, minimumStock: 10000, unit: "g", orderUnit: "sak", orderUnitConversion: 25000, department: "donut" },
+
+    // Roti Sobek Department (Placeholder)
+    { id: "ing-69", name: "Tepung Roti Sobek", currentStock: 10000, minimumStock: 5000, unit: "g", orderUnit: "sak", orderUnitConversion: 25000, department: "rotiSobek" },
+    { id: "ing-70", name: "Gula Roti Sobek", currentStock: 5000, minimumStock: 2000, unit: "g", department: "rotiSobek" },
+    { id: "ing-71", name: "Susu Bubuk Sobek", currentStock: 2000, minimumStock: 1000, unit: "g", department: "rotiSobek" },
+    { id: "ing-72", name: "Ragi Sobek", currentStock: 500, minimumStock: 250, unit: "g", department: "rotiSobek" },
+    { id: "ing-73", name: "Margarin Sobek", currentStock: 4000, minimumStock: 2000, unit: "g", department: "rotiSobek" },
+    { id: "ing-74", name: "Telur Sobek", currentStock: 1000, minimumStock: 500, unit: "g", department: "rotiSobek" },
+    { id: "ing-75", name: "Filling Coklat Sobek", currentStock: 1000, minimumStock: 500, unit: "g", department: "rotiSobek" },
+    { id: "ing-76", name: "Filling Keju Sobek", currentStock: 1000, minimumStock: 500, unit: "g", department: "rotiSobek" },
+    { id: "ing-77", name: "Filling Durian", currentStock: 1000, minimumStock: 500, unit: "g", department: "rotiSobek" },
+    { id: "ing-78", name: "Filling Srikaya", currentStock: 1000, minimumStock: 500, unit: "g", department: "rotiSobek" },
+    { id: "ing-79", name: "Filling Vanilla", currentStock: 1000, minimumStock: 500, unit: "g", department: "rotiSobek" },
+    { id: "ing-80", name: "Filling Choco Mocha", currentStock: 1000, minimumStock: 500, unit: "g", department: "rotiSobek" },
+    { id: "ing-81", name: "Filling Cream Cheese Sobek", currentStock: 1000, minimumStock: 500, unit: "g", department: "rotiSobek" },
+    { id: "ing-82", name: "Pewarna Pandan", currentStock: 100, minimumStock: 50, unit: "ml", department: "rotiSobek" }
 ];

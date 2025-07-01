@@ -29,10 +29,22 @@ export const productDepartments = {
         "7K BOMBOLONI DARK COKLAT",
         "7K BOMBOLONI GREENTEA",
         "7K BOMBOLONI TIRAMISU",
+    ],
+    rotiSobek: [
+        "Roti Sobek Coklat",
+        "Roti Sobek Double Coklat",
+        "Roti Sobek Durian",
+        "Roti Sobek Keju",
+        "Roti Sobek Srikaya",
+        "Roti Sobek Srikaya Pandan",
+        "Roti Sobek Vanilla",
+        "Roti Balok Choco Mocha",
+        "Roti Balok Cream Cheese"
     ]
 };
 
 export const allProductItems = [
     ...productDepartments.rotiManis,
-    ...productDepartments.donut
+    ...productDepartments.donut,
+    ...productDepartments.rotiSobek
 ];

@@ -181,52 +181,98 @@ export const productIngredientsData: AllProductsData = {
     // Donut Department
     "Donut Almond": { 
         baseRecipes: [{ recipeName: "Adonan Donat Joko", weight: 45 }],
-        ingredients: { "almond": { amount: 15, unit: "g" } },
+        ingredients: { "Almond": { amount: 15, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "Donut Coklat Ceres": { 
         baseRecipes: [{ recipeName: "Adonan Donat Joko", weight: 45 }],
-        ingredients: { "ceres": { amount: 15, unit: "g" } },
+        ingredients: { "Ceres": { amount: 15, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "Donut Coklat Kacang": { 
         baseRecipes: [{ recipeName: "Adonan Donat Joko", weight: 45 }],
-        ingredients: { "kacang morin": { amount: 10, unit: "g" }, "compound dark": { amount: 5, unit: "g" } },
+        ingredients: { "Kacang Morin": { amount: 10, unit: "g" }, "Compound Dark": { amount: 5, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "Donut Gula Halus": { 
         baseRecipes: [{ recipeName: "Adonan Donat Joko", weight: 45 }],
-        ingredients: { "dusting sugar": { amount: 15, unit: "g" } },
+        ingredients: { "Dusting Sugar": { amount: 15, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "Donut Keju": { 
         baseRecipes: [{ recipeName: "Adonan Donat Joko", weight: 45 }],
-        ingredients: { "keju": { amount: 15, unit: "g" } },
+        ingredients: { "Keju": { amount: 15, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "Donut Oreo": { 
         baseRecipes: [{ recipeName: "Adonan Donat Joko", weight: 45 }],
-        ingredients: { "crumble oreo coarsa": { amount: 15, unit: "g" } },
+        ingredients: { "Crumble Oreo Coarsa": { amount: 15, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "7K BOMBOLONI CAPPUCINO": { 
         baseRecipes: [{ recipeName: "Adonan Donat Joko", weight: 45 }],
-        ingredients: { "glaze cappucino": { amount: 20, unit: "g" } },
+        ingredients: { "Glaze Cappucino": { amount: 20, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "7K BOMBOLONI DARK COKLAT": { 
         baseRecipes: [{ recipeName: "Adonan Donat Joko", weight: 45 }],
-        ingredients: { "glaze dark": { amount: 20, unit: "g" } },
+        ingredients: { "Glaze Dark": { amount: 20, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "7K BOMBOLONI GREENTEA": { 
         baseRecipes: [{ recipeName: "Adonan Donat Joko", weight: 45 }],
-        ingredients: { "glaze greentea": { amount: 20, unit: "g" } },
+        ingredients: { "Glaze Greentea": { amount: 20, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "7K BOMBOLONI TIRAMISU": { 
         baseRecipes: [{ recipeName: "Adonan Donat Joko", weight: 45 }],
-        ingredients: { "glaze tiramisu": { amount: 20, unit: "g" } },
+        ingredients: { "Glaze Tiramisu": { amount: 20, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
+    },
+    // Roti Sobek Department (Placeholder)
+    "Roti Sobek Coklat": {
+        baseRecipes: [{ recipeName: "Adonan Roti Sobek", weight: 50 }],
+        ingredients: { "Filling Coklat Sobek": { amount: 20, unit: "g" } },
+        calculation: { divisor: 10, unit: 'loyang' }
+    },
+    "Roti Sobek Double Coklat": {
+        baseRecipes: [{ recipeName: "Adonan Roti Sobek", weight: 50 }],
+        ingredients: { "Filling Coklat Sobek": { amount: 25, unit: "g" }, "Ceres": { amount: 10, unit: "g"} },
+        calculation: { divisor: 10, unit: 'loyang' }
+    },
+    "Roti Sobek Durian": {
+        baseRecipes: [{ recipeName: "Adonan Roti Sobek", weight: 50 }],
+        ingredients: { "Filling Durian": { amount: 20, unit: "g" } },
+        calculation: { divisor: 10, unit: 'loyang' }
+    },
+    "Roti Sobek Keju": {
+        baseRecipes: [{ recipeName: "Adonan Roti Sobek", weight: 50 }],
+        ingredients: { "Filling Keju Sobek": { amount: 20, unit: "g" } },
+        calculation: { divisor: 10, unit: 'loyang' }
+    },
+    "Roti Sobek Srikaya": {
+        baseRecipes: [{ recipeName: "Adonan Roti Sobek", weight: 50 }],
+        ingredients: { "Filling Srikaya": { amount: 20, unit: "g" } },
+        calculation: { divisor: 10, unit: 'loyang' }
+    },
+    "Roti Sobek Srikaya Pandan": {
+        baseRecipes: [{ recipeName: "Adonan Roti Sobek", weight: 50 }],
+        ingredients: { "Filling Srikaya": { amount: 20, unit: "g" }, "Pewarna Pandan": { amount: 1, unit: "ml"} },
+        calculation: { divisor: 10, unit: 'loyang' }
+    },
+    "Roti Sobek Vanilla": {
+        baseRecipes: [{ recipeName: "Adonan Roti Sobek", weight: 50 }],
+        ingredients: { "Filling Vanilla": { amount: 20, unit: "g" } },
+        calculation: { divisor: 10, unit: 'loyang' }
+    },
+    "Roti Balok Choco Mocha": {
+        baseRecipes: [{ recipeName: "Adonan Roti Sobek", weight: 50 }],
+        ingredients: { "Filling Choco Mocha": { amount: 20, unit: "g" } },
+        calculation: { divisor: 10, unit: 'loyang' }
+    },
+    "Roti Balok Cream Cheese": {
+        baseRecipes: [{ recipeName: "Adonan Roti Sobek", weight: 50 }],
+        ingredients: { "Filling Cream Cheese Sobek": { amount: 20, unit: "g" } },
+        calculation: { divisor: 10, unit: 'loyang' }
     },
 };

@@ -254,5 +254,26 @@ export const recipes: Recipe[] = [
             "Proofing akhir hingga mengembang dua kali lipat, sekitar 45-60 menit.",
             "Goreng donat dalam minyak panas dengan api sedang hingga kedua sisi berwarna keemasan."
         ]
+    },
+    {
+        id: "adonan_roti_sobek",
+        name: "Adonan Roti Sobek",
+        ingredients: [
+            { "name": "Tepung Roti Sobek", "amount": 1000, "unit": "g" },
+            { "name": "Gula Roti Sobek", "amount": 180, "unit": "g" },
+            { "name": "Susu Bubuk Sobek", "amount": 60, "unit": "g" },
+            { "name": "Ragi Sobek", "amount": 15, "unit": "g" },
+            { "name": "Telur Sobek", "amount": 150, "unit": "g" },
+            { "name": "Margarin Sobek", "amount": 100, "unit": "g" },
+            { "name": "Garam", "amount": 12, "unit": "g" },
+            { "name": "Air", "amount": 450, "unit": "g" }
+        ],
+        steps: [
+            "Campurkan bahan kering.",
+            "Masukkan bahan basah, uleni hingga setengah kalis.",
+            "Tambahkan margarin dan garam, uleni hingga kalis elastis.",
+            "Istirahatkan adonan, lalu bagi dan isi sesuai varian.",
+            "Proofing hingga mengembang, lalu panggang."
+        ]
     }
 ];

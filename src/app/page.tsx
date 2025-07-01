@@ -19,6 +19,7 @@ import {
 import type { DailyUsageRecord } from '@/components/bakery-app';
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
+import { productDepartments } from '@/lib/products';
 
 export const dynamic = 'force-dynamic';
 
@@ -65,7 +66,7 @@ async function fetchDataAndSeed() {
 
     // 2. Fetch all data for the application directly from Firestore.
     const recipesSnapshot = await getDocs(collection(db, 'recipes'));
-    const recipes: Recipe[] = recipesSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Recipe));
+    let recipes: Recipe[] = recipesSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Recipe));
 
     const productsDoc = await getDoc(doc(db, 'appData', 'products'));
     let products: AllProductsData = productsDoc.exists() ? productsDoc.data().data : {};
@@ -106,6 +107,61 @@ async function fetchDataAndSeed() {
             console.log("No new donut inventory items to migrate. Setting flag to prevent future checks.");
             await setDoc(donutInventoryMigrationFlagRef, { isMigrated: true, migratedAt: Timestamp.now() });
         }
+    }
+
+    // Migration for Roti Sobek department data
+    const rotiSobekMigrationFlagRef = doc(db, 'appData', 'rotiSobekMigrationFlag_v1');
+    const rotiSobekMigrationFlagDoc = await getDoc(rotiSobekMigrationFlagRef);
+
+    if (!rotiSobekMigrationFlagDoc.exists()) {
+        console.log("Performing one-time data migration for Roti Sobek department...");
+        const migrationBatch = writeBatch(db);
+
+        // 1. Add Roti Sobek inventory
+        const existingInventoryIds = new Set(inventory.map(item => item.id));
+        const sobekInventoryToAdd = initialInventoryData.filter(item => 
+            item.department === 'rotiSobek' && !existingInventoryIds.has(item.id)
+        );
+        sobekInventoryToAdd.forEach(item => {
+            const docRef = doc(db, 'inventory', item.id);
+            migrationBatch.set(docRef, item);
+        });
+
+        // 2. Add Roti Sobek recipe
+        const existingRecipeIds = new Set(recipes.map(r => r.id));
+        const sobekRecipeToAdd = initialRecipesData.find(r => r.id === 'adonan_roti_sobek');
+        if (sobekRecipeToAdd && !existingRecipeIds.has(sobekRecipeToAdd.id)) {
+            const docRef = doc(db, 'recipes', sobekRecipeToAdd.id);
+            migrationBatch.set(docRef, sobekRecipeToAdd);
+        }
+
+        // 3. Add Roti Sobek products
+        const sobekProductsToAdd: { [key: string]: any } = {};
+        const sobekProductNames = productDepartments.rotiSobek;
+        sobekProductNames.forEach(productName => {
+            if (!products[productName]) {
+                sobekProductsToAdd[productName] = initialProductData[productName];
+            }
+        });
+        if (Object.keys(sobekProductsToAdd).length > 0) {
+            const productsDocRef = doc(db, 'appData', 'products');
+            migrationBatch.set(productsDocRef, { data: { ...products, ...sobekProductsToAdd } }, { merge: true });
+        }
+        
+        // 4. Set migration flag and commit
+        migrationBatch.set(rotiSobekMigrationFlagRef, { isMigrated: true, migratedAt: Timestamp.now() });
+        await migrationBatch.commit();
+        console.log("Roti Sobek data migration complete.");
+
+        // Re-fetch all data to reflect the migration for the current render
+        const newRecipesSnapshot = await getDocs(collection(db, 'recipes'));
+        recipes = newRecipesSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Recipe));
+
+        const newProductsDoc = await getDoc(doc(db, 'appData', 'products'));
+        products = newProductsDoc.exists() ? newProductsDoc.data().data : {};
+
+        const newInventorySnapshot = await getDocs(collection(db, 'inventory'));
+        inventory = newInventorySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as InventoryItem));
     }
 
 

@@ -75,14 +75,29 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         const totalRoll = totalRollProducts.reduce((sum, p) => sum + (numInputs[p.toLowerCase()] || 0) / safeGetDivisor(p), 0) / 12;
         if (totalRoll > 0) productionCalculations.push(["Total Roll", `${totalRoll.toFixed(2)} loyang`]);
 
-        const nonRotiProducts = new Set(["abon piramid", "abon roll pedas", "cheese roll", "donut paha ayam", "abon sosis", "cream choco cheese", "double coklat", "hot sosis", "kacang merah", "maxicana coklat", "red velvet cream cheese", "sosis label", "strawberry almond", "vanilla oreo", "abon taiwan"]);
-        const totalRotiPcs = Object.keys(numInputs).reduce((sum, p) => {
-            if (nonRotiProducts.has(p.toLowerCase())) return sum;
+        const rotiProductsForSum = [
+            "abon piramid", 
+            "abon roll pedas", 
+            "cheese roll", 
+            "donut paha ayam", 
+            "abon sosis", 
+            "cream choco cheese", 
+            "double coklat", 
+            "hot sosis", 
+            "kacang merah", 
+            "maxicana coklat", 
+            "red velvet cream cheese", 
+            "sosis label", 
+            "strawberry almond", 
+            "vanilla oreo", 
+            "abon taiwan"
+        ];
+        const totalRotiPcs = rotiProductsForSum.reduce((sum, p) => {
             return sum + (numInputs[p.toLowerCase()] || 0);
         }, 0);
         if (totalRotiPcs > 0) productionCalculations.push(["Total Roti", `${totalRotiPcs.toFixed(0)} pcs`]);
         
-        // New "Total Slongsong" calculation based on user request
+        // Total Slongsong calculation
         const slongsongProducts = [
             "abon ayam pedas",
             "cream choco cheese",
@@ -216,16 +231,14 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
 
     const customSortOrder = [
         "Total Sosis",
-        "Adonan Donat",
-        "Adonan Donut Joko",
-        "Adonan Donut Paha Ayam",
-        "Adonan Roti Manis Roll",
-        "Adonan Roti Manis Mesin",
         "Total Roll",
         "Total Roti",
         "Total Box Tray",
         "Total Loyang",
         "Total Slongsong",
+        "Adonan Donut Paha Ayam",
+        "Adonan Roti Manis Roll",
+        "Adonan Roti Manis Mesin",
         "Egg Cream",
         "Cream Cheese",
         "Butter",

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -61,7 +60,7 @@ export default function RecipeScaler({ recipes }: RecipeScalerProps) {
         <Card className="w-full max-w-4xl mx-auto glassmorphic">
             <CardHeader>
                 <CardTitle>Recipe Scaler</CardTitle>
-                <CardDescription>Choose a recipe and enter a multiplier to scale the ingredients.</CardDescription>
+                <CardDescription className="text-foreground">Choose a recipe and enter a multiplier to scale the ingredients.</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="grid md:grid-cols-3 gap-6 items-start">

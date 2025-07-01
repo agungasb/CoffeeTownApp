@@ -75,7 +75,9 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         const totalRoll = totalRollProducts.reduce((sum, p) => sum + (numInputs[p.toLowerCase()] || 0) / safeGetDivisor(p), 0) / 12;
         if (totalRoll > 0) productionCalculations.push(["Total Roll", `${totalRoll.toFixed(2)} loyang`]);
 
+        // Total Roti calculation
         const rotiProductsForSum = [
+            "abon ayam pedas",
             "abon piramid", 
             "abon roll pedas", 
             "cheese roll", 
@@ -116,6 +118,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
             productionCalculations.push(["Total Slongsong", `${totalSlongsong.toFixed(2)} trolley`]);
         }
 
+        // Total Sosis calculation
         const getSausageAmountForProduct = (productName: string): number => {
             const productData = findProductData(productName, productIngredientsData);
             if (!productData || !productData.ingredients) return 0;
@@ -142,8 +145,27 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     }
 
     // Generic calculations (apply to both departments)
-    const totalBoxTray = Object.keys(numInputs).reduce((sum, p) => sum + (numInputs[p.toLowerCase()] || 0), 0);
-    if (totalBoxTray > 0) productionCalculations.push(["Total Box Tray", `${totalBoxTray.toFixed(0)} pcs`]);
+    const totalBoxTrayValue =
+      ((numInputs['abon ayam pedas'] || 0) / 15) +
+      ((numInputs['abon piramid'] || 0) / 20) +
+      ((numInputs['abon roll pedas'] || 0) / 25) +
+      ((numInputs['abon sosis'] || 0) / 15) +
+      ((numInputs['cheese roll'] || 0) / 35) +
+      ((numInputs['cream choco cheese'] || 0) / 12) +
+      ((numInputs['donut paha ayam'] || 0) / 15) +
+      ((numInputs['double coklat'] || 0) / 15) +
+      ((numInputs['hot sosis'] || 0) / 15) +
+      ((numInputs['kacang merah'] || 0) / 15) +
+      ((numInputs['maxicana coklat'] || 0) / 15) +
+      ((numInputs['red velvet cream cheese'] || 0) / 15) +
+      ((numInputs['sosis label'] || 0) / 15) +
+      ((numInputs['strawberry almond'] || 0) / 15) +
+      ((numInputs['vanilla oreo'] || 0) / 15) +
+      ((numInputs['abon taiwan'] || 0) / 15);
+
+    if (totalBoxTrayValue > 0) {
+        productionCalculations.push(["Total Box Tray", `${totalBoxTrayValue.toFixed(2)} pcs`]);
+    }
 
     const totalLoyang = Object.keys(numInputs).reduce((sum, p) => sum + ((numInputs[p.toLowerCase()] || 0) / safeGetDivisor(p)), 0);
     if (totalLoyang > 0) productionCalculations.push(["Total Loyang", `${totalLoyang.toFixed(2)} loyang`]);

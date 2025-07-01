@@ -15,7 +15,7 @@
 
 ### 1. Gambaran Umum
 
-Aplikasi ini adalah alat bantu cerdas yang dirancang khusus untuk Coffee Town Bakery. Tujuannya adalah untuk menyederhanakan dan mempercepat proses perhitungan produksi harian, manajemen resep, inventaris, dan rekomendasi pemesanan bahan baku.
+Aplikasi ini adalah alat bantu yang dirancang khusus untuk Coffee Town Bakery. Tujuannya adalah untuk menyederhanakan dan mempercepat proses perhitungan produksi harian, manajemen resep, inventaris, dan rekomendasi pemesanan bahan baku. Sudah disesuaikan dengan workflow yang ada di Coffee Town Bakery.
 
 ---
 
@@ -27,13 +27,6 @@ Untuk dapat mengubah data (menambah, mengedit, menghapus resep, produk, dan inve
 - Masukkan `Username` dan `Password` yang telah diberikan.
 - Klik tombol **Login**.
 - Untuk keluar, klik ikon **gembok keluar (Logout)**.
-
-#### Pengaturan Visual
-Anda dapat menyesuaikan tampilan "efek kaca" (glassmorphism) pada semua panel.
-- Klik ikon **roda gigi (Settings)** di pojok kanan atas.
-- Akan muncul pop-up **Visual Settings**.
-- Geser slider **Blur** untuk mengatur tingkat keburaman latar belakang panel.
-- Geser slider **Opacity** untuk mengatur tingkat transparansi panel.
 
 ---
 
@@ -56,10 +49,10 @@ Tab ini adalah fitur utama untuk menghitung kebutuhan bahan baku berdasarkan jum
 2.  **Isi Jumlah Produksi**: Masukkan jumlah (dalam pcs) untuk setiap produk yang akan dibuat. Anda bisa melakukannya dengan dua cara:
     *   **Manual**: Ketik langsung jumlah di kolom input di samping nama produk.
     *   **Otomatis (OCR)**:
-        *   Siapkan screenshot catatan produksi Anda.
+        *   Siapkan screenshot catatan produksi Anda (yang dikirim Bang Dodi).
         *   Klik tombol **Upload & Map Quantities**.
         *   Pilih file gambar screenshot tersebut.
-        *   AI akan menganalisis gambar dan mencoba mengisi jumlah secara otomatis. Periksa kembali angka yang diisi AI.
+        *   OCR Genkit akan menganalisis gambar dan mencoba mengisi jumlah secara otomatis. Periksa kembali angka yang diisi OCR Genkit untuk memastikan inputan benar.
 3.  **Hitung**: Setelah semua jumlah terisi, klik tombol besar **CALCULATE**.
 4.  **Lihat Hasil**:
     *   **Calculation Results**: Bagian ini menampilkan metrik penting seperti total loyang, total roti, dan jumlah resep adonan yang dibutuhkan.
@@ -113,7 +106,7 @@ Di sini Anda mengelola daftar produk jadi yang dijual. Setiap produk terhubung d
     3. **Base Recipes**: Hubungkan produk dengan resep adonan dasarnya dan tentukan berat adonan per pcs.
     4. **Additional Ingredients**: Tambahkan bahan-bahan lain yang spesifik untuk produk ini (misalnya topping ceres, filling keju).
     5. Klik **Save Product**.
-- **Mengedit/Menghapus**: Gunakan tombol **Edit** dan **Delete** pada setiap kartu produk.
+- **Mengedit/Menghapus**: Gunakan tombol **Edit** dan **Delete** pada setiap produk.
 
 ---
 
@@ -140,3 +133,7 @@ Tab ini berisi arsip dari semua data penggunaan yang telah Anda simpan dari **Ka
 
 - Setiap entri menunjukkan tanggal penyimpanan dan daftar bahan yang digunakan pada hari itu.
 - Ini adalah sumber data utama untuk **Kalkulator Rekomendasi Pesanan** di tab Inventaris. Semakin banyak data yang Anda simpan, semakin akurat rekomendasinya.
+
+---
+
+Semoga Bermanfaat, Salam Gacor

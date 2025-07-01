@@ -43,13 +43,14 @@ export type DailyUsageIngredient = {
   unit: string;
 };
 
+export type Department = 'rotiManis' | 'donut';
+
 export type DailyUsageRecord = {
   id: string;
   date: Date;
   usage: DailyUsageIngredient[];
+  department?: Department;
 };
-
-type Department = 'rotiManis' | 'donut';
 
 interface BakeryAppProps {
     initialRecipes: Recipe[];
@@ -64,7 +65,7 @@ interface BakeryAppProps {
         addInventoryItem: (item: Omit<InventoryItem, 'id'>) => Promise<void>;
         updateInventoryItem: (item: InventoryItem) => Promise<void>;
         deleteInventoryItem: (itemId: string) => Promise<void>;
-        addDailyUsageRecord: (record: { usage: DailyUsageIngredient[] }) => Promise<void>;
+        addDailyUsageRecord: (record: { usage: DailyUsageIngredient[], department: Department }) => Promise<void>;
         resetDailyUsage: () => Promise<void>;
     };
 }
@@ -138,6 +139,11 @@ export default function BakeryApp({
     return inventory.filter(item => item.department === activeDepartment);
   }, [inventory, activeDepartment]);
 
+  const filteredDailyUsage = useMemo(() => {
+    return dailyUsage.filter(record => record.department === activeDepartment);
+  }, [dailyUsage, activeDepartment]);
+
+
   useEffect(() => {
     document.documentElement.style.setProperty('--glass-blur', `${blur}px`);
     document.documentElement.style.setProperty('--glass-opacity', `${opacity / 100}`);
@@ -181,7 +187,8 @@ export default function BakeryApp({
     };
     
     const updateProductsHandler = async (newProducts: AllProductsData) => {
-        await actions.updateProducts(newProducts);
+        const fullProductData = { ...products, ...newProducts };
+        await actions.updateProducts(fullProductData);
         toast({ title: 'Success', description: 'Product list updated.' });
         router.refresh();
     };
@@ -204,8 +211,8 @@ export default function BakeryApp({
         router.refresh();
     };
     
-    const addDailyUsageRecordHandler = async (record: Omit<DailyUsageRecord, 'id' | 'date'>) => {
-        await actions.addDailyUsageRecord(record);
+    const addDailyUsageRecordHandler = async (record: { usage: DailyUsageIngredient[] }) => {
+        await actions.addDailyUsageRecord({ ...record, department: activeDepartment });
         toast({ title: 'Success', description: 'Daily usage saved.' });
         router.refresh(); 
     };
@@ -373,7 +380,7 @@ export default function BakeryApp({
                 />
             </TabsContent>
             <TabsContent value="daily_usage">
-              <DailyUsageDashboard dailyUsageRecords={dailyUsage} />
+              <DailyUsageDashboard dailyUsageRecords={filteredDailyUsage} />
             </TabsContent>
           </Tabs>
         </main>

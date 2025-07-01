@@ -127,9 +127,48 @@ async function fetchDataAndSeed() {
         return { 
             id: doc.id, 
             date: (data.date as Timestamp).toDate(),
-            usage: data.usage
+            usage: data.usage,
+            department: data.department
         };
     });
+
+    // Migration for daily usage records missing a 'department'.
+    const usageMigrationFlagRef = doc(db, 'appData', 'usageDepartmentMigrationFlag');
+    const usageMigrationFlagDoc = await getDoc(usageMigrationFlagRef);
+
+    if (!usageMigrationFlagDoc.exists()) {
+        console.log("Performing one-time data migration for daily usage records...");
+        const usageMigrationBatch = writeBatch(db);
+        let migrationNeeded = false;
+        
+        dailyUsageSnapshot.docs.forEach(docSnapshot => {
+            const data = docSnapshot.data();
+            if (data.department === undefined) {
+                migrationNeeded = true;
+                usageMigrationBatch.update(docSnapshot.ref, { department: 'rotiManis' });
+            }
+        });
+
+        if (migrationNeeded) {
+            usageMigrationBatch.set(usageMigrationFlagRef, { isMigrated: true, migratedAt: Timestamp.now() });
+            await usageMigrationBatch.commit();
+            console.log("Daily usage migration complete.");
+            // Re-fetch data to reflect migration
+            const migratedSnapshot = await getDocs(query(collection(db, 'dailyUsage'), orderBy('date', 'desc')));
+            dailyUsage.forEach((record, index) => {
+                 const migratedDoc = migratedSnapshot.docs.find(d => d.id === record.id);
+                 if (migratedDoc && migratedDoc.data().department) {
+                    dailyUsage[index].department = migratedDoc.data().department;
+                 } else if (!record.department) {
+                    dailyUsage[index].department = 'rotiManis';
+                 }
+            });
+        } else {
+            // Set flag even if no migration was needed to prevent re-running this check.
+            await setDoc(usageMigrationFlagRef, { isMigrated: true, migratedAt: Timestamp.now() });
+        }
+    }
+
 
     return { recipes, products, inventory, dailyUsage };
 }

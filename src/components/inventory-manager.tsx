@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from 'react';
-import type { DailyUsageRecord } from '@/components/bakery-app';
+import type { DailyUsageRecord, Department } from '@/components/bakery-app';
 import type { InventoryItem } from '@/lib/inventoryData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,7 +24,7 @@ interface InventoryManagerProps {
     dailyUsageRecords: DailyUsageRecord[];
     resetDailyUsage: () => Promise<void>;
     isLoggedIn: boolean;
-    department: 'rotiManis' | 'donut';
+    department: Department;
 }
 
 export default function InventoryManager({ inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, dailyUsageRecords, resetDailyUsage, isLoggedIn, department }: InventoryManagerProps) {
@@ -36,11 +36,15 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
     
     const [averageUsageToday, setAverageUsageToday] = useState<{name: string, amount: number, unit: string}[]>([]);
 
+    const departmentUsageRecords = useMemo(() => {
+        return dailyUsageRecords.filter(r => r.department === department);
+    }, [dailyUsageRecords, department]);
+
     useEffect(() => {
         // Only run on client after mount
         const today = new Date().getDay();
-        setAverageUsageToday(calculateAverageDailyUsage(dailyUsageRecords, today));
-    }, [dailyUsageRecords]);
+        setAverageUsageToday(calculateAverageDailyUsage(departmentUsageRecords, today));
+    }, [departmentUsageRecords]);
     
     const handleAddClick = () => {
         setItemToEdit(null);
@@ -204,7 +208,7 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
                     {dailyUsageRecords.length > 0 ? (
                         <OrderCalculator 
                             inventory={inventory}
-                            dailyUsageRecords={dailyUsageRecords}
+                            dailyUsageRecords={departmentUsageRecords}
                         />
                     ) : (
                         <Alert className="mt-4 bg-muted/30 border-border/50">

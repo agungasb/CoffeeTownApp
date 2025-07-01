@@ -40,9 +40,11 @@ export async function deleteRecipe(recipeId: string) {
 // --- Product Actions ---
 export async function updateProducts(products: AllProductsData) {
     checkDb();
-    await setDoc(doc(db!, 'appData', 'products'), { data: products });
+    const productsDocRef = doc(db!, 'appData', 'products');
+    await setDoc(productsDocRef, { data: products });
     revalidatePath('/');
 }
+
 
 // --- Inventory Actions ---
 export async function addInventoryItem(item: Omit<InventoryItem, 'id'>) {
@@ -165,11 +167,12 @@ export async function deleteInventoryItem(itemId: string) {
 }
 
 // --- Daily Usage Actions ---
-export async function addDailyUsageRecord(record: { usage: { name: string, amount: number, unit: string }[] }) {
+export async function addDailyUsageRecord(record: { usage: { name: string, amount: number, unit: string }[], department: 'rotiManis' | 'donut' }) {
     checkDb();
     await addDoc(collection(db!, 'dailyUsage'), {
         date: Timestamp.now(),
         usage: record.usage,
+        department: record.department,
     });
     revalidatePath('/');
 }

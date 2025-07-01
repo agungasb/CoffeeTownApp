@@ -92,7 +92,7 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
                             <PlusCircle className="mr-2" /> Add New Ingredient
                         </Button>
                         <Button onClick={() => setIsOrderOpen(true)} variant="secondary" size="sm">
-                            <Package className="mr-2" /> Order
+                            <Package className="mr-2" /> Order CUK
                         </Button>
                          <AlertDialog>
                             <AlertDialogTrigger asChild>

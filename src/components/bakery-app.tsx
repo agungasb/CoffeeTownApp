@@ -386,7 +386,7 @@ export default function BakeryApp({
           </Tabs>
         </main>
         
-        <footer className="fixed bottom-0 left-0 w-full py-3 text-center glassmorphic border-t border-foreground/30 text-foreground font-medium text-base">
+        <footer className="fixed bottom-0 left-0 w-full py-2 text-center glassmorphic border-t border-foreground/30 text-foreground font-medium text-xs">
             <div className="flex justify-center items-center gap-2">
                 <span>Created for BAKER Coffee Town</span>
                 <span className="mx-1">|</span>
@@ -410,3 +410,5 @@ export default function BakeryApp({
     </>
   );
 }
+
+    

@@ -77,6 +77,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
 
         // Total Roti calculation
         const rotiProductsForSum = [
+            "abon ayam pedas",
             "abon piramid", 
             "abon roll pedas", 
             "cheese roll", 

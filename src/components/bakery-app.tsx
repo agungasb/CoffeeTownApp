@@ -316,10 +316,10 @@ export default function BakeryApp({
             <TabsContent value="calculator">
               <ProductionCalculator 
                 key={activeDepartment}
-                products={filteredProducts}
+                products={products}
                 productList={departmentProducts}
                 recipes={recipes}
-                inventory={initialInventory}
+                inventory={inventory}
                 addDailyUsageRecord={addDailyUsageRecordHandler} 
                 isLoggedIn={isLoggedIn}
                 department={activeDepartment}
@@ -382,3 +382,5 @@ export default function BakeryApp({
     </>
   );
 }
+
+    

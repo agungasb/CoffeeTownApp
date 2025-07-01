@@ -92,12 +92,33 @@ export default function BakeryApp({
   const [recipes, setRecipes] = useState(initialRecipes);
   const [products, setProducts] = useState(initialProducts);
   const [inventory, setInventory] = useState(initialInventory);
+  const [dailyUsage, setDailyUsage] = useState(initialDailyUsage);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const [blur, setBlur] = useState(16);
   const [opacity, setOpacity] = useState(40);
   const [activeTab, setActiveTab] = useState(TABS[0].id);
   const [activeDepartment, setActiveDepartment] = useState<Department>('rotiManis');
+
+  // This ensures that when router.refresh() provides new initial data,
+  // the client-side state is updated to match. This is crucial for keeping
+  // data consistent after server actions.
+  useEffect(() => {
+    setProducts(initialProducts);
+  }, [initialProducts]);
+
+  useEffect(() => {
+    setInventory(initialInventory);
+  }, [initialInventory]);
+  
+  useEffect(() => {
+    setRecipes(initialRecipes);
+  }, [initialRecipes]);
+
+  useEffect(() => {
+    setDailyUsage(initialDailyUsage);
+  }, [initialDailyUsage]);
+
 
   const departmentProducts = useMemo(() => {
     return productDepartments[activeDepartment];
@@ -142,49 +163,42 @@ export default function BakeryApp({
   }
 
     const addRecipeHandler = async (recipe: Omit<Recipe, 'id'>) => {
-        setRecipes(prev => [...prev, { ...recipe, id: 'temp-id' }]); // Optimistic add
         await actions.addRecipe(recipe);
         toast({ title: 'Success', description: 'Recipe added successfully.' });
         router.refresh(); 
     };
 
     const updateRecipeHandler = async (recipe: Recipe) => {
-        setRecipes(prev => prev.map(r => r.id === recipe.id ? recipe : r));
         await actions.updateRecipe(recipe);
         toast({ title: 'Success', description: 'Recipe updated successfully.' });
         router.refresh(); 
     };
 
     const deleteRecipeHandler = async (recipeId: string) => {
-        setRecipes(prev => prev.filter(r => r.id !== recipeId));
         await actions.deleteRecipe(recipeId);
         toast({ title: 'Success', description: 'Recipe deleted.' });
         router.refresh(); 
     };
     
     const updateProductsHandler = async (newProducts: AllProductsData) => {
-        setProducts(newProducts);
         await actions.updateProducts(newProducts);
         toast({ title: 'Success', description: 'Product list updated.' });
         router.refresh();
     };
     
     const addInventoryItemHandler = async (itemData: Omit<InventoryItem, 'id'>) => {
-        setInventory(prev => [...prev, { ...itemData, id: 'temp-id' } as InventoryItem]); // Optimistic add
         await actions.addInventoryItem(itemData);
         toast({ title: 'Success', description: 'Ingredient added.' });
         router.refresh(); 
     };
 
     const updateInventoryItemHandler = async (item: InventoryItem) => {
-        setInventory(prev => prev.map(i => i.id === item.id ? item : i));
         await actions.updateInventoryItem(item);
         toast({ title: 'Success', description: 'Ingredient updated.' });
         router.refresh();
     };
 
     const deleteInventoryItemHandler = async (itemId: string) => {
-        setInventory(prev => prev.filter(i => i.id !== itemId));
         await actions.deleteInventoryItem(itemId);
         toast({ title: 'Success', description: 'Ingredient deleted.' });
         router.refresh();
@@ -352,14 +366,14 @@ export default function BakeryApp({
                     addInventoryItem={addInventoryItemHandler}
                     updateInventoryItem={updateInventoryItemHandler}
                     deleteInventoryItem={deleteInventoryItemHandler}
-                    dailyUsageRecords={initialDailyUsage}
+                    dailyUsageRecords={dailyUsage}
                     resetDailyUsage={resetDailyUsageHandler}
                     isLoggedIn={isLoggedIn}
                     department={activeDepartment}
                 />
             </TabsContent>
             <TabsContent value="daily_usage">
-              <DailyUsageDashboard dailyUsageRecords={initialDailyUsage} />
+              <DailyUsageDashboard dailyUsageRecords={dailyUsage} />
             </TabsContent>
           </Tabs>
         </main>

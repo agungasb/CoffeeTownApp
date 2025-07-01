@@ -20,6 +20,7 @@ import type { Recipe } from "@/lib/recipes";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { capitalize } from "@/lib/utils";
 import type { DailyUsageRecord, DailyUsageIngredient } from "@/components/bakery-app";
+import type { InventoryItem } from "@/lib/inventoryData";
 
 type ProductionFormValues = {
   [key: string]: number | '';
@@ -29,12 +30,13 @@ interface ProductionCalculatorProps {
     products: AllProductsData;
     productList: string[];
     recipes: Recipe[];
+    inventory: InventoryItem[];
     addDailyUsageRecord: (record: { usage: DailyUsageIngredient[] }) => Promise<void>;
     isLoggedIn: boolean;
     department: 'rotiManis' | 'donut';
 }
 
-export default function ProductionCalculator({ products, productList, recipes, addDailyUsageRecord, isLoggedIn, department }: ProductionCalculatorProps) {
+export default function ProductionCalculator({ products, productList, recipes, inventory, addDailyUsageRecord, isLoggedIn, department }: ProductionCalculatorProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -55,7 +57,7 @@ export default function ProductionCalculator({ products, productList, recipes, a
   }, [productList, form]);
 
   const handleCalculate = (data: ProductionFormValues) => {
-    const newResults = calculateProductionMetrics(data as ProductionInputs, products, recipes);
+    const newResults = calculateProductionMetrics(data as ProductionInputs, products, recipes, inventory);
     setResults(newResults);
     setHasCalculated(true);
     toast({ title: "Success", description: "Calculations complete." });

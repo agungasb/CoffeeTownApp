@@ -77,7 +77,6 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
 
         // Total Roti calculation
         const rotiProductsForSum = [
-            "abon ayam pedas",
             "abon piramid", 
             "abon roll pedas", 
             "cheese roll", 
@@ -128,15 +127,22 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
 
             if (quantity > 0) {
                 const productData = findProductData(lowerCaseProductName, productIngredientsData);
-                if (productData?.ingredients) {
+                // More robust check: ensure productData and ingredients object exist.
+                if (productData && typeof productData.ingredients === 'object' && productData.ingredients !== null) {
+                    // Find the key for 'sosis' case-insensitively
                     const sosisKey = Object.keys(productData.ingredients).find(k => k.toLowerCase() === 'sosis');
+                    
+                    // If the key is found, and it has a valid amount, add to total
                     if (sosisKey) {
-                        const amountPerProduct = productData.ingredients[sosisKey].amount;
-                        totalSosisPcs += quantity * amountPerProduct;
+                        const amountPerProduct = productData.ingredients[sosisKey]?.amount;
+                        if (typeof amountPerProduct === 'number' && !isNaN(amountPerProduct)) {
+                            totalSosisPcs += quantity * amountPerProduct;
+                        }
                     }
                 }
             }
         });
+
 
         if (totalSosisPcs > 0) {
             const sosisInventoryItem = inventory.find(item => item.name.toLowerCase() === 'sosis');
@@ -151,7 +157,6 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         }
     }
 
-    // Generic calculations (apply to both departments)
     const totalBoxTrayValue =
       ((numInputs['abon ayam pedas'] || 0) / 15) +
       ((numInputs['abon piramid'] || 0) / 20) +
@@ -217,9 +222,6 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         }
     }
     
-    // 2. Other Filling/Topping Recipes (Hardcoded logic replaced by dynamic base recipe links)
-    // The previous hardcoded calculations for Egg Cream, Cream Cheese, etc., are now handled by the dynamic loop above.
-
     // --- Ingredient Summary Calculation ---
     for (const [recipeName, recipeMultiplier] of Object.entries(recipeMultiplierMap)) {
         if (recipeMultiplier > 0) {

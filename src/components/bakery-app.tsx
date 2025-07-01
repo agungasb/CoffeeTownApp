@@ -163,10 +163,13 @@ export default function BakeryApp({
     };
     
     const updateProductsHandler = async (newProducts: AllProductsData) => {
-        setProducts(prev => ({...prev, ...newProducts}));
-        await actions.updateProducts({...products, ...newProducts});
+        // The newProducts object from the form is the complete, new state.
+        // Set it directly to avoid stale state issues.
+        setProducts(newProducts);
+        // Pass the correct new state to the server action.
+        await actions.updateProducts(newProducts);
         toast({ title: 'Success', description: 'Product list updated.' });
-        router.refresh(); 
+        router.refresh();
     };
     
     const addInventoryItemHandler = async (itemData: Omit<InventoryItem, 'id'>) => {

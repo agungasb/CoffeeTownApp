@@ -56,7 +56,10 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         if (quantity > 0) {
             const productData = findProductData(productName, productIngredientsData);
             if (productData?.calculation?.divisor && productData.calculation.divisor > 0) {
-                const result = quantity / productData.calculation.divisor;
+                let result = quantity / productData.calculation.divisor;
+                if (productData.calculation.multiplier) {
+                    result *= productData.calculation.multiplier;
+                }
                 const unit = productData.calculation.unit || 'loyang';
                 productionCalculations.push([capitalize(productName), `${result.toFixed(2)} ${unit}`]);
             }

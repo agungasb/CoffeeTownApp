@@ -57,7 +57,7 @@ export default function ProductionCalculator({ products, productList, recipes, i
   }, [productList, form]);
 
   const handleCalculate = (data: ProductionFormValues) => {
-    const newResults = calculateProductionMetrics(data as ProductionInputs, products, recipes, inventory);
+    const newResults = calculateProductionMetrics(data as ProductionInputs, products, recipes, inventory, department);
     setResults(newResults);
     setHasCalculated(true);
     toast({ title: "Success", description: "Calculations complete." });

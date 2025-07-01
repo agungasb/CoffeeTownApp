@@ -75,15 +75,31 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         const totalRoll = totalRollProducts.reduce((sum, p) => sum + (numInputs[p.toLowerCase()] || 0) / safeGetDivisor(p), 0) / 12;
         if (totalRoll > 0) productionCalculations.push(["Total Roll", `${totalRoll.toFixed(2)} loyang`]);
 
-        const nonRotiProducts = new Set(["abon piramid", "abon roll pedas", "cheese roll", "donut paha ayam"]);
+        const nonRotiProducts = new Set(["abon piramid", "abon roll pedas", "cheese roll", "donut paha ayam", "abon sosis", "cream choco cheese", "double coklat", "hot sosis", "kacang merah", "maxicana coklat", "red velvet cream cheese", "sosis label", "strawberry almond", "vanilla oreo", "abon taiwan"]);
         const totalRotiPcs = Object.keys(numInputs).reduce((sum, p) => {
             if (nonRotiProducts.has(p.toLowerCase())) return sum;
             return sum + (numInputs[p.toLowerCase()] || 0);
         }, 0);
         if (totalRotiPcs > 0) productionCalculations.push(["Total Roti", `${totalRotiPcs.toFixed(0)} pcs`]);
         
-        const totalSlongsong = numInputs['donut paha ayam'] || 0;
-        if (totalSlongsong > 0) productionCalculations.push(["Total Slongsong", `${totalSlongsong.toFixed(0)} pcs`]);
+        // New "Total Slongsong" calculation based on user request
+        const slongsongProducts = [
+            "abon ayam pedas",
+            "cream choco cheese",
+            "double coklat",
+            "hot sosis",
+            "strawberry almond"
+        ];
+        const totalSlongsongTrays = slongsongProducts.reduce((sum, p) => {
+            const productNameLower = p.toLowerCase();
+            const quantity = numInputs[productNameLower] || 0;
+            const divisor = safeGetDivisor(productNameLower);
+            return sum + (quantity / divisor);
+        }, 0);
+        const totalSlongsong = totalSlongsongTrays / 15;
+        if (totalSlongsong > 0) {
+            productionCalculations.push(["Total Slongsong", `${totalSlongsong.toFixed(2)} trolley`]);
+        }
 
         const getSausageAmountForProduct = (productName: string): number => {
             const productData = findProductData(productName, productIngredientsData);

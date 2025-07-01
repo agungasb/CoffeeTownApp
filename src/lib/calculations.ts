@@ -71,28 +71,18 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     
     // Department-specific calculations
     if (department === 'rotiManis') {
-        const totalRollProducts = ["abon piramid", "abon roll pedas", "cheese roll"];
-        const totalRoll = totalRollProducts.reduce((sum, p) => sum + (numInputs[p.toLowerCase()] || 0) / safeGetDivisor(p), 0) / 12;
+        const totalRoll = (
+            (numInputs["abon piramid"] || 0) / safeGetDivisor("abon piramid") +
+            (numInputs["abon roll pedas"] || 0) / safeGetDivisor("abon roll pedas") +
+            (numInputs["cheese roll"] || 0) / safeGetDivisor("cheese roll")
+        ) / 12;
         if (totalRoll > 0) productionCalculations.push(["Total Roll", `${totalRoll.toFixed(2)} loyang`]);
 
         // Total Roti calculation
         const rotiProductsForSum = [
-            "abon ayam pedas",
-            "abon piramid", 
-            "abon roll pedas", 
-            "cheese roll", 
-            "donut paha ayam", 
-            "abon sosis", 
-            "cream choco cheese", 
-            "double coklat", 
-            "hot sosis", 
-            "kacang merah", 
-            "maxicana coklat", 
-            "red velvet cream cheese", 
-            "sosis label", 
-            "strawberry almond", 
-            "vanilla oreo", 
-            "abon taiwan"
+            "abon ayam pedas", "abon piramid", "abon roll pedas", "cheese roll", "donut paha ayam", "abon sosis", 
+            "cream choco cheese", "double coklat", "hot sosis", "kacang merah", "maxicana coklat", 
+            "red velvet cream cheese", "sosis label", "strawberry almond", "vanilla oreo", "abon taiwan"
         ];
         const totalRotiPcs = rotiProductsForSum.reduce((sum, p) => {
             return sum + (numInputs[p.toLowerCase()] || 0);
@@ -100,13 +90,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         if (totalRotiPcs > 0) productionCalculations.push(["Total Roti", `${totalRotiPcs.toFixed(0)} pcs`]);
         
         // Total Slongsong calculation
-        const slongsongProducts = [
-            "abon ayam pedas",
-            "cream choco cheese",
-            "double coklat",
-            "hot sosis",
-            "strawberry almond"
-        ];
+        const slongsongProducts = ["abon ayam pedas", "cream choco cheese", "double coklat", "hot sosis", "strawberry almond"];
         const totalSlongsongTrays = slongsongProducts.reduce((sum, p) => {
             const productNameLower = p.toLowerCase();
             const quantity = numInputs[productNameLower] || 0;
@@ -119,30 +103,35 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         }
 
         // Total Sosis calculation
-        let totalSosisPcs = 0;
         const sosisProducts = ["abon sosis", "hot sosis", "sosis label"];
-        
-        sosisProducts.forEach(productName => {
+        const totalSosisPcs = sosisProducts.reduce((currentTotal, productName) => {
             const lowerCaseProductName = productName.toLowerCase();
             const quantity = numInputs[lowerCaseProductName] || 0;
 
-            if (quantity > 0) {
-                const productData = findProductData(lowerCaseProductName, productIngredientsData);
-                // More robust check: ensure productData and ingredients object exist.
-                if (productData && typeof productData.ingredients === 'object' && productData.ingredients !== null) {
-                    // Find the key for 'sosis' case-insensitively
-                    const sosisKey = Object.keys(productData.ingredients).find(k => k.toLowerCase() === 'sosis');
-                    
-                    // If the key is found, and it has a valid amount, add to total
-                    if (sosisKey) {
-                        const amountPerProduct = productData.ingredients[sosisKey]?.amount;
-                        if (typeof amountPerProduct === 'number' && !isNaN(amountPerProduct)) {
-                            totalSosisPcs += quantity * amountPerProduct;
-                        }
-                    }
-                }
+            if (quantity === 0) {
+                return currentTotal;
             }
-        });
+
+            const productData = findProductData(lowerCaseProductName, productIngredientsData);
+
+            if (!productData || typeof productData.ingredients !== 'object' || productData.ingredients === null) {
+                return currentTotal;
+            }
+
+            const sosisKey = Object.keys(productData.ingredients).find(k => k.toLowerCase() === 'sosis');
+
+            if (!sosisKey) {
+                return currentTotal;
+            }
+            
+            const amountPerProduct = productData.ingredients[sosisKey]?.amount;
+
+            if (typeof amountPerProduct === 'number' && !isNaN(amountPerProduct) && amountPerProduct > 0) {
+                return currentTotal + (quantity * amountPerProduct);
+            }
+
+            return currentTotal;
+        }, 0);
 
 
         if (totalSosisPcs > 0) {
@@ -152,7 +141,6 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
                 const orderUnitName = sosisInventoryItem.orderUnit || 'pack';
                 productionCalculations.push(['Total Sosis', `${totalSosisOrderUnit.toFixed(2)} ${orderUnitName}`]);
             } else {
-                // Fallback if conversion isn't set
                 productionCalculations.push(['Total Sosis', `${totalSosisPcs.toFixed(0)} pcs`]);
             }
         }

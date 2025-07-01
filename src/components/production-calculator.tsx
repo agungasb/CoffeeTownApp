@@ -22,7 +22,7 @@ import type { AllProductsData } from "@/lib/productIngredients";
 import type { Recipe } from "@/lib/recipes";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { capitalize } from "@/lib/utils";
-import type { DailyUsageRecord, DailyUsageIngredient } from "@/components/bakery-app";
+import type { DailyUsageRecord, DailyUsageIngredient, Department } from "@/components/bakery-app";
 import type { InventoryItem } from "@/lib/inventoryData";
 
 type ProductionFormValues = {
@@ -36,7 +36,7 @@ interface ProductionCalculatorProps {
     inventory: InventoryItem[];
     addDailyUsageRecord: (record: { usage: DailyUsageIngredient[] }) => Promise<void>;
     isLoggedIn: boolean;
-    department: 'rotiManis' | 'donut';
+    department: Department;
 }
 
 export default function ProductionCalculator({ products, productList, recipes, inventory, addDailyUsageRecord, isLoggedIn, department }: ProductionCalculatorProps) {

@@ -32,8 +32,10 @@ export default function LoginForm({ onLoginSuccess, onCancel }: LoginFormProps) 
     });
 
     const handleSubmit = (data: LoginFormData) => {
-        // Prototype login check
-        if (data.username === 'agung' && data.password === 'freepalestine') {
+        const validUsername = process.env.NEXT_PUBLIC_LOGIN_USERNAME || 'agung';
+        const validPassword = process.env.NEXT_PUBLIC_LOGIN_PASSWORD || 'freepalestine';
+
+        if (data.username === validUsername && data.password === validPassword) {
             onLoginSuccess();
             toast({ title: 'Success', description: 'Logged in successfully.' });
         } else {

@@ -15,10 +15,11 @@ import { ProductForm } from './product-form';
 import { capitalize } from '@/lib/utils';
 import type { Recipe } from '@/lib/recipes';
 import { productDepartments } from '@/lib/products';
+import type { Department } from './bakery-app';
 
 interface ProductManagerProps {
     products: AllProductsData;
-    department: 'rotiManis' | 'donut';
+    department: Department;
     recipes: Recipe[];
     updateProducts: (products: AllProductsData) => Promise<void>;
     isLoggedIn: boolean;

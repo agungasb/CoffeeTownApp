@@ -4,6 +4,7 @@ import type { AllProductsData, ProductData } from "./productIngredients";
 import type { Recipe } from "./recipes";
 import { capitalize } from "./utils";
 import { InventoryItem } from "./inventoryData";
+import type { Department } from "@/components/bakery-app";
 
 export function createProductionSchema(products: string[]) {
     const shape = products.reduce((acc, item) => {
@@ -38,7 +39,7 @@ const getRecipeBaseWeight = (recipeName: string, allRecipes: Recipe[]): number =
     return recipe.ingredients.reduce((sum, ing) => sum + ing.amount, 0);
 };
 
-export function calculateProductionMetrics(inputs: ProductionInputs, productIngredientsData: AllProductsData, allRecipes: Recipe[], inventory: InventoryItem[], department: 'rotiManis' | 'donut') {
+export function calculateProductionMetrics(inputs: ProductionInputs, productIngredientsData: AllProductsData, allRecipes: Recipe[], inventory: InventoryItem[], department: Department) {
     const numInputs: { [key: string]: number } = {};
     for (const key in inputs) {
         if (Object.prototype.hasOwnProperty.call(inputs, key)) {

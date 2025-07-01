@@ -7,7 +7,7 @@ import { revalidatePath } from 'next/cache';
 import type { Recipe } from '@/lib/recipes';
 import type { AllProductsData, ProductData, IngredientData } from '@/lib/productIngredients';
 import type { InventoryItem } from '@/lib/inventoryData';
-import type { DailyUsageRecord, DailyUsageIngredient } from '@/components/bakery-app';
+import type { DailyUsageRecord, DailyUsageIngredient, Department } from '@/components/bakery-app';
 import type { OcrProductionMappingOutput } from '@/ai/flows/ocr-production-mapping';
 import { ocrProductionMapping } from '@/ai/flows/ocr-production-mapping';
 
@@ -167,7 +167,7 @@ export async function deleteInventoryItem(itemId: string) {
 }
 
 // --- Daily Usage Actions ---
-export async function addDailyUsageRecord(record: { usage: { name: string, amount: number, unit: string }[], department: 'rotiManis' | 'donut' }) {
+export async function addDailyUsageRecord(record: { usage: { name: string, amount: number, unit: string }[], department: Department }) {
     checkDb();
     await addDoc(collection(db!, 'dailyUsage'), {
         date: Timestamp.now(),

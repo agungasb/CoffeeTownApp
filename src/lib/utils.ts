@@ -36,37 +36,26 @@ export function calculateAverageDailyUsage(
     return [];
   }
 
-  const totals: Record<string, { sum: number; unit: string; count: number }> = {};
+  const totals: Record<string, { sum: number; unit: string }> = {};
 
-  // Aggregate usage from the relevant records
+  // Aggregate usage from the relevant records, ignoring case
   for (const record of relevantRecords) {
     for (const { name, amount, unit } of record.usage) {
-      if (!totals[name]) {
-        totals[name] = { sum: 0, unit, count: 0 };
+      const lowerCaseName = name.toLowerCase();
+      if (!totals[lowerCaseName]) {
+        totals[lowerCaseName] = { sum: 0, unit };
       }
-      totals[name].sum += amount;
+      totals[lowerCaseName].sum += amount;
     }
   }
 
-  // To correctly average, we need to know how many records contributed to each total.
-  // Since some ingredients might not be in every record, we create a map of ingredient appearances.
-  const ingredientCounts: Record<string, number> = {};
-  for (const record of relevantRecords) {
-      for (const { name } of record.usage) {
-          if (!ingredientCounts[name]) {
-              ingredientCounts[name] = 0;
-          }
-          ingredientCounts[name]++;
-      }
-  }
-
-
-  // Calculate the average
+  // Calculate the average. The divisor is the number of relevant days.
+  const divisor = relevantRecords.length;
   const averages: DailyUsageIngredient[] = Object.entries(totals).map(
     ([name, data]) => {
-      const divisor = relevantRecords.length; // Average over the number of days found
       const averageAmount = data.sum / divisor;
-      return {name, amount: averageAmount, unit: data.unit};
+      // Capitalize the name for consistent display
+      return {name: capitalize(name), amount: averageAmount, unit: data.unit};
     }
   );
 

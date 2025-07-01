@@ -36,25 +36,26 @@ export function calculateAverageDailyUsage(
     return [];
   }
 
-  const totals: Record<string, { sum: number; unit: string }> = {};
+  const totals: Record<string, { sum: number; unit: string; originalName: string }> = {};
 
-  // Aggregate usage from the relevant records with case-sensitivity
+  // Aggregate usage from the relevant records, case-insensitively
   for (const record of relevantRecords) {
     for (const { name, amount, unit } of record.usage) {
-      if (!totals[name]) { // Use the name directly as the key
-        totals[name] = { sum: 0, unit };
+      const key = name.toLowerCase(); // Use lowercase key for grouping
+      if (!totals[key]) {
+        totals[key] = { sum: 0, unit, originalName: name }; // Store the first encountered casing
       }
-      totals[name].sum += amount;
+      totals[key].sum += amount;
     }
   }
 
   // Calculate the average. The divisor is the number of relevant days.
   const divisor = relevantRecords.length;
-  const averages: DailyUsageIngredient[] = Object.entries(totals).map(
-    ([name, data]) => {
+  const averages: DailyUsageIngredient[] = Object.values(totals).map(
+    (data) => {
       const averageAmount = data.sum / divisor;
-      // Return the name with its original casing
-      return {name: name, amount: averageAmount, unit: data.unit};
+      // Return the name with its original casing for display purposes
+      return {name: data.originalName, amount: averageAmount, unit: data.unit};
     }
   );
 

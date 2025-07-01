@@ -191,12 +191,12 @@ export const productIngredientsData: AllProductsData = {
     },
     "Donut Coklat Kacang": { 
         baseRecipes: [{ recipeName: "Adonan Donat Joko", weight: 45 }],
-        ingredients: { "kacang tanah": { amount: 10, unit: "g" }, "coklat filling": { amount: 5, unit: "g" } },
+        ingredients: { "kacang morin": { amount: 10, unit: "g" }, "compound dark": { amount: 5, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "Donut Gula Halus": { 
         baseRecipes: [{ recipeName: "Adonan Donat Joko", weight: 45 }],
-        ingredients: { "gula halus": { amount: 15, unit: "g" } },
+        ingredients: { "dusting sugar": { amount: 15, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "Donut Keju": { 
@@ -206,27 +206,27 @@ export const productIngredientsData: AllProductsData = {
     },
     "Donut Oreo": { 
         baseRecipes: [{ recipeName: "Adonan Donat Joko", weight: 45 }],
-        ingredients: { "crumble oreo": { amount: 15, unit: "g" } },
+        ingredients: { "crumble oreo coarsa": { amount: 15, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "7K BOMBOLONI CAPPUCINO": { 
         baseRecipes: [{ recipeName: "Adonan Donat Joko", weight: 45 }],
-        ingredients: { "cappucino filling": { amount: 20, unit: "g" } },
+        ingredients: { "glaze cappucino": { amount: 20, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "7K BOMBOLONI DARK COKLAT": { 
         baseRecipes: [{ recipeName: "Adonan Donat Joko", weight: 45 }],
-        ingredients: { "dark coklat filling (bomboloni)": { amount: 20, unit: "g" } },
+        ingredients: { "glaze dark": { amount: 20, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "7K BOMBOLONI GREENTEA": { 
         baseRecipes: [{ recipeName: "Adonan Donat Joko", weight: 45 }],
-        ingredients: { "greentea filling": { amount: 20, unit: "g" } },
+        ingredients: { "glaze greentea": { amount: 20, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
     "7K BOMBOLONI TIRAMISU": { 
         baseRecipes: [{ recipeName: "Adonan Donat Joko", weight: 45 }],
-        ingredients: { "tiramisu filling": { amount: 20, unit: "g" } },
+        ingredients: { "glaze tiramisu": { amount: 20, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
 };

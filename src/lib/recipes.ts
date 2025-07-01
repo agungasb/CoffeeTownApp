@@ -231,18 +231,18 @@ export const recipes: Recipe[] = [
         id: "adonan_donat_joko",
         name: "Adonan Donat Joko",
         ingredients: [
-            { "name": "tepung", "amount": 714.2857143, "unit": "g" },
+            { "name": "Tepung Gerbang", "amount": 714.2857143, "unit": "g" },
             { "name": "Premix", "amount": 285.7142857, "unit": "g" },
             { "name": "Gula Pasir", "amount": 120, "unit": "g" },
             { "name": "Susu Bubuk", "amount": 50, "unit": "g" },
             { "name": "Ragi", "amount": 14.28571429, "unit": "g" },
-            { "name": "softer", "amount": 2.571428571, "unit": "g" },
-            { "name": "telur utuh", "amount": 100, "unit": "g" },
+            { "name": "Softer", "amount": 2.571428571, "unit": "g" },
+            { "name": "Telur", "amount": 100, "unit": "g" },
             { "name": "Margarin", "amount": 75, "unit": "g" },
-            { "name": "bos", "amount": 75, "unit": "g" },
+            { "name": "Bos", "amount": 75, "unit": "g" },
             { "name": "Garam", "amount": 14.28571429, "unit": "g" },
             { "name": "Air", "amount": 171.42857145, "unit": "g" },
-            { "name": "es batu", "amount": 171.42857145, "unit": "g" }
+            { "name": "Es Batu", "amount": 171.42857145, "unit": "g" }
         ],
         steps: [
             "Campurkan semua bahan kering (tepung, premix, gula, susu, ragi, softer) dalam mangkuk mixer. Aduk rata.",

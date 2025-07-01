@@ -58,9 +58,28 @@ export const inventoryData: InventoryItem[] = [
     { id: "ing-44", name: "wijen putih", currentStock: 0, minimumStock: 0, unit: "g", department: "rotiManis" },
 
     // Donut Department
-    { id: "ing-45", name: "kacang tanah", currentStock: 0, minimumStock: 1000, unit: "g", department: "donut" },
-    { id: "ing-46", name: "cappucino filling", currentStock: 0, minimumStock: 500, unit: "g", department: "donut" },
-    { id: "ing-47", name: "dark coklat filling (bomboloni)", currentStock: 0, minimumStock: 500, unit: "g", department: "donut" },
-    { id: "ing-48", name: "greentea filling", currentStock: 0, minimumStock: 500, unit: "g", department: "donut" },
-    { id: "ing-49", name: "tiramisu filling", currentStock: 0, minimumStock: 500, unit: "g", department: "donut" }
+    { id: "ing-45", name: "Almond", currentStock: 0, minimumStock: 1000, unit: "g", department: "donut" },
+    { id: "ing-46", name: "Bos", currentStock: 0, minimumStock: 1000, unit: "g", department: "donut" },
+    { id: "ing-47", name: "Butter", currentStock: 0, minimumStock: 1000, unit: "g", department: "donut" },
+    { id: "ing-48", name: "Ceres", currentStock: 0, minimumStock: 1000, unit: "g", department: "donut" },
+    { id: "ing-49", name: "Compound Dark", currentStock: 0, minimumStock: 1000, unit: "g", department: "donut" },
+    { id: "ing-50", name: "Compound White", currentStock: 0, minimumStock: 1000, unit: "g", department: "donut" },
+    { id: "ing-51", name: "Crumble Oreo Coarsa", currentStock: 0, minimumStock: 1000, unit: "g", department: "donut" },
+    { id: "ing-52", name: "Dusting Sugar", currentStock: 0, minimumStock: 1000, unit: "g", department: "donut" },
+    { id: "ing-53", name: "Es Batu", currentStock: 0, minimumStock: 1000, unit: "g", department: "donut" },
+    { id: "ing-54", name: "Garam", currentStock: 0, minimumStock: 1000, unit: "g", department: "donut" },
+    { id: "ing-55", name: "Glaze Cappucino", currentStock: 0, minimumStock: 1000, unit: "g", department: "donut" },
+    { id: "ing-56", name: "Glaze Dark", currentStock: 0, minimumStock: 1000, unit: "g", department: "donut" },
+    { id: "ing-57", name: "Glaze Greentea", currentStock: 0, minimumStock: 1000, unit: "g", department: "donut" },
+    { id: "ing-58", name: "Glaze Tiramisu", currentStock: 0, minimumStock: 1000, unit: "g", department: "donut" },
+    { id: "ing-59", name: "Gula Pasir", currentStock: 0, minimumStock: 5000, unit: "g", department: "donut" },
+    { id: "ing-60", name: "Kacang Morin", currentStock: 0, minimumStock: 1000, unit: "g", department: "donut" },
+    { id: "ing-61", name: "Keju", currentStock: 0, minimumStock: 1000, unit: "g", department: "donut" },
+    { id: "ing-62", name: "Margarin", currentStock: 0, minimumStock: 4000, unit: "g", department: "donut" },
+    { id: "ing-63", name: "Premix", currentStock: 0, minimumStock: 5000, unit: "g", department: "donut" },
+    { id: "ing-64", name: "Ragi", currentStock: 0, minimumStock: 500, unit: "g", department: "donut" },
+    { id: "ing-65", name: "Softer", currentStock: 0, minimumStock: 500, unit: "g", department: "donut" },
+    { id: "ing-66", name: "Susu Bubuk", currentStock: 0, minimumStock: 2000, unit: "g", department: "donut" },
+    { id: "ing-67", name: "Telur", currentStock: 0, minimumStock: 1000, unit: "g", department: "donut" },
+    { id: "ing-68", name: "Tepung Gerbang", currentStock: 0, minimumStock: 10000, unit: "g", orderUnit: "sak", orderUnitConversion: 25000, department: "donut" }
 ];

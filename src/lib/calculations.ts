@@ -30,9 +30,11 @@ const findRecipe = (recipeName: string, allRecipes: Recipe[]): Recipe | null => 
 const getRecipeBaseWeight = (recipeName: string, allRecipes: Recipe[]): number => {
     const recipe = findRecipe(recipeName, allRecipes);
     if (!recipe) return 0;
+    // Use override if it exists and is valid
     if (recipe.baseWeight && recipe.baseWeight > 0) {
         return recipe.baseWeight;
     }
+    // Otherwise, calculate by summing ingredients
     return recipe.ingredients.reduce((sum, ing) => sum + ing.amount, 0);
 };
 
@@ -68,7 +70,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     };
     
     const totalRollProducts = ["abon piramid", "abon roll pedas", "cheese roll"];
-    const totalRoll = totalRollProducts.reduce((sum, p) => sum + (numInputs[p.toLowerCase()] || 0) / safeGetDivisor(p), 0);
+    const totalRoll = totalRollProducts.reduce((sum, p) => sum + (numInputs[p.toLowerCase()] || 0) / safeGetDivisor(p), 0) / 12;
     if (totalRoll > 0) productionCalculations.push(["Total Roll", `${totalRoll.toFixed(2)} loyang`]);
 
     const nonRotiProducts = new Set(["abon piramid", "abon roll pedas", "cheese roll", "donut paha ayam", "donut almond", "donut coklat ceres", "donut coklat kacang", "donut gula halus", "donut keju", "donut oreo", "7k bomboloni cappucino", "7k bomboloni dark coklat", "7k bomboloni greentea", "7k bomboloni tiramisu"]);
@@ -89,7 +91,9 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
 
     const getSausageAmountForProduct = (productName: string): number => {
         const productData = findProductData(productName, productIngredientsData);
-        return productData?.ingredients['sosis']?.amount || 0;
+        if (!productData || !productData.ingredients) return 0;
+        const sosisKey = Object.keys(productData.ingredients).find(k => k.toLowerCase() === 'sosis');
+        return sosisKey ? productData.ingredients[sosisKey].amount : 0;
     };
 
     const totalSosisPcs =

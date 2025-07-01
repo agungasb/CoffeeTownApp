@@ -37,7 +37,7 @@ async function fetchDataAndSeed() {
         
         // Seed Recipes
         initialRecipesData.forEach(recipe => {
-            const docRef = doc(collection(db, 'recipes'));
+            const docRef = doc(db, 'recipes', recipe.id);
             batch.set(docRef, recipe);
         });
 
@@ -47,7 +47,7 @@ async function fetchDataAndSeed() {
         
         // Seed Inventory
         initialInventoryData.forEach(item => {
-            const docRef = doc(collection(db, 'inventory'));
+            const docRef = doc(db, 'inventory', item.id);
             batch.set(docRef, item);
         });
 
@@ -65,13 +65,15 @@ async function fetchDataAndSeed() {
 
     // 2. Fetch all data for the application directly from Firestore.
     const recipesSnapshot = await getDocs(collection(db, 'recipes'));
-    const recipes: Recipe[] = recipesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Recipe));
+    const recipes: Recipe[] = recipesSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Recipe));
 
     const productsDoc = await getDoc(doc(db, 'appData', 'products'));
     let products: AllProductsData = productsDoc.exists() ? productsDoc.data().data : {};
 
     const inventorySnapshot = await getDocs(collection(db, 'inventory'));
-    let inventory: InventoryItem[] = inventorySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as InventoryItem));
+    // This mapping ensures the unique Firestore document ID is used, overwriting any 'id' field from the document data.
+    // This is the fix for the duplicate key error.
+    let inventory: InventoryItem[] = inventorySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as InventoryItem));
 
     // --- Data Migrations ---
     // This section ensures that data stored in Firestore is compatible with the latest code changes.

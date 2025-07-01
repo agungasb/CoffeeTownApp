@@ -386,7 +386,7 @@ export default function BakeryApp({
         </main>
         
         <footer className="fixed bottom-0 left-0 w-full p-1 text-center glassmorphic border-t border-foreground/30 text-primary-foreground font-medium text-xs">
-            © 2024 Coffee Town Bakery. All Rights Reserved. | Follow me <a href="https://twitter.com/Agung_styb" target="_blank" rel="noopener noreferrer" className="font-bold underline text-accent-foreground/80 hover:text-accent-foreground">@Agung_styb</a>
+            Released under the MIT License.
         </footer>
       </div>
       <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>

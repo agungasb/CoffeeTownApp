@@ -17,6 +17,7 @@ const OcrProductionMappingInputSchema = z.object({
     .describe(
       "A photo of a production sheet, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
+  productsToMap: z.array(z.string()).describe('A list of product names to look for in the image.'),
 });
 export type OcrProductionMappingInput = z.infer<typeof OcrProductionMappingInputSchema>;
 
@@ -35,27 +36,14 @@ const prompt = ai.definePrompt({
   // We are not specifying an output schema here, so the prompt will return a raw string.
   prompt: `You are an expert bakery production manager. You will extract the production quantities for various bakery items from a photo and map them to the corresponding product names.  The photo is provided as a data URI.
 
-  Here are the products:
-  - abon ayam pedas
-  - abon piramid
-  - abon roll pedas
-  - abon sosis
-  - cheese roll
-  - cream choco cheese
-  - donut paha ayam
-  - double coklat
-  - hot sosis
-  - kacang merah
-  - maxicana coklat
-  - red velvet cream cheese
-  - sosis label
-  - strawberry almond
-  - vanilla oreo
-  - abon taiwan
+  Here are the products you need to find quantities for:
+  {{#each productsToMap}}
+  - {{this}}
+  {{/each}}
 
-  Analyze the photo and extract the quantities for each product, mapping them to the correct product name.  If a product's quantity cannot be determined, set it to 0. 
+  Analyze the photo and extract the quantities for each product, mapping them to the correct product name. If a product's quantity cannot be determined, set it to 0. Only include the products from the list above in the output. Do not invent new products.
 
-  Your response must be ONLY a raw JSON object string. Do not wrap it in markdown backticks (\`\`\`json) or add any other explanatory text. The JSON object should have keys that are the product names and values that are the corresponding quantities as numbers. Only include these products in the output, do not invent new products.
+  Your response must be ONLY a raw JSON object string. Do not wrap it in markdown backticks (\`\`\`json) or add any other explanatory text. The JSON object should have keys that are the product names and values that are the corresponding quantities as numbers.
 
   Photo: {{media url=photoDataUri}}
   `,

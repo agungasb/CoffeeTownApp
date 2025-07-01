@@ -191,17 +191,21 @@ export async function resetDailyUsage() {
 
 
 // --- AI Actions ---
-export async function getQuantitiesFromImage(photoDataUri: string): Promise<{ data: OcrProductionMappingOutput | null; error: string | null; }> {
+export async function getQuantitiesFromImage(photoDataUri: string, productsToMap: string[]): Promise<{ data: OcrProductionMappingOutput | null; error: string | null; }> {
     const MAX_RETRIES = 3;
     let lastError: Error | null = null;
 
     if (!photoDataUri) {
         return { data: null, error: "Image data URI is missing." };
     }
+    
+    if (!productsToMap || productsToMap.length === 0) {
+        return { data: null, error: "No products provided for mapping." };
+    }
 
     for (let i = 0; i < MAX_RETRIES; i++) {
         try {
-            const result = await ocrProductionMapping({ photoDataUri });
+            const result = await ocrProductionMapping({ photoDataUri, productsToMap });
             return { data: result, error: null }; // Success
         } catch (error) {
             lastError = error instanceof Error ? error : new Error("An unknown error occurred.");

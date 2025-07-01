@@ -389,8 +389,8 @@ export default function BakeryApp({
             <div className="flex justify-center items-center gap-2">
                 <span>Created for BAKER</span>
                 <span className="mx-1">|</span>
-                <a href="https://x.com/Agung-styb" target="_blank" rel="noopener noreferrer" className="hover:underline">
-                    Follow me @Agung-styb
+                <a href="https://x.com/Agung_styb" target="_blank" rel="noopener noreferrer" className="hover:underline">
+                    Follow me @Agung_styb
                 </a>
             </div>
         </footer>

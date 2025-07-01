@@ -386,7 +386,13 @@ export default function BakeryApp({
         </main>
         
         <footer className="fixed bottom-0 left-0 w-full p-1 text-center glassmorphic border-t border-foreground/30 text-primary-foreground font-medium text-xs">
-            Released under the MIT License.
+            <div className="flex justify-center items-center gap-2">
+                <span>Released under the MIT License.</span>
+                <span className="mx-1">|</span>
+                <a href="https://x.com/yourhandle" target="_blank" rel="noopener noreferrer" className="hover:underline">
+                    Follow me on X
+                </a>
+            </div>
         </footer>
       </div>
       <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
@@ -403,5 +409,3 @@ export default function BakeryApp({
     </>
   );
 }
-
-    

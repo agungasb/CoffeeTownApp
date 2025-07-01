@@ -153,7 +153,7 @@ async function fetchDataAndSeed() {
 
 
     const dailyUsageSnapshot = await getDocs(query(collection(db, 'dailyUsage'), orderBy('date', 'desc')));
-    const dailyUsage: DailyUsageRecord[] = dailyUsageSnapshot.docs.map(doc => {
+    let dailyUsage: DailyUsageRecord[] = dailyUsageSnapshot.docs.map(doc => {
         const data = doc.data();
         return { 
             id: doc.id, 
@@ -186,13 +186,14 @@ async function fetchDataAndSeed() {
             console.log("Daily usage migration complete.");
             // Re-fetch data to reflect migration
             const migratedSnapshot = await getDocs(query(collection(db, 'dailyUsage'), orderBy('date', 'desc')));
-            dailyUsage.forEach((record, index) => {
-                 const migratedDoc = migratedSnapshot.docs.find(d => d.id === record.id);
-                 if (migratedDoc && migratedDoc.data().department) {
-                    dailyUsage[index].department = migratedDoc.data().department;
-                 } else if (!record.department) {
-                    dailyUsage[index].department = 'rotiManis';
-                 }
+            dailyUsage = migratedSnapshot.docs.map(doc => {
+                 const data = doc.data();
+                 return { 
+                    id: doc.id, 
+                    date: (data.date as Timestamp).toDate(),
+                    usage: data.usage,
+                    department: data.department
+                };
             });
         } else {
             // Set flag even if no migration was needed to prevent re-running this check.

@@ -229,7 +229,7 @@ export default function BakeryApp({
         
         <header className="fixed top-0 left-0 w-full p-2 md:p-4 z-20 glassmorphic flex justify-between items-center">
             <div>
-                 <h1 className="font-headline text-2xl md:text-3xl text-primary-foreground" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+                 <h1 className="font-headline text-2xl md:text-3xl text-foreground" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
                     Coffee Town Bakery
                 </h1>
                 <p className="hidden md:block text-sm text-foreground/90 italic" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
@@ -317,8 +317,8 @@ export default function BakeryApp({
                 </div>
             </div>
              <div className="flex items-center gap-2 px-4">
-                <Building className="h-5 w-5 text-primary-foreground" />
-                <Label htmlFor="department" className="text-primary-foreground font-semibold">Department:</Label>
+                <Building className="h-5 w-5 text-foreground" />
+                <Label htmlFor="department" className="text-foreground font-semibold">Department:</Label>
                 <Select onValueChange={(value: Department) => setActiveDepartment(value)} value={activeDepartment}>
                     <SelectTrigger id="department" className="w-[200px] bg-background/80">
                         <SelectValue placeholder="Select Department" />
@@ -386,7 +386,7 @@ export default function BakeryApp({
           </Tabs>
         </main>
         
-        <footer className="fixed bottom-0 left-0 w-full py-2 text-center glassmorphic border-t border-foreground/30 text-primary-foreground font-medium text-sm">
+        <footer className="fixed bottom-0 left-0 w-full py-3 text-center glassmorphic border-t border-foreground/30 text-foreground font-medium text-base">
             <div className="flex justify-center items-center gap-2">
                 <span>Created for BAKER Coffee Town</span>
                 <span className="mx-1">|</span>

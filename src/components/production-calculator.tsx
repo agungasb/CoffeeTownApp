@@ -5,6 +5,9 @@ import { useState, useTransition, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UploadCloud, Loader2, Calculator, ShoppingBasket, Save } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -42,6 +45,7 @@ export default function ProductionCalculator({ products, productList, recipes, i
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [results, setResults] = useState(initialMetrics);
   const [hasCalculated, setHasCalculated] = useState(false);
+  const [isCompactView, setIsCompactView] = useState(false);
 
   const productionSchema = createProductionSchema(productList);
 
@@ -147,6 +151,14 @@ export default function ProductionCalculator({ products, productList, recipes, i
           <div>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleCalculate)} className="space-y-4">
+                <div className="flex items-center justify-end gap-2 mb-2">
+                    <Label htmlFor="compact-view-switch" className="text-xs">Compact View</Label>
+                    <Switch
+                        id="compact-view-switch"
+                        checked={isCompactView}
+                        onCheckedChange={setIsCompactView}
+                    />
+                </div>
                 <div className="space-y-2">
                   {productList.map((item) => (
                     <FormField
@@ -154,8 +166,14 @@ export default function ProductionCalculator({ products, productList, recipes, i
                       control={form.control}
                       name={item as any}
                       render={({ field }) => (
-                        <FormItem className="flex justify-between items-center py-2 border-b border-border">
-                            <FormLabel className="flex-grow text-left text-foreground font-medium text-sm">
+                        <FormItem className={cn(
+                            "flex justify-between items-center border-b border-border/80",
+                            isCompactView ? "py-1" : "py-2"
+                        )}>
+                            <FormLabel className={cn(
+                              "flex-grow text-left text-foreground font-medium",
+                               isCompactView ? "text-xs" : "text-sm"
+                            )}>
                               {capitalize(item)}
                             </FormLabel>
                             <FormControl>
@@ -163,7 +181,10 @@ export default function ProductionCalculator({ products, productList, recipes, i
                                 type="number" 
                                 {...field} 
                                 placeholder="0"
-                                className="flex-none w-20 sm:w-24 text-center rounded-md py-1 px-2 h-auto"
+                                className={cn(
+                                    "flex-none text-center rounded-md px-2 h-auto",
+                                    isCompactView ? "w-20 py-0.5 text-sm" : "w-20 sm:w-24 py-1"
+                                )}
                                 onChange={e => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
                                 value={field.value === 0 ? '' : field.value}
                               />

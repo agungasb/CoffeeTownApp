@@ -118,12 +118,16 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
             productionCalculations.push(["Total Slongsong", `${totalSlongsong.toFixed(2)} trolley`]);
         }
 
-        // Total Sosis calculation (Dynamic)
+        // Total Sosis calculation
         let totalSosisPcs = 0;
-        for (const productName in numInputs) {
-            const quantity = numInputs[productName];
+        const sosisProducts = ["abon sosis", "hot sosis", "sosis label"];
+        
+        sosisProducts.forEach(productName => {
+            const lowerCaseProductName = productName.toLowerCase();
+            const quantity = numInputs[lowerCaseProductName] || 0;
+
             if (quantity > 0) {
-                const productData = findProductData(productName, productIngredientsData);
+                const productData = findProductData(lowerCaseProductName, productIngredientsData);
                 if (productData?.ingredients) {
                     const sosisKey = Object.keys(productData.ingredients).find(k => k.toLowerCase() === 'sosis');
                     if (sosisKey) {
@@ -132,7 +136,7 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
                     }
                 }
             }
-        }
+        });
 
         if (totalSosisPcs > 0) {
             const sosisInventoryItem = inventory.find(item => item.name.toLowerCase() === 'sosis');

@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -14,9 +14,11 @@ import { Edit, PlusCircle, ShieldAlert, Trash2, Archive, CookingPot } from "luci
 import { ProductForm } from './product-form';
 import { capitalize } from '@/lib/utils';
 import type { Recipe } from '@/lib/recipes';
+import { productDepartments } from '@/lib/products';
 
 interface ProductManagerProps {
     products: AllProductsData;
+    department: 'rotiManis' | 'donut';
     recipes: Recipe[];
     updateProducts: (products: AllProductsData) => Promise<void>;
     isLoggedIn: boolean;
@@ -32,7 +34,7 @@ type ProductFormData = {
     calculation?: { divisor?: number | '', unit?: string, multiplier?: number | '' } 
 };
 
-export default function ProductManager({ products, recipes, updateProducts, isLoggedIn }: ProductManagerProps) {
+export default function ProductManager({ products, department, recipes, updateProducts, isLoggedIn }: ProductManagerProps) {
     const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
     const [productToEdit, setProductToEdit] = useState<{ 
         name: string; 
@@ -40,7 +42,18 @@ export default function ProductManager({ products, recipes, updateProducts, isLo
         ingredients: { name: string; amount: number; unit: string }[];
         calculation?: { divisor?: number; unit?: string; multiplier?: number; }
     } | null>(null);
-    const productCount = Object.keys(products).length;
+
+    const departmentProducts = useMemo(() => {
+        const departmentProductSet = new Set(productDepartments[department]);
+        return Object.entries(products)
+          .filter(([name]) => departmentProductSet.has(name))
+          .reduce((acc, [name, productData]) => {
+            acc[name] = productData;
+            return acc;
+          }, {} as AllProductsData);
+    }, [products, department]);
+
+    const productCount = Object.keys(departmentProducts).length;
 
     const handleAddClick = () => {
         setProductToEdit(null);
@@ -138,7 +151,7 @@ export default function ProductManager({ products, recipes, updateProducts, isLo
                     </Alert>
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {Object.entries(products).sort(([a], [b]) => a.localeCompare(b)).map(([productName, productData]) => (
+                    {Object.entries(departmentProducts).sort(([a], [b]) => a.localeCompare(b)).map(([productName, productData]) => (
                         <Card key={productName} className="flex flex-col bg-background/70">
                             <CardHeader>
                                 <CardTitle className="text-lg">{capitalize(productName)}</CardTitle>

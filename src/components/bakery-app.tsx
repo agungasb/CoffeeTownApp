@@ -163,10 +163,7 @@ export default function BakeryApp({
     };
     
     const updateProductsHandler = async (newProducts: AllProductsData) => {
-        // The newProducts object from the form is the complete, new state.
-        // Set it directly to avoid stale state issues.
         setProducts(newProducts);
-        // Pass the correct new state to the server action.
         await actions.updateProducts(newProducts);
         toast({ title: 'Success', description: 'Product list updated.' });
         router.refresh();
@@ -342,7 +339,8 @@ export default function BakeryApp({
             </TabsContent>
             <TabsContent value="product_management">
               <ProductManager 
-                products={filteredProducts}
+                products={products}
+                department={activeDepartment}
                 recipes={recipes}
                 updateProducts={updateProductsHandler}
                 isLoggedIn={isLoggedIn} 

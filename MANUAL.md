@@ -80,17 +80,17 @@ Tab ini berfungsi untuk menghitung ulang bahan-bahan dalam sebuah resep jika And
 
 Di sini Anda dapat melihat, menambah, mengedit, dan menghapus semua resep dasar (seperti adonan). **Anda harus login untuk melakukan perubahan.**
 
-- **Melihat Detail**: Klik **View Details** pada kartu resep untuk melihat bahan dan langkah-langkahnya.
+- **Melihat Detail**: Klik **View Details** pada resep untuk melihat bahan dan langkah-langkahnya.
 - **Menambah Resep Baru**:
     1. Klik **Add New Recipe**.
     2. Isi nama resep, bahan-bahan, dan langkah-langkah pada form yang muncul.
     3. Klik **Save Recipe**.
 - **Mengedit Resep**:
-    1. Klik **Edit** pada kartu resep yang ingin diubah.
+    1. Klik **Edit** pada resep yang ingin diubah.
     2. Ubah data pada form yang muncul.
     3. Klik **Save Recipe**.
 - **Menghapus Resep**:
-    1. Klik **Delete** pada kartu resep yang ingin dihapus.
+    1. Klik **Delete** pada resep yang ingin dihapus.
     2. Konfirmasi penghapusan. **Tindakan ini tidak bisa dibatalkan.**
 
 ---
@@ -99,7 +99,7 @@ Di sini Anda dapat melihat, menambah, mengedit, dan menghapus semua resep dasar 
 
 Di sini Anda mengelola daftar produk jadi yang dijual. Setiap produk terhubung dengan resep adonan dasar dan bahan-bahan tambahan (topping, filling). **Anda harus login untuk melakukan perubahan.**
 
-- **Melihat Detail**: Klik **View Details** pada kartu produk untuk melihat bahan tambahannya.
+- **Melihat Detail**: Klik **View Details** pada produk untuk melihat bahan tambahannya.
 - **Menambah Produk Baru**:
     1. Klik **Add New Product**.
     2. Isi nama produk.

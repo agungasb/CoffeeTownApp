@@ -118,18 +118,21 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
             productionCalculations.push(["Total Slongsong", `${totalSlongsong.toFixed(2)} trolley`]);
         }
 
-        // Total Sosis calculation
-        const getSausageAmountForProduct = (productName: string): number => {
-            const productData = findProductData(productName, productIngredientsData);
-            if (!productData || !productData.ingredients) return 0;
-            const sosisKey = Object.keys(productData.ingredients).find(k => k.toLowerCase() === 'sosis');
-            return sosisKey ? productData.ingredients[sosisKey].amount : 0;
-        };
-
-        const totalSosisPcs =
-            (numInputs['abon sosis'] || 0) * getSausageAmountForProduct('abon sosis') +
-            (numInputs['hot sosis'] || 0) * getSausageAmountForProduct('hot sosis') +
-            (numInputs['sosis label'] || 0) * getSausageAmountForProduct('sosis label');
+        // Total Sosis calculation (Dynamic)
+        let totalSosisPcs = 0;
+        for (const productName in numInputs) {
+            const quantity = numInputs[productName];
+            if (quantity > 0) {
+                const productData = findProductData(productName, productIngredientsData);
+                if (productData?.ingredients) {
+                    const sosisKey = Object.keys(productData.ingredients).find(k => k.toLowerCase() === 'sosis');
+                    if (sosisKey) {
+                        const amountPerProduct = productData.ingredients[sosisKey].amount;
+                        totalSosisPcs += quantity * amountPerProduct;
+                    }
+                }
+            }
+        }
 
         if (totalSosisPcs > 0) {
             const sosisInventoryItem = inventory.find(item => item.name.toLowerCase() === 'sosis');

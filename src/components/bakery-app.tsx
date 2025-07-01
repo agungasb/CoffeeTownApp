@@ -373,7 +373,7 @@ export default function BakeryApp({
                     addInventoryItem={addInventoryItemHandler}
                     updateInventoryItem={updateInventoryItemHandler}
                     deleteInventoryItem={deleteInventoryItemHandler}
-                    dailyUsageRecords={dailyUsage}
+                    dailyUsageRecords={filteredDailyUsage}
                     resetDailyUsage={resetDailyUsageHandler}
                     isLoggedIn={isLoggedIn}
                     department={activeDepartment}

@@ -36,15 +36,11 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
     
     const [averageUsageToday, setAverageUsageToday] = useState<{name: string, amount: number, unit: string}[]>([]);
 
-    const departmentUsageRecords = useMemo(() => {
-        return dailyUsageRecords.filter(r => r.department === department);
-    }, [dailyUsageRecords, department]);
-
     useEffect(() => {
         // Only run on client after mount
         const today = new Date().getDay();
-        setAverageUsageToday(calculateAverageDailyUsage(departmentUsageRecords, today));
-    }, [departmentUsageRecords]);
+        setAverageUsageToday(calculateAverageDailyUsage(dailyUsageRecords, today));
+    }, [dailyUsageRecords]);
     
     const handleAddClick = () => {
         setItemToEdit(null);
@@ -208,7 +204,7 @@ export default function InventoryManager({ inventory, addInventoryItem, updateIn
                     {dailyUsageRecords.length > 0 ? (
                         <OrderCalculator 
                             inventory={inventory}
-                            dailyUsageRecords={departmentUsageRecords}
+                            dailyUsageRecords={dailyUsageRecords}
                         />
                     ) : (
                         <Alert className="mt-4 bg-muted/30 border-border/50">

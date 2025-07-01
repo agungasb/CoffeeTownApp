@@ -71,12 +71,43 @@ async function fetchDataAndSeed() {
     let products: AllProductsData = productsDoc.exists() ? productsDoc.data().data : {};
 
     const inventorySnapshot = await getDocs(collection(db, 'inventory'));
-    // This mapping ensures the unique Firestore document ID is used, overwriting any 'id' field from the document data.
-    // This is the fix for the duplicate key error.
     let inventory: InventoryItem[] = inventorySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as InventoryItem));
 
     // --- Data Migrations ---
-    // This section ensures that data stored in Firestore is compatible with the latest code changes.
+
+    // Migration to add Donut Department inventory items if they are missing.
+    const donutInventoryMigrationFlagRef = doc(db, 'appData', 'donutInventoryMigrationFlag_v2');
+    const donutInventoryMigrationFlagDoc = await getDoc(donutInventoryMigrationFlagRef);
+
+    if (!donutInventoryMigrationFlagDoc.exists()) {
+        console.log("Performing one-time data migration for donut inventory items...");
+        
+        const existingItemIds = new Set(inventory.map(item => item.id));
+        const donutItemsToAdd = initialInventoryData.filter(item => 
+            item.department === 'donut' && !existingItemIds.has(item.id)
+        );
+
+        if (donutItemsToAdd.length > 0) {
+            const migrationBatch = writeBatch(db);
+            donutItemsToAdd.forEach(item => {
+                const docRef = doc(db, 'inventory', item.id);
+                migrationBatch.set(docRef, item);
+            });
+            
+            migrationBatch.set(donutInventoryMigrationFlagRef, { isMigrated: true, migratedAt: Timestamp.now() });
+            
+            await migrationBatch.commit();
+            console.log(`Successfully migrated ${donutItemsToAdd.length} new donut inventory items.`);
+            
+            // Re-fetch inventory data to include the new items for the current render.
+            const newInventorySnapshot = await getDocs(collection(db, 'inventory'));
+            inventory = newInventorySnapshot.docs.map(docSnapshot => ({ ...docSnapshot.data(), id: docSnapshot.id } as InventoryItem));
+        } else {
+            console.log("No new donut inventory items to migrate. Setting flag to prevent future checks.");
+            await setDoc(donutInventoryMigrationFlagRef, { isMigrated: true, migratedAt: Timestamp.now() });
+        }
+    }
+
 
     // Migration for inventory items missing a 'department'.
     const inventoryMigrationBatch = writeBatch(db);

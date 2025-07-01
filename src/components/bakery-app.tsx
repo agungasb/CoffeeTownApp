@@ -388,7 +388,7 @@ export default function BakeryApp({
         
         <footer className="fixed bottom-0 left-0 w-full p-1 text-center glassmorphic border-t border-foreground/30 text-primary-foreground font-medium text-xs">
             <div className="flex justify-center items-center gap-2">
-                <span>Created for BAKER</span>
+                <span>Created for BAKER Coffee Town</span>
                 <span className="mx-1">|</span>
                 <a href="https://x.com/Agung_styb" target="_blank" rel="noopener noreferrer" className="hover:underline">
                     Follow me @Agung_styb

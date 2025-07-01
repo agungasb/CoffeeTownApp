@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm, useFieldArray } from 'react-hook-form';
@@ -75,11 +76,14 @@ export function ProductForm({ productToEdit, recipes, onSubmit, onCancel }: Prod
     const form = useForm<ProductFormData>({
         resolver: zodResolver(productFormSchema),
         defaultValues: productToEdit ? {
-            ...productToEdit,
             name: productToEdit.name,
             baseRecipes: productToEdit.baseRecipes ?? [],
-            calculation: productToEdit.calculation ?? { divisor: '', unit: '', multiplier: '' },
             ingredients: productToEdit.ingredients ?? [],
+            calculation: {
+                divisor: productToEdit.calculation?.divisor ?? '',
+                unit: productToEdit.calculation?.unit ?? '',
+                multiplier: productToEdit.calculation?.multiplier ?? ''
+            },
         } : {
             name: '',
             baseRecipes: [],

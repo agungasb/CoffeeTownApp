@@ -91,7 +91,7 @@
   }
 
   .nav-button:hover, .nav-button.active {
-    @apply bg-accent scale-105 ring-2 ring-accent/50 ring-offset-2 ring-offset-background;
+    @apply bg-accent scale-105 ring-4 ring-yellow-400/50 ring-offset-2 ring-offset-background;
   }
 }
 

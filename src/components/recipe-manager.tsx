@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { PlusCircle, Edit, Trash2, ShieldAlert, BookHeart, Weight } from 'lucide-react';
-import { RecipeForm } from './recipe-form';
+import { RecipeForm, type RecipeFormData } from './recipe-form';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
@@ -47,15 +47,21 @@ export default function RecipeManager({ recipes, addRecipe, updateRecipe, delete
         await deleteRecipe(recipeId);
     };
 
-    const handleFormSubmit = async (data: Recipe) => {
+    const handleFormSubmit = async (data: RecipeFormData) => {
         setIsFormDialogOpen(false);
-        if (recipeToEdit && data.id) {
-            await updateRecipe(data);
+        setRecipeToEdit(null);
+
+        const cleanedData = {
+            ...data,
+            baseWeight: data.baseWeight === '' ? undefined : data.baseWeight,
+        };
+
+        if (recipeToEdit && cleanedData.id) {
+            await updateRecipe(cleanedData as Recipe);
         } else {
-            const { id, ...recipeData } = data;
+            const { id, ...recipeData } = cleanedData;
             await addRecipe(recipeData);
         }
-        setRecipeToEdit(null);
     };
 
     return (

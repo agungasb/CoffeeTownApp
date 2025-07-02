@@ -17,17 +17,20 @@ const recipeFormSchema = z.object({
     baseWeight: z.coerce.number().positive("Base weight must be a positive number.").optional().or(z.literal('')),
     ingredients: z.array(z.object({
         name: z.string().min(1, "Name is required."),
-        amount: z.coerce.number({ invalid_type_error: "Amount is required." }).positive("Amount must be positive."),
+        amount: z.preprocess(
+            (val) => (String(val).trim() === '' ? NaN : Number(val)),
+            z.number({ invalid_type_error: "Amount must be a number." }).positive("Amount must be a positive number.")
+        ),
         unit: z.string().min(1, "Unit is required."),
     })).min(1, "A recipe must have at least one ingredient."),
     steps: z.array(z.string().min(3, "Step must be at least 3 characters long.")).min(1, "A recipe must have at least one step."),
 });
 
-type RecipeFormData = z.infer<typeof recipeFormSchema>;
+export type RecipeFormData = z.infer<typeof recipeFormSchema>;
 
 interface RecipeFormProps {
     recipeToEdit?: Recipe | null;
-    onSubmit: (data: Recipe) => void;
+    onSubmit: (data: RecipeFormData) => void;
     onCancel: () => void;
 }
 
@@ -57,11 +60,7 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
 
 
     const handleSubmit = (data: RecipeFormData) => {
-        const finalData = {
-            ...data,
-            baseWeight: data.baseWeight === '' ? undefined : data.baseWeight,
-        };
-        onSubmit(finalData as unknown as Recipe);
+        onSubmit(data);
     };
 
     return (

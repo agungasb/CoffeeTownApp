@@ -17,13 +17,7 @@ const recipeFormSchema = z.object({
     baseWeight: z.coerce.number().positive("Base weight must be a positive number.").optional().or(z.literal('')),
     ingredients: z.array(z.object({
         name: z.string().min(1, "Name is required."),
-        amount: z.preprocess(
-            (val) => (val === "" ? undefined : val), // Treat empty string as undefined so required_error is triggered
-            z.coerce.number({
-                required_error: "Amount is required.",
-                invalid_type_error: "Amount must be a number."
-            }).positive({ message: "Amount must be a positive number." })
-        ),
+        amount: z.coerce.number({invalid_type_error: "Amount is required."}).gt(0, { message: "Amount must be greater than 0." }),
         unit: z.string().min(1, "Unit is required."),
     })).min(1, "A recipe must have at least one ingredient."),
     steps: z.array(z.string().min(3, "Step must be at least 3 characters long.")).min(1, "A recipe must have at least one step."),
@@ -40,6 +34,7 @@ interface RecipeFormProps {
 export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps) {
     const form = useForm<RecipeFormData>({
         resolver: zodResolver(recipeFormSchema),
+        mode: 'onBlur',
         defaultValues: recipeToEdit ? {
             ...recipeToEdit,
             baseWeight: recipeToEdit.baseWeight ?? '',

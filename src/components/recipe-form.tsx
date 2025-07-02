@@ -17,10 +17,13 @@ const recipeFormSchema = z.object({
     baseWeight: z.coerce.number().positive("Base weight must be a positive number.").optional().or(z.literal('')),
     ingredients: z.array(z.object({
         name: z.string().min(1, "Name is required."),
-        amount: z.coerce.number({
-            required_error: "Amount is required.",
-            invalid_type_error: "Amount must be a number."
-        }).positive({ message: "Amount must be a positive number." }),
+        amount: z.preprocess(
+            (val) => (val === "" ? undefined : val), // Treat empty string as undefined so required_error is triggered
+            z.coerce.number({
+                required_error: "Amount is required.",
+                invalid_type_error: "Amount must be a number."
+            }).positive({ message: "Amount must be a positive number." })
+        ),
         unit: z.string().min(1, "Unit is required."),
     })).min(1, "A recipe must have at least one ingredient."),
     steps: z.array(z.string().min(3, "Step must be at least 3 characters long.")).min(1, "A recipe must have at least one step."),
@@ -43,7 +46,7 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
         } : {
             name: '',
             baseWeight: '',
-            ingredients: [{ name: '', amount: '', unit: 'g' }],
+            ingredients: [{ name: '', amount: '' as any, unit: 'g' }],
             steps: [''],
         },
     });
@@ -123,7 +126,7 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
                                             <FormItem>
                                                 <FormLabel>Amount</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" step="0.01" placeholder="e.g. 100" {...field} className="md:w-24"/>
+                                                    <Input type="number" step="0.01" placeholder="e.g. 100" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -147,7 +150,6 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
                                         variant="destructive"
                                         size="icon"
                                         onClick={() => removeIngredient(index)}
-                                        disabled={ingredientFields.length <= 1}
                                         className="justify-self-end md:justify-self-auto"
                                     >
                                         <Trash2 />
@@ -158,7 +160,7 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
                         <Button
                             type="button"
                             variant="outline"
-                            onClick={() => appendIngredient({ name: '', amount: '', unit: 'g' })}
+                            onClick={() => appendIngredient({ name: '', amount: '' as any, unit: 'g' })}
                             className="mt-2"
                         >
                             <PlusCircle className="mr-2" /> Add Ingredient
@@ -188,7 +190,6 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
                                         variant="destructive"
                                         size="icon"
                                         onClick={() => removeStep(index)}
-                                        disabled={stepFields.length <= 1}
                                         className="shrink-0 mt-1"
                                     >
                                         <Trash2 />

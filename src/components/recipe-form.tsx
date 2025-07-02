@@ -17,10 +17,10 @@ const recipeFormSchema = z.object({
     baseWeight: z.coerce.number().positive("Base weight must be a positive number.").optional().or(z.literal('')),
     ingredients: z.array(z.object({
         name: z.string().min(1, "Name is required."),
-        amount: z.preprocess(
-            (val) => (String(val).trim() === '' ? NaN : Number(val)),
-            z.number({ invalid_type_error: "Amount must be a number." }).positive("Amount must be a positive number.")
-        ),
+        amount: z.coerce.number({
+            required_error: "Amount is required.",
+            invalid_type_error: "Amount must be a number."
+        }).positive({ message: "Amount must be a positive number." }),
         unit: z.string().min(1, "Unit is required."),
     })).min(1, "A recipe must have at least one ingredient."),
     steps: z.array(z.string().min(3, "Step must be at least 3 characters long.")).min(1, "A recipe must have at least one step."),
@@ -43,7 +43,7 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
         } : {
             name: '',
             baseWeight: '',
-            ingredients: [{ name: '', amount: '' as any, unit: '' }],
+            ingredients: [{ name: '', amount: '', unit: 'g' }],
             steps: [''],
         },
     });
@@ -158,7 +158,7 @@ export function RecipeForm({ recipeToEdit, onSubmit, onCancel }: RecipeFormProps
                         <Button
                             type="button"
                             variant="outline"
-                            onClick={() => appendIngredient({ name: '', amount: '' as any, unit: '' })}
+                            onClick={() => appendIngredient({ name: '', amount: '', unit: 'g' })}
                             className="mt-2"
                         >
                             <PlusCircle className="mr-2" /> Add Ingredient

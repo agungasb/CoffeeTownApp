@@ -229,7 +229,7 @@ export const productIngredientsData: AllProductsData = {
         ingredients: { "Glaze Tiramisu": { amount: 20, unit: "g" } },
         calculation: { divisor: 15, unit: 'loyang' }
     },
-    // Roti Sobek Department (Placeholder)
+    // Roti Sobek Department
     "Roti Sobek Coklat": {
         baseRecipes: [{ recipeName: "Adonan Roti Sobek", weight: 50 }],
         ingredients: { "Filling Coklat Sobek": { amount: 20, unit: "g" } },
@@ -275,4 +275,55 @@ export const productIngredientsData: AllProductsData = {
         ingredients: { "Filling Cream Cheese Sobek": { amount: 20, unit: "g" } },
         calculation: { divisor: 10, unit: 'loyang' }
     },
+    // Bolu Department
+    "Banana Choco": {
+        baseRecipes: [{ recipeName: "Adonan Bolu", weight: 60 }],
+        ingredients: { "Pisang Ambon": { amount: 20, unit: "g" }, "Ceres": { amount: 10, unit: "g"} },
+        calculation: { divisor: 1, unit: 'pcs' }
+    },
+    "Banana Pandan Cheese": {
+        baseRecipes: [{ recipeName: "Adonan Bolu", weight: 60 }],
+        ingredients: { "Pisang Ambon": { amount: 20, unit: "g" }, "Pasta Pandan": { amount: 2, unit: "g" }, "Keju Bolu": { amount: 10, unit: "g" } },
+        calculation: { divisor: 1, unit: 'pcs' }
+    },
+    "Bolu Gulung Blueberry": {
+        baseRecipes: [{ recipeName: "Adonan Bolu", weight: 500 }],
+        ingredients: { "Selai Blueberry": { amount: 150, unit: "g" } },
+        calculation: { divisor: 1, unit: 'pcs' }
+    },
+    "Bolu Gulung Keju": {
+        baseRecipes: [{ recipeName: "Adonan Bolu", weight: 500 }],
+        ingredients: { "Keju Bolu": { amount: 100, unit: "g" }, "Butter": { amount: 50, unit: "g"} },
+        calculation: { divisor: 1, unit: 'pcs' }
+    },
+    "Brownies": {
+        baseRecipes: [{ recipeName: "Adonan Bolu", weight: 400 }],
+        ingredients: { "Coklat Bubuk": { amount: 50, unit: "g" }, "Compound Dark": { amount: 100, unit: "g"} },
+        calculation: { divisor: 1, unit: 'pcs' }
+    },
+    "Chiffon Mocha": {
+        baseRecipes: [{ recipeName: "Adonan Bolu", weight: 450 }],
+        ingredients: { "Pasta Moka": { amount: 10, unit: "g" } },
+        calculation: { divisor: 1, unit: 'pcs' }
+    },
+    "Chiffon Pandan": {
+        baseRecipes: [{ recipeName: "Adonan Bolu", weight: 450 }],
+        ingredients: { "Pasta Pandan": { amount: 10, unit: "g" } },
+        calculation: { divisor: 1, unit: 'pcs' }
+    },
+    "Muffin Coklat": {
+        baseRecipes: [{ recipeName: "Adonan Bolu", weight: 70 }],
+        ingredients: { "Coklat Bubuk": { amount: 10, unit: "g" }, "Ceres": { amount: 5, unit: "g"} },
+        calculation: { divisor: 1, unit: 'pcs' }
+    },
+    "Muffin Vanilla": {
+        baseRecipes: [{ recipeName: "Adonan Bolu", weight: 70 }],
+        ingredients: { },
+        calculation: { divisor: 1, unit: 'pcs' }
+    },
+    "Bolu Coklat": {
+        baseRecipes: [{ recipeName: "Adonan Bolu", weight: 400 }],
+        ingredients: { "Coklat Bubuk": { amount: 40, unit: "g" } },
+        calculation: { divisor: 1, unit: 'pcs' }
+    }
 };

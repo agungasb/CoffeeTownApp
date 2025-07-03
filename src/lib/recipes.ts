@@ -275,5 +275,21 @@ export const recipes: Recipe[] = [
             "Istirahatkan adonan, lalu bagi dan isi sesuai varian.",
             "Proofing hingga mengembang, lalu panggang."
         ]
+    },
+    {
+        id: "adonan_bolu",
+        name: "Adonan Bolu",
+        ingredients: [
+            { "name": "Tepung Bolu", "amount": 1000, "unit": "g" },
+            { "name": "Gula Bolu", "amount": 800, "unit": "g" },
+            { "name": "Telur Bolu", "amount": 800, "unit": "g" },
+            { "name": "SP/Ovalet", "amount": 30, "unit": "g" }
+        ],
+        steps: [
+            "Kocok telur, gula, dan SP hingga kental berjejak.",
+            "Masukkan tepung, aduk balik dengan spatula.",
+            "Panggang hingga matang."
+        ],
+        baseWeight: 2630
     }
 ];

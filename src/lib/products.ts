@@ -40,11 +40,24 @@ export const productDepartments = {
         "Roti Sobek Vanilla",
         "Roti Balok Choco Mocha",
         "Roti Balok Cream Cheese"
+    ],
+    bolu: [
+        "Banana Choco",
+        "Banana Pandan Cheese",
+        "Bolu Gulung Blueberry",
+        "Bolu Gulung Keju",
+        "Brownies",
+        "Chiffon Mocha",
+        "Chiffon Pandan",
+        "Muffin Coklat",
+        "Muffin Vanilla",
+        "Bolu Coklat"
     ]
 };
 
 export const allProductItems = [
     ...productDepartments.rotiManis,
     ...productDepartments.donut,
-    ...productDepartments.rotiSobek
+    ...productDepartments.rotiSobek,
+    ...productDepartments.bolu
 ];

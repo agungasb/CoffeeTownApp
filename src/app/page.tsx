@@ -164,6 +164,61 @@ async function fetchDataAndSeed() {
         inventory = newInventorySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as InventoryItem));
     }
 
+    // Migration for Bolu department data
+    const boluMigrationFlagRef = doc(db, 'appData', 'boluDepartmentMigrationFlag_v1');
+    const boluMigrationFlagDoc = await getDoc(boluMigrationFlagRef);
+
+    if (!boluMigrationFlagDoc.exists()) {
+        console.log("Performing one-time data migration for Bolu department...");
+        const migrationBatch = writeBatch(db);
+
+        // 1. Add Bolu inventory
+        const existingInventoryIds = new Set(inventory.map(item => item.id));
+        const boluInventoryToAdd = initialInventoryData.filter(item => 
+            item.department === 'bolu' && !existingInventoryIds.has(item.id)
+        );
+        boluInventoryToAdd.forEach(item => {
+            const docRef = doc(db, 'inventory', item.id);
+            migrationBatch.set(docRef, item);
+        });
+
+        // 2. Add Bolu recipe
+        const existingRecipeIds = new Set(recipes.map(r => r.id));
+        const boluRecipeToAdd = initialRecipesData.find(r => r.id === 'adonan_bolu');
+        if (boluRecipeToAdd && !existingRecipeIds.has(boluRecipeToAdd.id)) {
+            const docRef = doc(db, 'recipes', boluRecipeToAdd.id);
+            migrationBatch.set(docRef, boluRecipeToAdd);
+        }
+
+        // 3. Add Bolu products
+        const boluProductsToAdd: { [key: string]: any } = {};
+        const boluProductNames = productDepartments.bolu;
+        boluProductNames.forEach(productName => {
+            if (!products[productName]) {
+                boluProductsToAdd[productName] = initialProductData[productName];
+            }
+        });
+        if (Object.keys(boluProductsToAdd).length > 0) {
+            const productsDocRef = doc(db, 'appData', 'products');
+            migrationBatch.set(productsDocRef, { data: { ...products, ...boluProductsToAdd } }, { merge: true });
+        }
+        
+        // 4. Set migration flag and commit
+        migrationBatch.set(boluMigrationFlagRef, { isMigrated: true, migratedAt: Timestamp.now() });
+        await migrationBatch.commit();
+        console.log("Bolu department data migration complete.");
+
+        // Re-fetch all data to reflect the migration for the current render
+        const newRecipesSnapshot = await getDocs(collection(db, 'recipes'));
+        recipes = newRecipesSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Recipe));
+
+        const newProductsDoc = await getDoc(doc(db, 'appData', 'products'));
+        products = newProductsDoc.exists() ? newProductsDoc.data().data : {};
+
+        const newInventorySnapshot = await getDocs(collection(db, 'inventory'));
+        inventory = newInventorySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as InventoryItem));
+    }
+
 
     // Migration for inventory items missing a 'department'.
     const inventoryMigrationBatch = writeBatch(db);

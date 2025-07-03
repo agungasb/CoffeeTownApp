@@ -17,14 +17,14 @@ const ingredientFormSchema = z.object({
     unit: z.string().min(1, "Unit is required (e.g., g, pcs, ml)."),
     orderUnit: z.string().optional(),
     orderUnitConversion: z.coerce.number().positive("Conversion must be a positive number").optional().or(z.literal('')),
-    department: z.enum(['rotiManis', 'donut', 'rotiSobek'])
+    department: z.enum(['rotiManis', 'donut', 'rotiSobek', 'bolu'])
 });
 
 export type IngredientFormData = Omit<InventoryItem, 'id'> & { id?: string };
 
 interface IngredientFormProps {
     ingredientToEdit?: InventoryItem | null;
-    department: 'rotiManis' | 'donut' | 'rotiSobek';
+    department: 'rotiManis' | 'donut' | 'rotiSobek' | 'bolu';
     onSubmit: (data: IngredientFormData) => void;
     onCancel: () => void;
 }

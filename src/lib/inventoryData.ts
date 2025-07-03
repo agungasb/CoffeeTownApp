@@ -7,7 +7,7 @@ export interface InventoryItem {
     unit: string;
     orderUnit?: string;
     orderUnitConversion?: number;
-    department: 'rotiManis' | 'donut' | 'rotiSobek';
+    department: 'rotiManis' | 'donut' | 'rotiSobek' | 'bolu';
 }
 
 export const inventoryData: InventoryItem[] = [
@@ -83,7 +83,7 @@ export const inventoryData: InventoryItem[] = [
     { id: "ing-67", name: "Telur", currentStock: 0, minimumStock: 1000, unit: "g", department: "donut" },
     { id: "ing-68", name: "Tepung Gerbang", currentStock: 0, minimumStock: 10000, unit: "g", orderUnit: "sak", orderUnitConversion: 25000, department: "donut" },
 
-    // Roti Sobek Department (Placeholder)
+    // Roti Sobek Department
     { id: "ing-69", name: "Tepung Roti Sobek", currentStock: 10000, minimumStock: 5000, unit: "g", orderUnit: "sak", orderUnitConversion: 25000, department: "rotiSobek" },
     { id: "ing-70", name: "Gula Roti Sobek", currentStock: 5000, minimumStock: 2000, unit: "g", department: "rotiSobek" },
     { id: "ing-71", name: "Susu Bubuk Sobek", currentStock: 2000, minimumStock: 1000, unit: "g", department: "rotiSobek" },
@@ -97,5 +97,17 @@ export const inventoryData: InventoryItem[] = [
     { id: "ing-79", name: "Filling Vanilla", currentStock: 1000, minimumStock: 500, unit: "g", department: "rotiSobek" },
     { id: "ing-80", name: "Filling Choco Mocha", currentStock: 1000, minimumStock: 500, unit: "g", department: "rotiSobek" },
     { id: "ing-81", name: "Filling Cream Cheese Sobek", currentStock: 1000, minimumStock: 500, unit: "g", department: "rotiSobek" },
-    { id: "ing-82", name: "Pewarna Pandan", currentStock: 100, minimumStock: 50, unit: "ml", department: "rotiSobek" }
+    { id: "ing-82", name: "Pewarna Pandan", currentStock: 100, minimumStock: 50, unit: "ml", department: "rotiSobek" },
+
+    // Bolu Department
+    { id: "ing-bolu-1", name: "Tepung Bolu", currentStock: 10000, minimumStock: 5000, unit: "g", department: "bolu" },
+    { id: "ing-bolu-2", name: "Gula Bolu", currentStock: 10000, minimumStock: 5000, unit: "g", department: "bolu" },
+    { id: "ing-bolu-3", name: "Telur Bolu", currentStock: 2000, minimumStock: 1000, unit: "g", department: "bolu" },
+    { id: "ing-bolu-4", name: "SP/Ovalet", currentStock: 500, minimumStock: 200, unit: "g", department: "bolu" },
+    { id: "ing-bolu-5", name: "Pisang Ambon", currentStock: 2000, minimumStock: 1000, unit: "g", department: "bolu" },
+    { id: "ing-bolu-6", name: "Coklat Bubuk", currentStock: 1000, minimumStock: 500, unit: "g", department: "bolu" },
+    { id: "ing-bolu-7", name: "Selai Blueberry", currentStock: 1000, minimumStock: 500, unit: "g", department: "bolu" },
+    { id: "ing-bolu-8", name: "Keju Bolu", currentStock: 1000, minimumStock: 500, unit: "g", department: "bolu" },
+    { id: "ing-bolu-9", name: "Pasta Moka", currentStock: 500, minimumStock: 200, unit: "g", department: "bolu" },
+    { id: "ing-bolu-10", name: "Pasta Pandan", currentStock: 500, minimumStock: 200, unit: "g", department: "bolu" }
 ];

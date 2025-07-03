@@ -43,7 +43,7 @@ export type DailyUsageIngredient = {
   unit: string;
 };
 
-export type Department = 'rotiManis' | 'donut' | 'rotiSobek';
+export type Department = 'rotiManis' | 'donut' | 'rotiSobek' | 'bolu';
 
 export type DailyUsageRecord = {
   id: string;
@@ -327,6 +327,7 @@ export default function BakeryApp({
                         <SelectItem value="rotiManis">Department Roti Manis</SelectItem>
                         <SelectItem value="donut">Department Donut</SelectItem>
                         <SelectItem value="rotiSobek">Department Roti Sobek</SelectItem>
+                        <SelectItem value="bolu">Department Bolu</SelectItem>
                     </SelectContent>
                 </Select>
             </div>

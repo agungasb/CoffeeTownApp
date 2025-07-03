@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getFirestore, type Firestore } from "firebase/firestore";
+import { getAnalytics, isSupported, type Analytics } from "firebase/analytics";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,6 +13,7 @@ const firebaseConfig = {
 
 let app: FirebaseApp | null = null;
 let db: Firestore | null = null;
+let analytics: Analytics | null = null;
 
 // Only initialize if the config is valid.
 // This prevents the app from crashing at module load time.
@@ -19,10 +21,18 @@ if (firebaseConfig.apiKey && firebaseConfig.projectId) {
     try {
         app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
         db = getFirestore(app);
+        // Initialize Analytics only in the browser where it's supported
+        if (typeof window !== 'undefined') {
+            isSupported().then(supported => {
+                if (supported) {
+                    analytics = getAnalytics(app!);
+                }
+            });
+        }
     } catch (e) {
         console.error("Failed to initialize Firebase", e);
-        // db and app will remain null
+        // db, app, and analytics will remain null
     }
 }
 
-export { db, app };
+export { db, app, analytics };

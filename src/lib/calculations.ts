@@ -82,17 +82,6 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
         ) / 12;
         if (totalRoll > 0) productionCalculations.push(["Total Roll", `${totalRoll.toFixed(2)} loyang`]);
 
-        // Total Roti calculation
-        const rotiProductsForSum = [
-            "abon ayam pedas", "abon piramid", "abon roll pedas", "cheese roll", "donut paha ayam", "abon sosis", 
-            "cream choco cheese", "double coklat", "hot sosis", "kacang merah", "maxicana coklat", 
-            "red velvet cream cheese", "sosis label", "strawberry almond", "vanilla oreo", "abon taiwan"
-        ];
-        const totalRotiPcs = rotiProductsForSum.reduce((sum, p) => {
-            return sum + (numInputs[p.toLowerCase()] || 0);
-        }, 0);
-        if (totalRotiPcs > 0) productionCalculations.push(["Total Roti", `${totalRotiPcs.toFixed(0)} pcs`]);
-        
         // Total Slongsong calculation
         const slongsongProducts = ["abon ayam pedas", "cream choco cheese", "double coklat", "hot sosis", "strawberry almond"];
         const totalSlongsongTrays = slongsongProducts.reduce((sum, p) => {
@@ -175,6 +164,11 @@ export function calculateProductionMetrics(inputs: ProductionInputs, productIngr
     const totalLoyang = Object.keys(numInputs).reduce((sum, p) => sum + ((numInputs[p.toLowerCase()] || 0) / safeGetDivisor(p)), 0);
     if (totalLoyang > 0) productionCalculations.push(["Total Loyang", `${totalLoyang.toFixed(2)} loyang`]);
     
+    // Total Roti calculation (sum of all inputs for the current department)
+    const totalRotiPcs = Object.values(numInputs).reduce((sum, quantity) => sum + quantity, 0);
+    if (totalRotiPcs > 0) {
+        productionCalculations.push(["Total Roti", `${totalRotiPcs.toFixed(0)} pcs`]);
+    }
     
     // --- Recipe Calculations ---
 

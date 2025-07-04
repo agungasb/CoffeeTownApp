@@ -14,7 +14,10 @@ import { Textarea } from './ui/textarea';
 const recipeFormSchema = z.object({
     id: z.string().optional(),
     name: z.string().min(3, "Recipe name must be at least 3 characters."),
-    baseWeight: z.coerce.number().positive("Base weight must be a positive number.").optional().or(z.literal('')),
+    baseWeight: z.preprocess(
+        (val) => (val === "" ? undefined : val),
+        z.coerce.number({ invalid_type_error: "Base weight must be a number." }).positive("Base weight must be a positive number.").optional()
+    ),
     ingredients: z.array(z.object({
         name: z.string().min(1, "Name is required."),
         amount: z.coerce.number({invalid_type_error: "Amount is required."}).positive({ message: "Amount must be a positive number." }),

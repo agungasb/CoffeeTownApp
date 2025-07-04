@@ -80,45 +80,52 @@ export default function ProductManager({ products, department, recipes, updatePr
     const handleFormSubmit = async (data: ProductFormData) => {
         const newProducts = { ...products };
         
-        const newIngredients: Record<string, IngredientData> = {};
-        if (data.ingredients) {
-            data.ingredients.forEach(ing => {
-                if(ing.name && ing.amount && ing.unit) { // ensure ingredient is not empty
-                    newIngredients[ing.name.toLowerCase()] = { amount: ing.amount, unit: ing.unit };
-                }
-            });
-        }
+        // Zod validation runs before this, so we can trust the data structure.
+        // We convert the ingredients array to the required Record format.
+        const newIngredients = data.ingredients.reduce((acc, ing) => {
+            acc[ing.name.toLowerCase()] = { amount: ing.amount, unit: ing.unit };
+            return acc;
+        }, {} as Record<string, IngredientData>);
 
         const newProductData: ProductData = {
             ingredients: newIngredients
         };
 
+        // Filter out any empty/unselected base recipe fields and map to the correct format.
         if (data.baseRecipes) {
             newProductData.baseRecipes = data.baseRecipes
-                .filter(br => br.recipeName && br.recipeName !== 'none' && (br.weight || br.weight === 0))
+                .filter(br => br.recipeName && br.recipeName !== 'none' && br.weight) // Schema ensures weight is a positive number
                 .map(br => ({
                     recipeName: br.recipeName!,
-                    weight: Number(br.weight)
+                    weight: br.weight as number // Already coerced to a number by Zod
                 }));
+            
             if (newProductData.baseRecipes.length === 0) {
-                delete newProductData.baseRecipes;
+                delete newProductData.baseRecipes; // Clean up if no valid base recipes were provided
             }
         }
         
+        // Clean up calculation data, removing empty fields.
         if (data.calculation && (data.calculation.divisor || data.calculation.unit || data.calculation.multiplier)) {
-            newProductData.calculation = {
+            const calculation: ProductData['calculation'] = {
                 divisor: data.calculation.divisor ? Number(data.calculation.divisor) : undefined,
                 unit: data.calculation.unit || undefined,
                 multiplier: data.calculation.multiplier ? Number(data.calculation.multiplier) : undefined
             };
-            if (!newProductData.calculation.divisor) delete newProductData.calculation.divisor;
-            if (!newProductData.calculation.unit) delete newProductData.calculation.unit;
-            if (!newProductData.calculation.multiplier) delete newProductData.calculation.multiplier;
-            if (Object.keys(newProductData.calculation).length === 0) {
-                delete newProductData.calculation;
+            
+            // Remove properties that are undefined to keep the object clean
+            Object.keys(calculation).forEach(key => {
+                if (calculation[key as keyof typeof calculation] === undefined) {
+                    delete calculation[key as keyof typeof calculation];
+                }
+            });
+            
+            if (Object.keys(calculation).length > 0) {
+                newProductData.calculation = calculation;
             }
         }
 
+        // If the product name was changed, remove the old entry before adding the new one.
         if (productToEdit && productToEdit.name.toLowerCase() !== data.name.toLowerCase()) {
             delete newProducts[productToEdit.name];
         }
@@ -130,6 +137,7 @@ export default function ProductManager({ products, department, recipes, updatePr
         setIsFormDialogOpen(false);
         setProductToEdit(null);
     };
+
 
     return (
         <Card className="w-full max-w-6xl mx-auto glassmorphic">

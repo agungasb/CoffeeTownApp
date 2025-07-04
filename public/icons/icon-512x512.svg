@@ -1,48 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <defs>
-    <path id="circlePath" d="M 256, 256 m -180, 0 a 180,180 0 1,1 360,0 a 180,180 0 1,1 -360,0" fill="none"/>
-    <path id="circlePathReverse" d="M 256, 256 m 180, 0 a 180,180 0 1,0 -360,0 a 180,180 0 1,0 360,0" fill="none"/>
-  </defs>
-  
-  <circle cx="256" cy="256" r="256" fill="#5a463a"/>
-  <circle cx="256" cy="256" r="240" fill="#5a463a"/>
-  <circle cx="256" cy="256" r="225" fill="none" stroke="#FFFFFF" stroke-width="8"/>
-  <circle cx="256" cy="256" r="205" fill="none" stroke="#5a463a" stroke-width="1"/>
-  <circle cx="256" cy="256" r="200" fill="#f3e9d8"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    <!-- Background: Dark Chocolate -->
+    <circle cx="256" cy="256" r="256" fill="#4E342E"/>
 
-  <!-- Simplified building representation -->
-  <g fill="#8c7b70" stroke="#7a6a60" stroke-width="1">
-    <path d="M160 210 L 160 320 L 220 320 L 220 230 L 210 230 L 210 220 Z"/>
-    <path d="M225 240 L 225 320 L 285 320 L 285 250 Z"/>
-    <path d="M290 220 L 290 320 L 350 320 L 350 210 Z"/>
-    <rect x="170" y="240" width="15" height="15" fill="#f3e9d8"/>
-    <rect x="195" y="240" width="15" height="15" fill="#f3e9d8"/>
-    <rect x="235" y="260" width="15" height="15" fill="#f3e9d8"/>
-    <rect x="260" y="260" width="15" height="15" fill="#f3e9d8"/>
-    <rect x="300" y="230" width="15" height="15" fill="#f3e9d8"/>
-    <rect x="325" y="230" width="15" height="15" fill="#f3e9d8"/>
-    <path d="M 160 210 Q 190 190, 220 220" fill="none" stroke-width="2"/>
-    <path d="M 290 220 Q 320 200, 350 210" fill="none" stroke-width="2"/>
-  </g>
-
-  <g font-family="Georgia, serif" font-weight="bold" fill="#FFFFFF" letter-spacing="8">
-    <text font-size="48">
-      <textPath href="#circlePath" startOffset="50%" text-anchor="middle">COFFEE TOWN</textPath>
-    </text>
-    <text font-size="48">
-      <textPath href="#circlePathReverse" startOffset="50%" text-anchor="middle">BAKERY</textPath>
-    </text>
-  </g>
-  
-  <!-- Coffee Bean Left -->
-  <g transform="translate(80 256) rotate(-30)">
-    <ellipse cx="0" cy="0" rx="20" ry="12" fill="#3d2b1f"/>
-    <path d="M -15 -3 C -5 -5, 5 5, 15 3" stroke="#f3e9d8" stroke-width="2" fill="none"/>
-  </g>
-  
-  <!-- Coffee Bean Right -->
-  <g transform="translate(432 256) rotate(30)">
-    <ellipse cx="0" cy="0" rx="20" ry="12" fill="#3d2b1f"/>
-    <path d="M -15 3 C -5 5, 5 -5, 15 -3" stroke="#f3e9d8" stroke-width="2" fill="none"/>
-  </g>
+    <!-- Coffee Cup with Black stroke -->
+    <g transform="translate(0, 20)">
+        <!-- Cup Body -->
+        <path fill="#FFFFFF" stroke="#000000" stroke-width="8" d="M388.2,148.2H123.8c-15.5,0-28.1,12.6-28.1,28.1v131.2c0,15.5,12.6,28.1,28.1,28.1h264.4c15.5,0,28.1-12.6,28.1-28.1V176.3C416.3,160.8,403.7,148.2,388.2,148.2z"/>
+        <!-- Cup Handle -->
+        <path fill="#FFFFFF" stroke="#000000" stroke-width="8" d="M416.3,209.1c-15.5,0-28.1,12.6-28.1,28.1s12.6,28.1,28.1,28.1h28.1v-56.2H416.3z"/>
+    </g>
+    
+    <!-- Steam in Green -->
+    <g fill="#2E7D32">
+        <path d="M225.5,108.4c-4.4,0-8,3.6-8,8v32.5c0,4.4,3.6,8,8,8s8-3.6,8-8v-32.5C233.5,112,229.9,108.4,225.5,108.4z"/>
+        <path d="M281.7,108.4c-4.4,0-8,3.6-8,8v32.5c0,4.4,3.6,8,8,8s8-3.6,8-8v-32.5C289.7,112,286.1,108.4,281.7,108.4z"/>
+        <path d="M337.9,108.4c-4.4,0-8,3.6-8,8v32.5c0,4.4,3.6,8,8,8s8-3.6,8-8v-32.5C345.9,112,342.3,108.4,337.9,108.4z"/>
+    </g>
+    
+    <!-- Text: COFFEE TOWN Bakery -->
+    <text x="256" y="80" font-family="'Poppins', sans-serif" font-size="48" font-weight="bold" fill="white" text-anchor="middle" letter-spacing="2">COFFEE TOWN</text>
+    <text x="256" y="460" font-family="'Pacifico', cursive" font-size="52" fill="#2E7D32" text-anchor="middle" stroke="white" stroke-width="2">Bakery</text>
 </svg>

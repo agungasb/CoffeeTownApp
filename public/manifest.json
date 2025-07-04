@@ -1,29 +1,17 @@
 {
-    "name": "Coffee Town Bakery",
-    "short_name": "Bakery App",
-    "description": "Intelligent tools for bakery production calculation and recipe scaling.",
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#252010",
-    "theme_color": "#5a463a",
-    "icons": [
-        {
-            "src": "/icons/icon-192.svg",
-            "sizes": "192x192",
-            "type": "image/svg+xml",
-            "purpose": "any"
-        },
-        {
-            "src": "/icons/icon-512.svg",
-            "sizes": "512x512",
-            "type": "image/svg+xml",
-            "purpose": "any"
-        },
-        {
-            "src": "/icons/icon-512.svg",
-            "sizes": "512x512",
-            "type": "image/svg+xml",
-            "purpose": "maskable"
-        }
-    ]
+  "name": "Coffee Town Bakery",
+  "short_name": "Bakery App",
+  "description": "Intelligent tools for bakery production calculation and recipe scaling.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#3D2B1F",
+  "theme_color": "#3D2B1F",
+  "icons": [
+    {
+      "src": "/icons/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }

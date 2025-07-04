@@ -1,13 +1,12 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="512" height="512" fill="#FFFFFF"/>
-  <g transform="translate(128, 120) scale(1.5)">
-      <path d="M40 160 C 80 180, 160 180, 200 160" stroke="#3D2B1F" stroke-width="8" fill="none"/>
-      <path d="M60 80 C 40 100, 40 140, 60 160 L 180 160 C 200 140, 200 100, 180 80 Z" fill="#F5F5F5" stroke="#3D2B1F" stroke-width="8"/>
-      <path d="M180 100 C 210 100, 210 140, 180 140" stroke="#3D2B1F" stroke-width="8" fill="none"/>
-      <path d="M90 70 Q 100 50, 110 70" stroke="#3D2B1F" stroke-width="6" fill="none" stroke-linecap="round"/>
-      <path d="M120 70 Q 130 50, 140 70" stroke="#3D2B1F" stroke-width="6" fill="none" stroke-linecap="round"/>
-      <path d="M150 70 Q 160 50, 170 70" stroke="#3D2B1F" stroke-width="6" fill="none" stroke-linecap="round"/>
-  </g>
-  <text x="256" y="380" text-anchor="middle" font-family="Georgia, serif" font-size="42" fill="#000000" font-weight="bold">COFFEE TOWN</text>
-  <text x="256" y="435" text-anchor="middle" font-family="Georgia, serif" font-size="32" fill="#006400" font-style="italic">Bakery</text>
+    <circle cx="256" cy="256" r="256" fill="#3A6345"/>
+    <path d="M149.333 341.333C176 357.333 221.333 365.333 312 341.333L320 354.667C224 386.667 152 376 130.667 354.667L149.333 341.333Z" fill="#C6BBAF"/>
+    <path d="M133.333 242.667C130.667 272 136 309.333 160 330.667H312C338.667 306.667 344 269.333 338.667 240L133.333 242.667Z" fill="white"/>
+    <path d="M338.667 240C344 269.333 338.667 306.667 312 330.667H160C136 309.333 130.667 272 133.333 242.667M338.667 240H133.333M338.667 240C357.333 248 368 269.333 368 288C368 312 352 328 333.333 330.667" stroke="#694F41" stroke-width="8"/>
+    <path d="M141.333 245.333C165.333 266.667 245.333 274.667 328 248C320 232 242.667 226.667 149.333 248L141.333 245.333Z" fill="#4A332D"/>
+    <path d="M224 173.333C226.667 189.333 224 202.667 226.667 216" stroke="white" stroke-width="6.66667" stroke-linecap="round"/>
+    <path d="M256 173.333C258.667 189.333 256 202.667 258.667 216" stroke="white" stroke-width="6.66667" stroke-linecap="round"/>
+    <path d="M288 173.333C290.667 189.333 288 202.667 290.667 216" stroke="white" stroke-width="6.66667" stroke-linecap="round"/>
+    <text fill="#F5F3EF" xml:space="preserve" style="white-space: pre" font-family="Georgia, serif" font-size="48" font-weight="bold" letter-spacing="0em"><tspan x="90" y="420">COFFEE TOWN</tspan></text>
+    <text fill="#D2C4A8" xml:space="preserve" style="white-space: pre" font-family="'Brush Script MT', cursive" font-size="32" letter-spacing="0em"><tspan x="200" y="465">Bakery</tspan></text>
 </svg>

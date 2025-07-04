@@ -80,8 +80,7 @@ export default function ProductManager({ products, department, recipes, updatePr
     const handleFormSubmit = async (data: ProductFormData) => {
         const newProducts = { ...products };
         
-        // Zod validation runs before this, so we can trust the data structure.
-        // We convert the ingredients array to the required Record format.
+        // Convert the ingredients array to the required Record format.
         const newIngredients = data.ingredients.reduce((acc, ing) => {
             acc[ing.name.toLowerCase()] = { amount: ing.amount, unit: ing.unit };
             return acc;
@@ -94,10 +93,10 @@ export default function ProductManager({ products, department, recipes, updatePr
         // Filter out any empty/unselected base recipe fields and map to the correct format.
         if (data.baseRecipes) {
             newProductData.baseRecipes = data.baseRecipes
-                .filter(br => br.recipeName && br.recipeName !== 'none' && br.weight) // Schema ensures weight is a positive number
+                .filter(br => br.recipeName && br.recipeName !== 'none' && (typeof br.weight === 'number' && br.weight > 0))
                 .map(br => ({
                     recipeName: br.recipeName!,
-                    weight: br.weight as number // Already coerced to a number by Zod
+                    weight: br.weight as number
                 }));
             
             if (newProductData.baseRecipes.length === 0) {
@@ -107,18 +106,10 @@ export default function ProductManager({ products, department, recipes, updatePr
         
         // Clean up calculation data, removing empty fields.
         if (data.calculation && (data.calculation.divisor || data.calculation.unit || data.calculation.multiplier)) {
-            const calculation: ProductData['calculation'] = {
-                divisor: data.calculation.divisor ? Number(data.calculation.divisor) : undefined,
-                unit: data.calculation.unit || undefined,
-                multiplier: data.calculation.multiplier ? Number(data.calculation.multiplier) : undefined
-            };
-            
-            // Remove properties that are undefined to keep the object clean
-            Object.keys(calculation).forEach(key => {
-                if (calculation[key as keyof typeof calculation] === undefined) {
-                    delete calculation[key as keyof typeof calculation];
-                }
-            });
+            const calculation: ProductData['calculation'] = {};
+            if (data.calculation.divisor) calculation.divisor = Number(data.calculation.divisor);
+            if (data.calculation.unit) calculation.unit = data.calculation.unit;
+            if (data.calculation.multiplier) calculation.multiplier = Number(data.calculation.multiplier);
             
             if (Object.keys(calculation).length > 0) {
                 newProductData.calculation = calculation;

@@ -77,7 +77,7 @@ export default function ProductionCalculator({ products, productList, recipes, i
       if (photoDataUri) {
         startTransition(async () => {
           toast({ title: "Processing...", description: "AI is analyzing your image." });
-          const { data, error } = await getQuantitiesFromImage(photoDataUri, productList);
+          const { data, error } = await getQuantitiesFromImage(photoDataUri, productList, department);
           if (error) {
             toast({ variant: "destructive", title: "OCR Failed", description: error });
           } else if (data) {

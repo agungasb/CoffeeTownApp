@@ -18,6 +18,7 @@ const OcrProductionMappingInputSchema = z.object({
       "A photo of a production sheet, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
   productsToMap: z.array(z.string()).describe('A list of product names to look for in the image.'),
+  department: z.enum(['rotiManis', 'donut', 'rotiSobek', 'bolu']).describe('The active department, which determines parsing rules.')
 });
 export type OcrProductionMappingInput = z.infer<typeof OcrProductionMappingInputSchema>;
 
@@ -40,8 +41,14 @@ const prompt = ai.definePrompt({
   {{#each productsToMap}}
   - {{this}}
   {{/each}}
+  
+  **IMPORTANT RULES BASED ON DEPARTMENT:**
+  The current department is: **{{department}}**.
 
-  Analyze the photo and extract the quantities for each product, mapping them to the correct product name. If a product's quantity cannot be determined, set it to 0. Only include the products from the list above in the output. Do not invent new products.
+  - **If the department is 'rotiSobek'**: You MUST find the table titled "FORM PENGIRIMAN ROTI KEMASAN". For each product ("NAMA ROTI") in the provided list, you MUST extract the quantity from the "ORDER ADMIN" column in that specific table.
+  - **For all other departments ('rotiManis', 'donut', 'bolu')**: Analyze the entire image. For each product in the list, find its corresponding row and extract the most relevant production quantity. This is typically in a column named 'ORDER', 'KITCHEN', 'TOTAL SG', or the first primary quantity column next to the product name.
+
+  After applying the correct rule, map the quantities to the product names. If a product's quantity cannot be determined, set its value to 0. Your output must only include products from the provided list.
 
   Your response must be ONLY a raw JSON object string. Do not wrap it in markdown backticks (\`\`\`json) or add any other explanatory text. The JSON object should have keys that are the product names and values that are the corresponding quantities as numbers.
 

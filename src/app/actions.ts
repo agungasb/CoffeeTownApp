@@ -191,7 +191,7 @@ export async function resetDailyUsage() {
 
 
 // --- AI Actions ---
-export async function getQuantitiesFromImage(photoDataUri: string, productsToMap: string[]): Promise<{ data: OcrProductionMappingOutput | null; error: string | null; }> {
+export async function getQuantitiesFromImage(photoDataUri: string, productsToMap: string[], department: Department): Promise<{ data: OcrProductionMappingOutput | null; error: string | null; }> {
     const MAX_RETRIES = 3;
     let lastError: Error | null = null;
 
@@ -205,7 +205,7 @@ export async function getQuantitiesFromImage(photoDataUri: string, productsToMap
 
     for (let i = 0; i < MAX_RETRIES; i++) {
         try {
-            const result = await ocrProductionMapping({ photoDataUri, productsToMap });
+            const result = await ocrProductionMapping({ photoDataUri, productsToMap, department });
             return { data: result, error: null }; // Success
         } catch (error) {
             lastError = error instanceof Error ? error : new Error("An unknown error occurred.");

@@ -1,89 +1,89 @@
-# BakeWise Application - Calculation Formulas
+# Aplikasi BakeWise - Rumus Perhitungan
 
-This document outlines the key formulas and logic used for calculations throughout the BakeWise application.
+Dokumen ini menguraikan rumus dan logika utama yang digunakan untuk perhitungan di seluruh aplikasi BakeWise.
 
-## 1. Production Calculator Tab
+## 1. Tab Kalkulator Produksi
 
-### 1.1. Calculation Results
+### 1.1. Hasil Perhitungan
 
-The "Calculation Results" section displays various metrics based on the production quantities you enter.
+Bagian "Hasil Perhitungan" menampilkan berbagai metrik berdasarkan jumlah produksi yang Anda masukkan.
 
-#### **Product-Specific Metrics (e.g., Total Loyang)**
+#### **Metrik Spesifik Produk (misalnya, Total Loyang)**
 
-For products that have a defined `calculation` object (managed in the "Product Management" tab), a specific metric is calculated.
+Untuk produk yang memiliki objek `calculation` yang ditentukan (dikelola di tab "Manajemen Produk"), metrik spesifik dihitung.
 
-- **Formula:** `(Product Quantity / Divisor) * Multiplier`
-- **Example:** If "Abon Sosis" has a `divisor` of 15 and a `unit` of 'loyang', and you enter a quantity of 30, the result will be `(30 / 15) = 2 loyang`.
+- **Rumus:** `(Jumlah Produk / Pembagi) * Pengali`
+- **Contoh:** Jika "Abon Sosis" memiliki `divisor` 15 dan `unit` 'loyang', dan Anda memasukkan jumlah 30, hasilnya akan menjadi `(30 / 15) = 2 loyang`.
 
 ---
 
 #### **Total Roti**
 
-This is the simplest metric, representing the total number of individual items to be produced for the selected department.
+Ini adalah metrik paling sederhana, yang mewakili jumlah total item individual yang akan diproduksi untuk departemen yang dipilih.
 
-- **Formula:** `SUM(All Product Quantities Entered)`
-- **Example:** If you enter 30 "Abon Sosis" and 20 "Cheese Roll", Total Roti will be `30 + 20 = 50 pcs`.
+- **Rumus:** `JUMLAH(Semua Jumlah Produk yang Dimasukkan)`
+- **Contoh:** Jika Anda memasukkan 30 "Abon Sosis" dan 20 "Cheese Roll", Total Roti akan menjadi `30 + 20 = 50 pcs`.
 
 ---
 
 #### **Total Loyang**
 
-This metric aggregates the "loyang" calculation from all relevant products.
+Metrik ini mengakumulasi perhitungan "loyang" dari semua produk yang relevan.
 
-- **Formula:** `SUM(Individual Product Loyang Calculations)`
-- **Example:** If "Abon Sosis" results in `2 loyang` and "Hot Sosis" results in `1 loyang`, the Total Loyang will be `3 loyang`.
-
----
-
-#### **Base Recipe Requirements (e.g., Adonan Roti Manis)**
-
-The app calculates how many batches of a base recipe are needed.
-
-1.  **Calculate Total Dough Needed:** For each product linked to the recipe, it multiplies the `Product Quantity` by the `Dough Weight` defined in that product's settings. It then sums these values.
-    - `Total Dough Needed = SUM(Product Quantity * Dough Weight per Product)`
-2.  **Calculate Recipe Multiplier:** It divides the `Total Dough Needed` by the `Base Weight` of the recipe itself. (The recipe's `Base Weight` is either a manual override or the sum of its own ingredients).
-    - **Formula:** `Recipes Needed = Total Dough Needed / Recipe Base Weight`
+- **Rumus:** `JUMLAH(Perhitungan Loyang Produk Individual)`
+- **Contoh:** Jika "Abon Sosis" menghasilkan `2 loyang` dan "Hot Sosis" menghasilkan `1 loyang`, Total Loyang akan menjadi `3 loyang`.
 
 ---
 
-### 1.2. Ingredient Summary
+#### **Kebutuhan Resep Dasar (misalnya, Adonan Roti Manis)**
 
-This section shows the total amount of every single ingredient required for the entire production run.
+Aplikasi menghitung berapa banyak takaran resep dasar yang dibutuhkan.
 
-- **Formula:** The summary is an aggregation of ingredients from two sources:
-    1.  **From Base Recipes:** For each required base recipe, the app takes the `Recipes Needed` multiplier (calculated above) and multiplies it by the amount of each ingredient within that recipe.
-    2.  **From Products (Additional Ingredients):** For each product you are making, the app takes the `Product Quantity` you entered and multiplies it by the amount of each "additional ingredient" listed for that product.
-
-All identical ingredients (e.g., "Tepung" from three different recipes) are then summed up into a single total.
-
----
-
-## 2. Recipe Scaler Tab
-
-This calculation is straightforward.
-
-- **Formula:** `Scaled Amount = Original Ingredient Amount * Multiplier`
-- **Example:** If a recipe calls for 100g of flour and you enter a multiplier of `1.5`, the scaled amount will be `100 * 1.5 = 150g`.
+1.  **Hitung Total Adonan yang Dibutuhkan:** Untuk setiap produk yang ditautkan ke resep, aplikasi mengalikan `Jumlah Produk` dengan `Berat Adonan` yang ditentukan dalam pengaturan produk tersebut. Kemudian nilai-nilai ini dijumlahkan.
+    - `Total Adonan yang Dibutuhkan = JUMLAH(Jumlah Produk * Berat Adonan per Produk)`
+2.  **Hitung Pengali Resep:** Aplikasi membagi `Total Adonan yang Dibutuhkan` dengan `Berat Dasar` dari resep itu sendiri. ( `Berat Dasar` resep bisa berupa nilai manual atau jumlah dari bahan-bahannya sendiri).
+    - **Rumus:** `Resep yang Dibutuhkan = Total Adonan yang Dibutuhkan / Berat Dasar Resep`
 
 ---
 
-## 3. Inventory Management Tab (Order CUK)
+### 1.2. Ringkasan Bahan
 
-The "Order CUK" (Order Recommendation Calculator) uses historical data to forecast needs.
+Bagian ini menunjukkan jumlah total setiap bahan yang diperlukan untuk seluruh proses produksi.
 
-### 3.1. Average Daily Usage
+- **Rumus:** Ringkasan ini adalah agregasi bahan dari dua sumber:
+    1.  **Dari Resep Dasar:** Untuk setiap resep dasar yang diperlukan, aplikasi mengambil pengali `Resep yang Dibutuhkan` (dihitung di atas) dan mengalikannya dengan jumlah setiap bahan dalam resep tersebut.
+    2.  **Dari Produk (Bahan Tambahan):** Untuk setiap produk yang Anda buat, aplikasi mengambil `Jumlah Produk` yang Anda masukkan dan mengalikannya dengan jumlah setiap "bahan tambahan" yang terdaftar untuk produk tersebut.
 
-This is calculated for the specific day of the week you select for the forecast (e.g., Monday).
+Semua bahan yang identik (misalnya, "Tepung" dari tiga resep berbeda) kemudian dijumlahkan menjadi satu total.
 
-- **Logic:** The app finds the **last 4 saved usage records** for that specific day of the week (e.g., the last 4 Mondays). It then calculates the average amount used for each ingredient across those days.
-- **Formula:** `Average Usage = SUM(Ingredient Amount from last 4 relevant days) / 4` (or divided by the number of records found, if less than 4).
+---
 
-### 3.2. Recommended Order Amount
+## 2. Tab Skala Resep
 
-This formula determines how much of an ingredient you need to order to meet the forecast and replenish your stock to its minimum safe level.
+Perhitungan ini sederhana.
 
-- **Formula:** `Amount to Order = (Minimum Stock + Average Daily Usage for Forecast Day) - Current Stock`
+- **Rumus:** `Jumlah Skala = Jumlah Bahan Asli * Pengali`
+- **Contoh:** Jika resep membutuhkan 100g tepung dan Anda memasukkan pengali `1.5`, jumlah skala akan menjadi `100 * 1.5 = 150g`.
 
-- **Notes:**
-    - If the result is zero or negative, it means you have enough stock, and no recommendation is shown for that item.
-    - If an ingredient has an "Order Unit" defined (e.g., ordering a "sak" of 25,000g), the final recommendation is converted to that larger unit for convenience.
+---
+
+## 3. Tab Manajemen Inventaris (Order CUK)
+
+"Order CUK" (Kalkulator Rekomendasi Pesanan) menggunakan data historis untuk memprediksi kebutuhan.
+
+### 3.1. Rata-rata Penggunaan Harian
+
+Ini dihitung untuk hari tertentu dalam seminggu yang Anda pilih untuk prakiraan (misalnya, Senin).
+
+- **Logika:** Aplikasi menemukan **4 catatan penggunaan terakhir yang tersimpan** untuk hari tertentu dalam seminggu tersebut (misalnya, 4 hari Senin terakhir). Kemudian menghitung jumlah rata-rata yang digunakan untuk setiap bahan selama hari-hari tersebut.
+- **Rumus:** `Rata-rata Penggunaan = JUMLAH(Jumlah Bahan dari 4 hari relevan terakhir) / 4` (atau dibagi dengan jumlah catatan yang ditemukan, jika kurang dari 4).
+
+### 3.2. Jumlah Pesanan yang Direkomendasikan
+
+Rumus ini menentukan berapa banyak bahan yang perlu Anda pesan untuk memenuhi prakiraan dan mengisi kembali stok Anda ke tingkat aman minimum.
+
+- **Rumus:** `Jumlah yang Harus Dipesan = (Stok Minimum + Rata-rata Penggunaan Harian untuk Hari Prakiraan) - Stok Saat Ini`
+
+- **Catatan:**
+    - Jika hasilnya nol atau negatif, itu berarti Anda memiliki cukup stok, dan tidak ada rekomendasi yang ditampilkan untuk item tersebut.
+    - Jika suatu bahan memiliki "Unit Pesanan" yang ditentukan (misalnya, memesan "sak" seberat 25.000g), rekomendasi akhir diubah ke unit yang lebih besar tersebut untuk kemudahan.
